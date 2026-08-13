@@ -2,7 +2,7 @@ import { clientState, clearSelection } from '../logic/state.js';
 import { moveCardToZone, attachCardToTarget, drawTopCard } from '../logic/engine.js';
 import { isPileZone } from '../../utils.js';
 import { domIdToStateZone, renderEntireBoard } from './render.js';
-import { openPileBrowser } from './pileBrowser.js';
+import { openPileBrowser, refreshPileBrowser } from './pileBrowser.js';
 import { openCardView } from './cardZoom.js';
 
 function handleBoardClick(e) {
@@ -24,6 +24,7 @@ function handleBoardClick(e) {
 
             clearSelection();
             renderEntireBoard();
+            refreshPileBrowser();
             return;
         }
     }
@@ -39,6 +40,7 @@ function handleBoardClick(e) {
             moveCardToZone(clientState.selectedInstanceId, clientState.selectedZone, targetZone);
             clearSelection();
             renderEntireBoard();
+            refreshPileBrowser();
             return;
         }
 
@@ -65,6 +67,7 @@ function handleBoardClick(e) {
             moveCardToZone(clientState.selectedInstanceId, clientState.selectedZone, targetZone);
             clearSelection();
             renderEntireBoard();
+            refreshPileBrowser();
             return;
         }
     }

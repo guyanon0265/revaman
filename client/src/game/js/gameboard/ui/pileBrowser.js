@@ -6,9 +6,11 @@
 // — #browser-menu is a small floating panel that opens on top of it,
 // so canceling out of that panel naturally reveals the grid again.
 
-import { gameState, clientState } from '../logic/state.js';
+import { gameState, clientState, clearSelection } from '../logic/state.js';
 import { ZONE_LABELS } from '../../utils.js';
-//import { openBrowserMenu } from '../../menu/browserMenu.js';
+import { openCardView } from './cardZoom.js';
+import { moveCardToZone } from '../logic/engine.js';
+import { renderEntireBoard } from './render.js';
 
 const browserEl = document.getElementById('pile-browser');
 const titleEl = document.getElementById('pile-browser-title');
@@ -19,7 +21,7 @@ let currentZone = null;
 
 // sections: [{ label: string|null, cards: [] }, ...]. Empty sections
 // are skipped entirely rather than rendered as an empty labeled group.
-export function renderBrowserGrid(title, count, sections, onCardClick) {
+export function renderBrowserGrid(title, count, sections, onCardClick, onCardContextMenu) {
     titleEl.textContent = title;
     countEl.textContent = count;
     gridEl.innerHTML = '';
@@ -45,6 +47,10 @@ export function renderBrowserGrid(title, count, sections, onCardClick) {
             img.alt = card.name;
             img.draggable = false;
             img.addEventListener('click', () => onCardClick(card));
+            img.addEventListener('contextmenu', e => {
+                e.preventDefault();
+                onCardContextMenu(card);
+            });
             grid.appendChild(img);
         });
         wrap.appendChild(grid);
@@ -59,20 +65,34 @@ function renderGrid() {
         ZONE_LABELS[currentZone] || currentZone,
         `${cards.length} card${cards.length === 1 ? '' : 's'}`,
         [{ label: null, cards }],
-        openInPileCardMenu
+        handleBrowserCardClick,
+        handleBrowserCardContextMenu
     );
 }
 
-function openInPileCardMenu(card) {
+function selectBrowserCard(card) {
     clientState.selectedInstanceId = card.instanceId;
     clientState.selectedZone = currentZone;
     clientState.selectedKind = 'card';
     clientState.selectedParentId = null;
-    //openBrowserMenu('in-pile-card-menu', reopenIfActive);
 }
 
-function reopenIfActive() {
-    if (currentZone) renderGrid();
+function handleBrowserCardClick(card) {
+    selectBrowserCard(card);
+    openCardView();
+    clearSelection();
+}
+
+function handleBrowserCardContextMenu(card) {
+    selectBrowserCard(card);
+    moveCardToZone(
+        card.instanceId,
+        currentZone,
+        `${card.owner}-hand`
+    );
+    clearSelection();
+    renderGrid();
+    renderEntireBoard();
 }
 
 export function openPileBrowser(zone) {
@@ -84,6 +104,11 @@ export function openPileBrowser(zone) {
 export function closePileBrowser() {
     browserEl.classList.add('collapsed');
     currentZone = null;
+}
+
+export function refreshPileBrowser() {
+    if (!currentZone) return;
+    renderGrid();
 }
 
 export function initPileBrowser() {
