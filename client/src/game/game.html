@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-    <title>PTCG Sandbox</title>
+    <title>RevaMan | PTCG Sandbox</title>
     <link rel="icon" type="image/png" href="../assets/logo.png">
     <link rel="stylesheet" href="./css/game.css">
     <link rel="stylesheet" href="./css/card.css">
     <link rel="stylesheet" href="./css/sidebar.css">
+    <link rel="stylesheet" href="./css/menu.css">
 </head>
 <body>
     <div class="app-container">
@@ -57,6 +58,17 @@
         <div class="hud-dock">
             <button id="btn-load-deck" class="dock-btn"></button>
         </div>
+    </div>
+
+    <div id="pile-browser" class="click-handling">
+        <div id="pile-browser-header">
+            <div>
+                <div id="pile-browser-title"></div>
+                <div id="pile-browser-count"></div>
+            </div>
+            <button id="btn-pile-browser-close">&#10005;</button>
+        </div>
+        <div id="pile-browser-grid"></div>
     </div>
 
     <script type="module" src="./js/game.js"></script>
