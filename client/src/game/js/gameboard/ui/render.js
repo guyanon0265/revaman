@@ -9,7 +9,7 @@
 
 import { gameState, clientState, runtimeState, clearSelection } from '../logic/state.js';
 import { moveCardToZone, attachCardToTarget } from '../logic/engine.js';
-import { OWNED_SUFFIXES, SHARED_ZONE_IDS, COUNT_BADGE_SUFFIXES, isHidden } from '../../utils.js';
+import { OWNED_SUFFIXES, SHARED_ZONE_IDS, COUNT_BADGE_SUFFIXES, isHidden, isPileZone } from '../../utils.js';
 
 // Logical zone "suffixes" that exist on both sides of the board.
 // #player-<suffix> in the DOM always shows runtimeState.mySlot's data;
@@ -238,19 +238,29 @@ function handleBoardClick(e) {
     // 0. Attachment mode active — the NEXT card clicked (that isn't the
     // card being attached) is the target, regardless of what it would
     // normally mean to click a card. Checked first, before anything else.
-    if (clientState.attachmentModeActive) {
-        if (cardEl && cardEl.dataset.instanceId !== clientState.selectedInstanceId) {
+    if (clientState.selectedInstanceId && cardEl) {
+        const targetInstanceId = cardEl.dataset.instanceId;
+        const targetZone = cardEl.dataset.zone;
+
+        if (targetZone === 'stadium' || targetZone.endsWith('-hand') || isPileZone(targetZone)) {
+            moveCardToZone(clientState.selectedInstanceId, clientState.selectedZone, targetZone);
+            clearSelection();
+            renderEntireBoard();
+            return;
+        }
+
+        if (targetInstanceId !== clientState.selectedInstanceId) {
             attachCardToTarget(
                 clientState.selectedInstanceId,
                 clientState.selectedZone,
-                cardEl.dataset.instanceId,
+                targetInstanceId,
                 cardEl.dataset.zone
             );
+
+            clearSelection();
+            renderEntireBoard();
+            return;
         }
-        // Hit or miss, attachment mode always ends on this click.
-        clearSelection();
-        renderEntireBoard();
-        return;
     }
 
     // 1. If a card is already selected and we click a DIFFERENT zone (or a card inside a different zone)

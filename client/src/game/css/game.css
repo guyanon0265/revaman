@@ -116,6 +116,7 @@ html, body {
     grid-column: 1;
     grid-row: 2;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-self: center;
     gap: 8px;
@@ -200,6 +201,15 @@ html, body {
     gap: 5px;
     padding: 6px;
     position: relative;
+}
+
+.stadium {
+    flex-direction: row;
+    gap: 0px;
+}
+
+.stadium:has(> .card ~ .card) {
+    width: calc(var(--card-w-sm) * 2);
 }
 
 .table {

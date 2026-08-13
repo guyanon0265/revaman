@@ -119,8 +119,8 @@
 .trainer-attachment-card,
 .energy-attachment-card,
 .evolution-stack-card {
-    width: calc(var(--card-width) / 3) !important;
-    height: calc(var(--card-height) /3) !important;
+    width: calc(var(--card-w-sm) / 3) !important;
+    height: calc(var(--card-h-sm) /3) !important;
     border-radius: 0.3vh;
     object-fit: cover;
     margin-top: -3.2vh;

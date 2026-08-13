@@ -36,7 +36,7 @@ export function moveCardToZone(instanceId, fromZone, toZone, position = 'top') {
     const card = removeFromZone(fromZone, instanceId);
     if (!card) return null;
 
-    if (isPileZone(toZone)) {
+    if (isPileZone(toZone) || toZone.endsWith('-hand')) {
         const toArr = gameState.zones[toZone];
         [...card.trainerAttachments, ...card.energyAttachments, ...card.evolutionStack].forEach(att => toArr.push(att));
         resetToFresh(card);
