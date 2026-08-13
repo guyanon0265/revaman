@@ -1,22 +1,5 @@
-// ui.js — renders gameState into the DOM and handles board click routing
-// (selection, move-to-zone, and attachment-mode targeting).
-// Still missing, not "demo scope" anymore so much as genuinely unbuilt:
-//   - Nested rendering of energyAttachments/trainerAttachments on their
-//     parent card (Attach works data-side; nothing draws the result yet)
-//   - Damage/status badges (styling not yet written — see chat)
-//   - The zone browser and #action-menu's own CSS/markup live outside
-//     this file entirely.
-
-import { gameState, clientState, runtimeState, clearSelection } from '../logic/state.js';
-import { moveCardToZone, attachCardToTarget, drawTopCard } from '../logic/engine.js';
-import { OWNED_SUFFIXES, SHARED_ZONE_IDS, COUNT_BADGE_SUFFIXES, isHidden, isPileZone } from '../../utils.js';
-
-// Logical zone "suffixes" that exist on both sides of the board.
-// #player-<suffix> in the DOM always shows runtimeState.mySlot's data;
-// #opp-<suffix> always shows runtimeState.oppSlot's data. This is the
-// one place screen position (player/opp) and slot identity (p1/p2) meet
-// — nothing else in this file, or in engine.js/state.js, should ever
-// need to know both at once.
+import { gameState, clientState, runtimeState } from '../logic/state.js';
+import { OWNED_SUFFIXES, SHARED_ZONE_IDS, COUNT_BADGE_SUFFIXES, isHidden } from '../../utils.js';
 
 // DOM element id -> actual gameState.zones key it should render/target.
 export function domIdToStateZone(domId) {
@@ -28,7 +11,7 @@ export function domIdToStateZone(domId) {
         const suffix = domId.slice('opp-'.length);
         return `${runtimeState.oppSlot}-${suffix}`;
     }
-    return domId; // stadium / lost-zone / table-left / table-right — 1:1
+    return domId; // stadium / lost-zone / etc
 }
 
 function buildAttachmentImg(attached, parentInstanceId, extraClass) {

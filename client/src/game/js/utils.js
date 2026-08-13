@@ -20,12 +20,12 @@ export const ZONE_LABELS = {
     'stadium': 'Stadium', 'lost-zone': 'Lost Zone'
 };
 
-/*-ui.js-*/
-export const OWNED_SUFFIXES = ['deck', 'hand', 'active', 'bench', 'discard', 'prizes'];
-export const SHARED_ZONE_IDS = ['stadium', 'lost-zone', 'table-left', 'table-right'];
+/*-render.js-*/
+export const OWNED_SUFFIXES = ['deck', 'hand', 'active', 'bench', 'discard', 'prizes', 'table-half'];
+export const SHARED_ZONE_IDS = ['stadium', 'lost-zone'];
 export const COUNT_BADGE_SUFFIXES = ['deck', 'hand', 'discard', 'prizes', 'bench'];
 
-/*-ui.js & cardview.js-*/
+/*-render.js & cardview.js-*/
 export function isHidden(card, stateZoneId) {
     if (card.isFaceDown) return true;
     if (stateZoneId.endsWith('-deck') || stateZoneId.endsWith('-prizes')) return true;

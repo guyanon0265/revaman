@@ -8,6 +8,7 @@ export const gameState = {
         'p1-bench': [],
         'p1-discard': [],
         'p1-prizes': [],
+        'p1-table-half': [],
 
         'p2-deck': [],
         'p2-hand': [],
@@ -15,11 +16,10 @@ export const gameState = {
         'p2-bench': [],
         'p2-discard': [],
         'p2-prizes': [],
+        'p2-table-half': [],
 
         'stadium': [],
-        'lost-zone': [],
-        'table-left': [],
-        'table-right': []
+        'lost-zone': []
     }
 };
 
