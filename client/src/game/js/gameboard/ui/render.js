@@ -278,6 +278,14 @@ function handleBoardClick(e) {
 
     // 2. Otherwise, treat clicking a card as a selection action
     if (cardEl) {
+        const clickedInstanceId = cardEl.dataset.instanceId;
+
+        if (clickedInstanceId === clientState.selectedInstanceId) {
+            clearSelection();
+            renderEntireBoard();
+            return;
+        }
+
         clientState.selectedInstanceId = cardEl.dataset.instanceId;
         clientState.selectedZone = cardEl.dataset.zone;
         clientState.selectedKind = 'card';
