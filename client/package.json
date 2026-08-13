@@ -1,0 +1,9 @@
+{
+  "name": "client",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "socket.io-client": "^4.8.3"
+  }
+}
