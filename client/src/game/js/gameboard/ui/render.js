@@ -8,7 +8,7 @@
 //     this file entirely.
 
 import { gameState, clientState, runtimeState, clearSelection } from '../logic/state.js';
-import { moveCardToZone, attachCardToTarget } from '../logic/engine.js';
+import { moveCardToZone, attachCardToTarget, drawTopCard } from '../logic/engine.js';
 import { OWNED_SUFFIXES, SHARED_ZONE_IDS, COUNT_BADGE_SUFFIXES, isHidden, isPileZone } from '../../utils.js';
 
 // Logical zone "suffixes" that exist on both sides of the board.
@@ -234,6 +234,14 @@ function handleBoardClick(e) {
 
     const cardEl = e.target.closest('.card');
     const zoneEl = e.target.closest('.zone, .hand, .table-half');
+
+    if (zoneEl) {
+        const targetZone = domIdToStateZone(zoneEl.id);
+
+        if (targetZone.endsWith('-deck') || targetZone.endsWith('-prizes')) {
+            drawTopCard(targetZone, `${runtimeState.mySlot}-hand`);
+        }
+    }
 
     // 0. Attachment mode active — the NEXT card clicked (that isn't the
     // card being attached) is the target, regardless of what it would

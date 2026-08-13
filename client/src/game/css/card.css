@@ -39,7 +39,7 @@
 }
 
 .card.selected {
-    border-color: #15b5fa;
+    border: 0.3vh solid #15b5fa;
     box-shadow: 0 0 0 0.2vh rgba(21, 174, 250, 0.5);
 }
 
