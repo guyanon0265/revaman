@@ -1,0 +1,33 @@
+.hud-dock {
+    position: fixed;
+    right: max(1.4vh, env(safe-area-inset-right, 0px));
+    bottom: max(1.4vh, env(safe-area-inset-bottom, 0px));
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+    z-index: 500;
+}
+
+.dock-btn {
+    width: 4.6vh;
+    height: 4.6vh;
+    border-radius: 50%;
+    background: var(--surface, #1b1e26);
+    border: 1px solid var(--border-subtle, rgba(255,255,255,0.1));
+    color: #cfd6e2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+    transition: transform 0.12s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.dock-btn .icon { width: 2.1vh; height: 2.1vh; }
+
+.dock-btn:hover {
+    background: var(--surface-elevated, #262b35);
+    border-color: var(--accent-2, #7db8ff);
+    color: #fff;
+}
+.dock-btn:active { transform: scale(0.92); }

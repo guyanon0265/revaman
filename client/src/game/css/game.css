@@ -136,6 +136,22 @@ html, body {
 }
 .zone.active { width: var(--card-w); height: var(--card-h) }
 
+.pile {
+    position: relative;
+    overflow: visible;
+}
+
+.pile .card {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.pile .card:nth-child(n+2) {
+    top: 0.15vh;
+    left: 0.15vh;
+}
+
 .bench {
     flex: 1 1 0;
     height: auto;

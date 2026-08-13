@@ -1,0 +1,159 @@
+.card {
+    width: var(--card-width);
+    height: var(--card-height);
+    border-radius: 0.8vh;
+    position: relative;
+    cursor: pointer;
+    border: 0.2vh solid var(--border-color);
+    background: #0f172a;
+    flex-shrink: 0;
+    transform: rotate(var(--card-rotate, 0deg));
+    transition: transform 0.1s ease, border-color 0.15s ease;
+    z-index: 1;
+}
+
+.card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+}
+
+.card:hover {
+    transform: rotate(var(--card-rotate, 0deg)) translateY(-0.3vh);
+}
+
+.card.selected {
+    border-color: #15b5fa;
+    box-shadow: 0 0 0 0.2vh rgba(21, 174, 250, 0.5);
+}
+
+.card-face {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: hidden;
+    border-radius: 0.6vh;
+}
+
+.card-stats-overlay {
+    position: absolute;
+    top: 0.2vh;
+    left: 0.2vh;
+    right: 0.2vh;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15vh;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.stat-badge {
+    color: #fff;
+    font-size: 1vh;
+    font-weight: 700;
+    padding: 0.1vh 0.35vh;
+    border-radius: 0.3vh;
+    box-shadow: 0 0.1vh 0.2vh rgba(0, 0, 0, 0.4);
+    text-shadow: 0 0.1vh 0.1vh rgba(0, 0, 0, 0.8);
+}
+
+.stat-badge.badge-dmg { background: rgba(220, 0, 0, 0.95); }
+.stat-badge.badge-ohl { background: rgba(0, 180, 60, 0.95); }
+.stat-badge.badge-counter { background: #fff; color: #b00d0d; text-shadow: none; }
+.stat-badge.badge-ability { background: #cc0000; border: 2px solid #fff; }
+
+.stat-badge.status-par { background: #e6b800; color: #000; text-shadow: none; }
+.stat-badge.status-brn { background: #ff6600; }
+.stat-badge.status-psn { background: #9900cc; }
+.stat-badge.status-slp { background: #6c6c6d; }
+.stat-badge.status-frz { background: #33ccff; }
+.stat-badge.status-con { background: #222; }
+
+.trainer-attachments {
+    position: absolute;
+    bottom: -0.6vh;
+    left: -0.6vh;
+    display: flex;
+    flex-direction: column-reverse;
+    z-index: 2;
+}
+
+.evolution-stack {
+    position: absolute;
+    bottom: -0.6vh;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column-reverse;
+    z-index: 2;
+}
+
+.energy-attachments {
+    position: absolute;
+    bottom: -0.6vh;
+    right: -0.6vh;
+    display: flex;
+    flex-direction: column-reverse;
+    z-index: 2;
+}
+
+.trainer-attachment-card,
+.energy-attachment-card,
+.evolution-stack-card {
+    width: calc(var(--card-width) / 3) !important;
+    height: calc(var(--card-height) /3) !important;
+    border-radius: 0.3vh;
+    object-fit: cover;
+    margin-top: -3.2vh;
+    box-shadow: 0 0.15vh 0.3vh rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+}
+
+.selected-attachment {
+    outline: 0.3vh solid #00E6FF;
+    box-shadow: 0 0 1vh #00E6FF;
+    opacity: 1 !important;
+    filter: none !important;
+}
+
+.break-overlay {
+    position: absolute;
+    top: -35%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0.8vh;
+    border: 0.2vh solid var(--border-color);
+    transform: translateX(-50%) rotate(90deg);
+    pointer-events: none;
+    z-index: 2;
+}
+
+#card-view-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 150;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2vh;
+}
+
+#card-view-img {
+    max-width: 80vw;
+    max-height: 70vh;
+    border-radius: 1.5vh;
+    box-shadow: 0 0 4vh rgba(0, 0, 0, 0.6);
+}
+
+#card-view-img.break-rotated {
+    transform: rotate(90deg);
+}
