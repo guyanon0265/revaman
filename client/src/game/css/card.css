@@ -1,6 +1,6 @@
 .card {
-    width: var(--card-width);
-    height: var(--card-height);
+    width: var(--card-w-sm);
+    height: var(--card-h-sm);
     border-radius: 0.8vh;
     position: relative;
     cursor: pointer;
@@ -10,6 +10,20 @@
     transform: rotate(var(--card-rotate, 0deg));
     transition: transform 0.1s ease, border-color 0.15s ease;
     z-index: 1;
+}
+
+.hand .card, .zone.active .card {
+    width: var(--card-w);
+    height: var(--card-h);
+    flex-shrink: 0;
+}
+
+.hand .card {
+    margin-left: -4.5vh; 
+}
+
+.hand .card:first-child {
+    margin-left: 0;
 }
 
 .card img {
@@ -112,6 +126,13 @@
     margin-top: -3.2vh;
     box-shadow: 0 0.15vh 0.3vh rgba(0, 0, 0, 0.4);
     cursor: pointer;
+}
+
+.hand .trainer-attachment-card, .zone.active .trainer-attachment-card,
+.hand .energy-attachment-card, .zone.active .energy-attachment-card,
+.hand .evolution-stack-card, .zone.active .evolution-stack-card {
+    width: calc(var(--card-w) / 3) !important;
+    height: calc(var(--card-h) /3) !important;
 }
 
 .selected-attachment {

@@ -233,7 +233,7 @@ function handleBoardClick(e) {
     if (e.target.closest('.click-handling')) return; // menu clicks are actionmenu.js's domain entirely
 
     const cardEl = e.target.closest('.card');
-    const zoneEl = e.target.closest('.zone');
+    const zoneEl = e.target.closest('.zone, .hand, .table-half');
 
     // 0. Attachment mode active — the NEXT card clicked (that isn't the
     // card being attached) is the target, regardless of what it would
