@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>PTCG Sandbox</title>
+    <link rel="stylesheet" href="./css/game.css">
+    <link rel="stylesheet" href="./css/card.css">
+    <link rel="stylesheet" href="./css/sidebar.css">
+</head>
+<body>
+    <div class="app-container">
+        <div id="opp-hand" class="hand"></div>
+
+        <div class="gameboard">
+            <div id="opp-field" class="field">
+                <div id="opp-prizes" class="zone prizes"></div>
+
+                <div id="opp-bench" class="zone bench"></div>
+
+                <div class="deck-discard">
+                    <div id="opp-deck" class="zone deck"></div>
+                    <div id="opp-discard" class="zone discard"></div>
+                </div>
+            </div>
+
+            <div class="mid-field">
+                <div class="stadium-lz">
+                    <div id="lost-zone" class="zone lost-zone"></div>
+                    <div id="stadium" class="zone stadium"></div>
+                </div>
+
+                <div id="opp-active" class="zone active"></div>
+                <div id="player-active" class="zone active"></div>
+
+                <div class="table">
+                    <div id="opp-table-half" class="table-half"></div>
+                    <div id="player-table-half" class="table-half"></div>
+                </div>
+            </div>
+
+            <div id="player-field" class="field">
+                <div id="player-prizes" class="zone prizes"></div>
+
+                <div id="player-bench" class="zone bench"></div>
+
+                <div class="deck-discard">
+                    <div id="player-deck" class="zone deck"></div>
+                    <div id="player-discard" class="zone discard"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="player-hand" class="hand"></div>
+
+        <div class="hud-dock">
+            <button id="btn-load-deck" class="dock-btn"></button>
+        </div>
+    </div>
+
+    <script type="module" src="./js/game.js"></script>
+</body>
+</html>
