@@ -238,8 +238,17 @@ function handleBoardClick(e) {
     if (zoneEl) {
         const targetZone = domIdToStateZone(zoneEl.id);
 
-        if (targetZone.endsWith('-deck') || targetZone.endsWith('-prizes')) {
-            drawTopCard(targetZone, `${runtimeState.mySlot}-hand`);
+        if (
+            !clientState.selectedInstanceId &&
+            (targetZone.endsWith('-deck') || targetZone.endsWith('-prizes'))
+        ) {
+            const ownerSlot = targetZone.split('-')[0];
+
+            drawTopCard(targetZone, `${ownerSlot}-hand`);
+
+            clearSelection();
+            renderEntireBoard();
+            return;
         }
     }
 

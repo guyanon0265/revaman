@@ -19,7 +19,8 @@
 }
 
 .hand .card {
-    margin-left: -4.5vh; 
+    margin-left: -4.5vh;
+    pointer-events: auto;
 }
 
 .hand .card:first-child {

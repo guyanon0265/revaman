@@ -249,6 +249,7 @@ html, body {
     min-height: var(--card-h); 
     overflow-x: auto;
     padding-top: 2vh;
+    pointer-events: none;
 }
 
 #opp-hand {
