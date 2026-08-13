@@ -6,8 +6,8 @@
 // — #browser-menu is a small floating panel that opens on top of it,
 // so canceling out of that panel naturally reveals the grid again.
 
-import { gameState, clientState } from '../gameboard/logic/state.js';
-import { ZONE_LABELS } from '../utils.js';
+import { gameState, clientState } from '../logic/state.js';
+import { ZONE_LABELS } from '../../utils.js';
 //import { openBrowserMenu } from '../../menu/browserMenu.js';
 
 const browserEl = document.getElementById('pile-browser');
@@ -78,11 +78,11 @@ function reopenIfActive() {
 export function openPileBrowser(zone) {
     currentZone = zone;
     renderGrid();
-    browserEl.style.display = 'flex';
+    browserEl.classList.remove('collapsed');
 }
 
 export function closePileBrowser() {
-    browserEl.style.display = 'none';
+    browserEl.classList.add('collapsed');
     currentZone = null;
 }
 

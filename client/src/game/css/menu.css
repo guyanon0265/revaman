@@ -60,13 +60,6 @@
     box-sizing: border-box;
 }
 
-.status-chip { background: #1a1a1a; }
-.status-chip.active[data-status="PAR"] { background: #e6b800; color: #000; }
-.status-chip.active[data-status="BRN"] { background: #ff6600; }
-.status-chip.active[data-status="PSN"] { background: #9900cc; }
-.status-chip.active[data-status="SLP"] { background: #0066ff; }
-.status-chip.active[data-status="CNF"] { background: #cc0000; }
-
 .zone-pick-group { display: flex; flex-direction: column; gap: 4px; width: 100%; }
 .zone-group-label {
     font-size: 9.5px;
@@ -78,49 +71,148 @@
 }
 .zone-pick-buttons { display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; }
 
-/* --- FULL-SCREEN PILE BROWSER --- */
+/* ==========================================================================
+   PILE BROWSER -- left-side floating off-canvas panel
+   ========================================================================== */
+
 #pile-browser {
     position: fixed;
-    inset: 0;
-    z-index: 100;
-    background: rgba(8, 8, 8, 0.9);
-    display: none;
+
+    top: max(1.4vh, env(safe-area-inset-top, 0px));
+    left: max(1.4vh, env(safe-area-inset-left, 0px));
+    bottom: max(1.4vh, env(safe-area-inset-bottom, 0px));
+
+    width: min(520px, 92vw);
+
+    background: var(--surface, #1b1e26);
+    border: 1px solid var(--border-subtle, rgba(255,255,255,0.08));
+    border-radius: 1.8vh;
+
+    display: flex;
     flex-direction: column;
+
+    padding: 1.4vh;
+
+    font-family: system-ui, -apple-system, BlinkMacSystemFont,
+        'Segoe UI', Roboto, sans-serif;
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    transition:
+        transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.2s ease;
+
+    z-index: 30;
 }
+
+/* Slide OUT to the left */
+#pile-browser.collapsed {
+    transform: translateX(calc(-100% - 3vh));
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+
 #pile-browser-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
-    padding: 14px 14px 10px;
-    padding-top: calc(14px + env(safe-area-inset-top, 0px));
+
+    gap: 0.8vh;
+    margin-bottom: 1.2vh;
+
+    flex-shrink: 0;
 }
-#pile-browser-title { color: #fff; font-size: 16px; font-weight: bold; }
-#pile-browser-count { color: #888; font-size: 12px; margin-top: 2px; }
+
+#pile-browser-title {
+    color: #cfd6e2;
+    font-size: 1.5vh;
+    font-weight: 600;
+}
+
+#pile-browser-count {
+    color: #888;
+    font-size: 1.15vh;
+    margin-top: 0.25vh;
+}
+
+
+/* ==========================================================================
+   Close
+   ========================================================================== */
+
 #btn-pile-browser-close {
-    background: #801515;
-    border: 1px solid #a31616;
-    color: #fff;
-    width: 36px;
-    height: 36px;
+    width: 3.4vh;
+    height: 3.4vh;
+
     border-radius: 50%;
-    font-size: 16px;
+
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border-subtle, rgba(255,255,255,0.08));
+
+    color: #cfd6e2;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     cursor: pointer;
     flex-shrink: 0;
 }
 
+#btn-pile-browser-close:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #fca5a5;
+}
+
+
+/* ==========================================================================
+   Content
+   ========================================================================== */
+
 #pile-browser-grid {
     flex: 1;
+    min-height: 0;
+
+    background-color: var(--bg-recessed, #121419);
+    border: 1px solid var(--border-subtle, rgba(255,255,255,0.08));
+    border-radius: 1.2vh;
+
+    padding: 1.4vh;
+
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+
     display: flex;
     flex-direction: column;
     gap: 18px;
-    padding: 10px 14px calc(20px + env(safe-area-inset-bottom, 0px));
 }
+
+#pile-browser-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+#pile-browser-grid::-webkit-scrollbar-thumb {
+    background-color: #3a3f4a;
+    border-radius: 3px;
+}
+
+
+/* ==========================================================================
+   Sections
+   ========================================================================== */
 
 .pile-browser-section-label {
     color: #888;
-    font-size: 12px;
+    font-size: 1.15vh;
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -134,17 +226,61 @@
     justify-items: center;
 }
 
+
+/* ==========================================================================
+   Cards
+   ========================================================================== */
+
 .pile-browser-thumbnail {
     width: 100%;
     aspect-ratio: 5 / 7;
     object-fit: cover;
+
     border-radius: 6px;
     border: 1px solid #333;
+
     cursor: pointer;
-    transition: transform 0.1s ease, border-color 0.15s ease;
+
+    transition:
+        transform 0.1s ease,
+        border-color 0.15s ease;
 }
 
 .pile-browser-thumbnail:hover {
     transform: translateY(-2px);
     border-color: #555;
+}
+
+@media (max-width: 767px) {
+    #pile-browser {
+        top: auto;
+        bottom: max(1.4vh, env(safe-area-inset-bottom, 0px));
+        left: 1.4vh;
+        right: 1.4vh;
+        width: auto;
+        height: min(50vh, 560px);
+        border-radius: 2.2vh;
+    }
+
+    #pile-browser.collapsed {
+        transform: translateY(calc(100% + 3vh));
+    }
+
+    #sidebar {
+        top: auto;
+        bottom: max(1.4vh, env(safe-area-inset-bottom, 0px));
+        left: 1.4vh;
+        right: 1.4vh;
+        width: auto;
+        height: min(72vh, 560px);
+        border-radius: 2.2vh;
+    }
+
+    #sidebar.collapsed {
+        transform: translateY(calc(100% + 3vh));
+    }
+
+    .hud-dock {
+        bottom: 1.4vh;
+    }
 }
