@@ -19,7 +19,8 @@ export default [
       "no-unused-vars": "warn",
       "no-console": "warn",
       "no-undef": "error",
-      "import-x/no-unresolved": ["error", { caseSensitive: true }]
+      "import-x/no-unresolved": ["error", { caseSensitive: true }],
+      "import-x/extensions": ["error", "always", { js: "always" }]
     }
   }
 ];
