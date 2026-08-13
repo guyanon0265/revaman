@@ -5,7 +5,7 @@
 // Attach — closing the overlay returns you to a state where the card
 // is still clickable to reopen the action-menu.
 
-import { getSelectedCard } from '../logic/state.js';
+import { getSelectedCard } from '../../logic/state.js';
 
 const overlayEl = document.getElementById('card-view-overlay');
 const imgEl = document.getElementById('card-view-img');

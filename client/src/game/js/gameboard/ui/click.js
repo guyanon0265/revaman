@@ -2,8 +2,8 @@ import { clientState, clearSelection } from '../logic/state.js';
 import { moveCardToZone, attachCardToTarget, drawTopCard } from '../logic/engine.js';
 import { isPileZone } from '../../utils.js';
 import { domIdToStateZone, renderEntireBoard } from './render.js';
-import { openPileBrowser, refreshPileBrowser } from './pileBrowser.js';
-import { openCardView } from './cardZoom.js';
+import { openPileBrowser, refreshPileBrowser } from './overlays/pileBrowser.js';
+import { openCardView } from './overlays/cardZoom.js';
 
 function handleBoardClick(e) {
     if (e.target.closest('.click-handling')) return; // menu clicks are actionmenu.js's domain entirely

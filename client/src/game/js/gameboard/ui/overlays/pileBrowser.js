@@ -6,11 +6,11 @@
 // — #browser-menu is a small floating panel that opens on top of it,
 // so canceling out of that panel naturally reveals the grid again.
 
-import { gameState, clientState, clearSelection } from '../logic/state.js';
-import { ZONE_LABELS } from '../../utils.js';
+import { gameState, clientState, clearSelection } from '../../logic/state.js';
+import { ZONE_LABELS } from '../../../utils.js';
 import { openCardView } from './cardZoom.js';
-import { moveCardToZone } from '../logic/engine.js';
-import { renderEntireBoard } from './render.js';
+import { moveCardToZone } from '../../logic/engine.js';
+import { renderEntireBoard } from '../render.js';
 
 const browserEl = document.getElementById('pile-browser');
 const titleEl = document.getElementById('pile-browser-title');
