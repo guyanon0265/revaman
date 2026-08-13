@@ -3,6 +3,7 @@ import { moveCardToZone, attachCardToTarget, drawTopCard } from '../logic/engine
 import { isPileZone } from '../../utils.js';
 import { domIdToStateZone, renderEntireBoard } from './render.js';
 import { openPileBrowser } from './pileBrowser.js';
+import { openCardView } from './cardZoom.js';
 
 function handleBoardClick(e) {
     if (e.target.closest('.click-handling')) return; // menu clicks are actionmenu.js's domain entirely
@@ -94,6 +95,7 @@ function handleBoardClick(e) {
 
 function handleContextMenu(e) {
     e.preventDefault();
+    const cardEl = e.target.closest('.card');
     const zoneEl = e.target.closest('.zone, .hand, .table-half');
 
     if (zoneEl) {
@@ -101,7 +103,17 @@ function handleContextMenu(e) {
         
         if (isPileZone(zone)) {
             openPileBrowser(zone);
+            return;
         }
+    }
+
+    if (cardEl) {
+        clientState.selectedInstanceId = cardEl.dataset.instanceId;
+        clientState.selectedZone = cardEl.dataset.zone;
+        clientState.selectedKind = 'card';
+
+        renderEntireBoard();
+        openCardView();
     }
 }
 
