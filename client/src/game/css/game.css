@@ -180,7 +180,7 @@ html, body {
 }
 
 .pile .card:nth-child(n+2) {
-    top: 0.15vh;
+    top: -0.15vh;
     left: 0.15vh;
 }
 
