@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "pnpm --filter server start"
+    "start": "pnpm --filter server start",
+    "format": "pnpm prettier --write ."
   },
   "keywords": [],
   "author": "",
@@ -20,7 +21,10 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "eslint": "^10.8.0",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import-x": "^4.17.1",
-    "globals": "^17.9.0"
+    "globals": "^17.9.0",
+    "prettier": "^3.9.6",
+    "stylelint-config-prettier": "^9.0.5"
   }
 }

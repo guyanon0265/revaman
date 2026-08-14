@@ -1,32 +1,34 @@
-import js from "@eslint/js";
-import globals from "globals";
-import importPluginX from "eslint-plugin-import-x";
+import js from '@eslint/js';
+import globals from 'globals';
+import importPluginX from 'eslint-plugin-import-x';
+import eslintPluginPrettier from 'eslint-config-prettier';
 
 export default [
-  js.configs.recommended, 
+  js.configs.recommended,
   {
-    files: ["**/*.js", "**/*.jsx"],
+    files: ['**/*.js', '**/*.jsx'],
     languageOptions: {
       globals: {
         ...globals.browser,
-        ...globals.node
-      }
+        ...globals.node,
+      },
     },
     plugins: {
-      "import-x": importPluginX
+      'import-x': importPluginX,
     },
     settings: {
-      "import-x/resolver": {
-        node: true
-      }
+      'import-x/resolver': {
+        node: true,
+      },
     },
     rules: {
-      "no-unused-vars": "warn",
-      "no-console": "warn",
-      "no-undef": "error",
-      "import-x/named": "error",
-      "import-x/no-unresolved": ["error", { caseSensitive: true }],
-      "import-x/extensions": ["error", "always", { js: "always" }]
-    }
-  }
+      'no-unused-vars': 'warn',
+      'no-console': 'warn',
+      'no-undef': 'error',
+      'import-x/named': 'error',
+      'import-x/no-unresolved': ['error', { caseSensitive: true }],
+      'import-x/extensions': ['error', 'always', { js: 'always' }],
+    },
+  },
+  eslintPluginPrettier,
 ];
