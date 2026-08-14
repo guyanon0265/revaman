@@ -88,7 +88,7 @@ function selectBrowserCard(card) {
 
 function handleBrowserCardClick(card) {
     selectBrowserCard(card);
-    openCardView();
+    openCardView(card);
     clearSelection();
 }
 

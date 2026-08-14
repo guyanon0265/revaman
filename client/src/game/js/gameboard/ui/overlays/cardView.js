@@ -1,29 +1,35 @@
-// menu/cardview.js — the View Card zoom overlay. Read-only: never
-// mutates gameState, only displays. Selection is deliberately left
-// intact when this opens (see actionmenu.js's btn-view-card handler)
-// so the card stays selected underneath the overlay, same pattern as
-// Attach — closing the overlay returns you to a state where the card
-// is still clickable to reopen the action-menu.
-
-import { getSelectedCard } from '../../logic/state.js';
+// menu/cardview.js — the View Card zoom overlay.
+// Read-only: never mutates gameState or clientState.
+// The caller explicitly supplies the card to display.
+//
+// Card View owns only its own display state. It does not infer the card
+// from game selection, and it does not clear or modify any selection when
+// opened or closed.
 
 const overlayEl = document.getElementById('card-view-overlay');
 const imgEl = document.getElementById('card-view-img');
 
-export function openCardView() {
-    const card = getSelectedCard();
+let viewedCard = null;
+
+export function openCardView(card) {
     if (!card) return;
+
+    viewedCard = card;
 
     imgEl.classList.remove('break-rotated');
 
-    imgEl.src = card.imageUrl;
-    imgEl.alt = card.name;
-    if (card.isBreakActive) imgEl.classList.add('break-rotated');
+    imgEl.src = viewedCard.imageUrl;
+    imgEl.alt = viewedCard.name;
+
+    if (viewedCard.isBreakActive) {
+        imgEl.classList.add('break-rotated');
+    }
 
     overlayEl.style.display = 'flex';
 }
 
-function closeCardView() {
+export function closeCardView() {
+    viewedCard = null;
     overlayEl.style.display = 'none';
 }
 

@@ -161,8 +161,8 @@
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.85);
-    z-index: 150;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 100;
     align-items: center;
     justify-content: center;
     flex-direction: column;
@@ -178,4 +178,17 @@
 
 #card-view-img.break-rotated {
     transform: rotate(90deg);
+}
+
+@media (max-width: 767px) {
+    #card-view-overlay {
+        inset: 0 0 auto 0;
+        height: 50vh;
+    }
+
+    #card-view-img {
+        max-width: 90%;
+        max-height: 80%;
+        object-fit: contain;
+    }
 }

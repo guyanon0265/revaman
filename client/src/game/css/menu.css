@@ -48,16 +48,21 @@
 }
 .action-menu .cancel-btn { background: #801515; border-color: #a31616; }
 .close-btn {
-    background: #801515;
-    border: 1px solid #a31616;
-    color: white;
-    padding: 8px 11px;
-    min-height: 34px;
-    font-size: 11px;
-    border-radius: 0.7vh;
-    font-weight: bold;
+    width: 3.4vh;
+    height: 3.4vh;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid var(--border-subtle, rgba(239, 68, 68, 0.4));
+    color: #cfd6e2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+.close-btn:hover {
+    color: #fca5a5;
 }
 /* ==========================================================================
    PILE BROWSER -- left-side floating off-canvas panel
@@ -80,7 +85,7 @@
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
-    z-index: 30;
+    z-index: 200;
 }
 
 /* Slide OUT to the left */
