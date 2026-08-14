@@ -1,6 +1,6 @@
-import { runtimeState } from './state.js';
-import { parseDeckCSV } from './parser.js';
-import { renderEntireBoard } from '../ui/render.js';
+import { runtimeState } from '../../gameboard/logic/state.js';
+import { parseDeckCSV } from '../../gameboard/logic/parser.js';
+import { renderEntireBoard } from '../../gameboard/ui/render.js';
 
 export function promptForCSVAndParse(slot) {
     const input = document.createElement('input');

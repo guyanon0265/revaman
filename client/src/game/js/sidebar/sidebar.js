@@ -1,4 +1,4 @@
-export function initSiderbar() {
+export function initSiderbarHud() {
     document.querySelectorAll('[data-open-tab]').forEach(btn => {
             btn.addEventListener('click', () => {
                 const sidebar = document.getElementById('sidebar');

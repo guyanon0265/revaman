@@ -9,7 +9,7 @@
 import { gameState, clientState, clearSelection } from '../../logic/state.js';
 import { ZONE_LABELS } from '../../../utils.js';
 import { openCardView } from './cardZoom.js';
-import { moveCardToZone } from '../../logic/engine.js';
+import { moveCardToZone } from '../../logic/loggingEngine.js';
 import { renderEntireBoard } from '../render.js';
 
 const browserEl = document.getElementById('pile-browser');

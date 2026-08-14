@@ -1,5 +1,5 @@
 import { clientState, clearSelection } from '../logic/state.js';
-import { moveCardToZone, attachCardToTarget, drawTopCard } from '../logic/engine.js';
+import { moveCardToZone, attachCardToTarget, drawTopCard } from '../logic/loggingEngine.js';
 import { isPileZone } from '../../utils.js';
 import { domIdToStateZone, renderEntireBoard } from './render.js';
 import { openPileBrowser, refreshPileBrowser } from './overlays/pileBrowser.js';
