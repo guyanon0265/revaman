@@ -59,52 +59,27 @@
     cursor: pointer;
     box-sizing: border-box;
 }
-
-.zone-pick-group { display: flex; flex-direction: column; gap: 4px; width: 100%; }
-.zone-group-label {
-    font-size: 9.5px;
-    font-weight: bold;
-    color: #888;
-    text-transform: uppercase;
-    text-align: center;
-    letter-spacing: 0.5px;
-}
-.zone-pick-buttons { display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; }
-
 /* ==========================================================================
    PILE BROWSER -- left-side floating off-canvas panel
    ========================================================================== */
 
 #pile-browser {
     position: fixed;
-
     top: max(1.4vh, env(safe-area-inset-top, 0px));
     left: max(1.4vh, env(safe-area-inset-left, 0px));
     bottom: max(1.4vh, env(safe-area-inset-bottom, 0px));
-
     width: min(520px, 92vw);
-
     background: var(--surface, #1b1e26);
     border: 1px solid var(--border-subtle, rgba(255,255,255,0.08));
     border-radius: 1.8vh;
-
     display: flex;
     flex-direction: column;
-
     padding: 1.4vh;
-
-    font-family: system-ui, -apple-system, BlinkMacSystemFont,
-        'Segoe UI', Roboto, sans-serif;
-
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
-
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-
-    transition:
-        transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-        opacity 0.2s ease;
-
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
     z-index: 30;
 }
 
@@ -124,10 +99,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     gap: 0.8vh;
     margin-bottom: 1.2vh;
-
     flex-shrink: 0;
 }
 
@@ -151,18 +124,13 @@
 #btn-pile-browser-close {
     width: 3.4vh;
     height: 3.4vh;
-
     border-radius: 50%;
-
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid var(--border-subtle, rgba(255,255,255,0.08));
-
     color: #cfd6e2;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     cursor: pointer;
     flex-shrink: 0;
 }
@@ -181,16 +149,12 @@
 #pile-browser-grid {
     flex: 1;
     min-height: 0;
-
     background-color: var(--bg-recessed, #121419);
     border: 1px solid var(--border-subtle, rgba(255,255,255,0.08));
     border-radius: 1.2vh;
-
     padding: 1.4vh;
-
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-
     display: flex;
     flex-direction: column;
     gap: 18px;
@@ -235,12 +199,9 @@
     width: 100%;
     aspect-ratio: 5 / 7;
     object-fit: cover;
-
     border-radius: 6px;
     border: 1px solid #333;
-
     cursor: pointer;
-
     transition:
         transform 0.1s ease,
         border-color 0.15s ease;
