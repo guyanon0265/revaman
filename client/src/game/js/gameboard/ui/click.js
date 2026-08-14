@@ -1,12 +1,12 @@
 import { clientState, clearSelection } from '../logic/state.js';
-import { moveCardToZone, attachCardToTarget, drawTopCard } from '../logic/loggingEngine.js';
+import { moveCardToZone, attachCardToTarget, drawCards } from '../logic/loggingEngine.js';
 import { isPileZone } from '../../utils.js';
 import { domIdToStateZone, renderEntireBoard } from './render.js';
 import { openPileBrowser, refreshPileBrowser } from './overlays/pileBrowser.js';
 import { openCardView } from './overlays/cardZoom.js';
 
 function handleBoardClick(e) {
-    if (e.target.closest('.click-handling')) return; // menu clicks are actionmenu.js's domain entirely
+    if (e.target.closest('.click-handling')) return; // menu clicks are a different domain entirely
 
     const cardEl = e.target.closest('.card');
     const zoneEl = e.target.closest('.zone, .hand, .table-half');
@@ -20,7 +20,7 @@ function handleBoardClick(e) {
         ) {
             const ownerSlot = targetZone.split('-')[0];
 
-            drawTopCard(targetZone, `${ownerSlot}-hand`);
+            drawCards(targetZone, `${ownerSlot}-hand`, 1);
 
             clearSelection();
             renderEntireBoard();
