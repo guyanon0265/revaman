@@ -63,7 +63,7 @@
    PILE BROWSER -- left-side floating off-canvas panel
    ========================================================================== */
 
-#pile-browser {
+.side-panel {
     position: fixed;
     top: max(1.4vh, env(safe-area-inset-top, 0px));
     left: max(1.4vh, env(safe-area-inset-left, 0px));
@@ -84,7 +84,7 @@
 }
 
 /* Slide OUT to the left */
-#pile-browser.collapsed {
+.side-panel.collapsed {
     transform: translateX(calc(-100% - 3vh));
     opacity: 0;
     pointer-events: none;
@@ -95,7 +95,7 @@
    Header
    ========================================================================== */
 
-#pile-browser-header {
+.side-panel-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -104,7 +104,7 @@
     flex-shrink: 0;
 }
 
-#pile-browser-title {
+.side-panel-title {
     color: #cfd6e2;
     font-size: 1.5vh;
     font-weight: 600;
@@ -121,7 +121,7 @@
    Close
    ========================================================================== */
 
-#btn-pile-browser-close {
+.btn-side-panel-close {
     width: 3.4vh;
     height: 3.4vh;
     border-radius: 50%;
@@ -135,7 +135,7 @@
     flex-shrink: 0;
 }
 
-#btn-pile-browser-close:hover {
+.btn-side-panel-close:hover {
     background: rgba(239, 68, 68, 0.2);
     border-color: rgba(239, 68, 68, 0.4);
     color: #fca5a5;
@@ -213,7 +213,7 @@
 }
 
 @media (max-width: 767px) {
-    #pile-browser {
+    .side-panel {
         top: auto;
         bottom: max(1.4vh, env(safe-area-inset-bottom, 0px));
         left: 1.4vh;
@@ -223,25 +223,7 @@
         border-radius: 2.2vh;
     }
 
-    #pile-browser.collapsed {
+    .side-panel.collapsed {
         transform: translateY(calc(100% + 3vh));
-    }
-
-    #sidebar {
-        top: auto;
-        bottom: max(1.4vh, env(safe-area-inset-bottom, 0px));
-        left: 1.4vh;
-        right: 1.4vh;
-        width: auto;
-        height: min(72vh, 560px);
-        border-radius: 2.2vh;
-    }
-
-    #sidebar.collapsed {
-        transform: translateY(calc(100% + 3vh));
-    }
-
-    .hud-dock {
-        bottom: 1.4vh;
     }
 }
