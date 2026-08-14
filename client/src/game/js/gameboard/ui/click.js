@@ -3,7 +3,7 @@ import { moveCardToZone, attachCardToTarget, drawCards } from '../logic/loggingE
 import { isPileZone } from '../../utils.js';
 import { domIdToStateZone, renderEntireBoard } from './render.js';
 import { openPileBrowser, refreshPileBrowser } from './overlays/pileBrowser.js';
-import { openCardView } from './overlays/cardZoom.js';
+import { openCardView } from './overlays/cardView.js';
 
 function handleBoardClick(e) {
     if (e.target.closest('.click-handling')) return; // menu clicks are a different domain entirely

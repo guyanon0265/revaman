@@ -1,14 +1,14 @@
-// gameboard/pilebrowser.js — the full-screen grid overlay, shared by
-// the pile browser (deck/discard/lost-zone View buttons) and View
-// Attached. renderBrowserGrid takes sections so both callers can use
-// it: pile browser passes one unlabeled section, View Attached passes
-// three labeled ones. Clicking a thumbnail does NOT close this overlay
-// — #browser-menu is a small floating panel that opens on top of it,
-// so canceling out of that panel naturally reveals the grid again.
+// gameboard/pilebrowser.js — shared card-browser grid plus the standalone
+// pile browser.
+//
+// The grid renderer is intentionally context-free: callers provide the
+// sections and interaction handlers. The standalone pile browser owns its
+// own title/count header. View Attached can reuse the same grid without
+// inheriting pile-browser semantics.
 
 import { gameState, clientState, clearSelection } from '../../logic/state.js';
 import { ZONE_LABELS } from '../../../utils.js';
-import { openCardView } from './cardZoom.js';
+import { openCardView } from './cardView.js';
 import { moveCardToZone } from '../../logic/loggingEngine.js';
 import { renderEntireBoard } from '../render.js';
 
@@ -19,11 +19,18 @@ const gridEl = document.getElementById('pile-browser-grid');
 
 let currentZone = null;
 
-// sections: [{ label: string|null, cards: [] }, ...]. Empty sections
-// are skipped entirely rather than rendered as an empty labeled group.
-export function renderBrowserGrid(title, count, sections, onCardClick, onCardContextMenu) {
-    titleEl.textContent = title;
-    countEl.textContent = count;
+// ---------------------------------------------------------------------------
+// Shared browser grid
+// ---------------------------------------------------------------------------
+//
+// sections: [{ label: string|null, cards: [] }, ...]
+//
+// Empty sections are skipped entirely.
+//
+// This function deliberately knows nothing about whether the cards came from
+// a pile, attachments, or anything else. The caller supplies the sections
+// and interaction handlers.
+export function renderBrowserGrid(sections, onCardClick, onCardContextMenu) {
     gridEl.innerHTML = '';
     sections.forEach(section => {
         if (section.cards.length === 0) return;
@@ -58,12 +65,14 @@ export function renderBrowserGrid(title, count, sections, onCardClick, onCardCon
     });
 }
 
-function renderGrid() {
+function renderPileGrid() {
     if (!currentZone) return;
     const cards = [...(gameState.zones[currentZone] || [])].reverse(); // top-first, LIFO
+
+    titleEl.textContent = ZONE_LABELS[currentZone] || currentZone;
+    countEl.textContent = `${cards.length} card${cards.length === 1 ? '' : 's'}`;
+
     renderBrowserGrid(
-        ZONE_LABELS[currentZone] || currentZone,
-        `${cards.length} card${cards.length === 1 ? '' : 's'}`,
         [{ label: null, cards }],
         handleBrowserCardClick,
         handleBrowserCardContextMenu
@@ -91,13 +100,13 @@ function handleBrowserCardContextMenu(card) {
         `${card.owner}-hand`
     );
     clearSelection();
-    renderGrid();
+    renderPileGrid();
     renderEntireBoard();
 }
 
 export function openPileBrowser(zone) {
     currentZone = zone;
-    renderGrid();
+    renderPileGrid();
     browserEl.classList.remove('collapsed');
 }
 
@@ -108,7 +117,7 @@ export function closePileBrowser() {
 
 export function refreshPileBrowser() {
     if (!currentZone) return;
-    renderGrid();
+    renderPileGrid();
 }
 
 export function initPileBrowser() {
