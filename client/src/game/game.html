@@ -214,51 +214,51 @@
     </div>
 
     <div id="action-menu" class="collapsed side-panel click-handling">
-        <div id="side-panel-header">
-            <div class="menu-tabs sidebar-tabs">
+        <div id="action-menu-header" class="side-panel-header">
+            <div class="menu-tabs">
                 <div id="menu-card-name" class="side-panel-title"></div>
-                <button id="btn-section-markers" class="tab-btn">Markers</button>
-                <button id="btn-section-rotate" class="tab-btn">Rotate</button>
-                <button id="btn-view-attach" class="tab-btn">View Attached</button>
+                <button id="btn-card-controls" class="btn-menu-tab">Controls</button>
+                <button id="btn-view-attach" class="btn-menu-tab">View Attached</button>
                 <button id="btn-action-menu-close" class="btn-side-panel-close">&#10005;</button>
             </div>
         </div>
 
-        <div id="card-marker-tab" class="menu-page">
-            <div class="menu-section counters">
-                <div class="counter-control">
-                    <span>Dmg:</span><button id="btn-dmg-down">-</button><span id="txt-menu-dmg">0</span><button id="btn-dmg-up">+</button>
+        <div id="card-controls-tab" class="menu-page active">
+            <div id="markers-section">
+                <div class="menu-section counters">
+                    <div class="counter-control">
+                        <span>Dmg:</span><button id="btn-dmg-down">-</button><span id="txt-menu-dmg">0</span><button id="btn-dmg-up">+</button>
+                    </div>
+                    <div class="counter-control">
+                        <span>Ohl:</span><button id="btn-ohl-down">-</button><span id="txt-menu-ohl">0</span><button id="btn-ohl-up">+</button>
+                    </div>
+                    <div class="counter-control">
+                        <span>Counter:</span><button id="btn-counter-down">-</button><span id="txt-menu-counter">0</span><button id="btn-counter-up">+</button>
+                    </div>
                 </div>
-                <div class="counter-control">
-                    <span>Ohl:</span><button id="btn-ohl-down">-</button><span id="txt-menu-ohl">0</span><button id="btn-ohl-up">+</button>
+                <div class="menu-section statuses">
+                    <button class="status-chip" data-status="BRN">BRN</button>
+                    <button class="status-chip" data-status="PAR">PAR</button>
+                    <button class="status-chip" data-status="PSN">PSN</button>
+                    <button class="status-chip" data-status="FRZ">FRZ</button>
+                    <button class="status-chip" data-status="SLP">SLP</button>
+                    <button class="status-chip" data-status="CON">CON</button>
                 </div>
-                <div class="counter-control">
-                    <span>Counter:</span><button id="btn-counter-down">-</button><span id="txt-menu-counter">0</span><button id="btn-counter-up">+</button>
+                <div class="menu-section">
+                    <button id="btn-ability">Ability: Ready</button>
                 </div>
             </div>
-            <div class="menu-section statuses">
-                <button class="status-chip" data-status="BRN">BRN</button>
-                <button class="status-chip" data-status="PAR">PAR</button>
-                <button class="status-chip" data-status="PSN">PSN</button>
-                <button class="status-chip" data-status="FRZ">FRZ</button>
-                <button class="status-chip" data-status="SLP">SLP</button>
-                <button class="status-chip" data-status="CON">CON</button>
-            </div>
-            <div class="menu-section">
-                <button id="btn-ability">Ability: Ready</button>
-            </div>
-        </div>
 
-        <div id="card-rotate-tab" class="menu-page">
-            <div class="menu-section">
-                <button id="btn-rotate-left">Left</button>
-                <button id="btn-rotate-right">Right</button>
-                <button id="btn-flip">Flip Card</button>
-                <button id="btn-rotate-invert">Invert</button>
-                <button id="btn-rotate-upright">Upright</button>
-            </div>
-            <div class="menu-section">
-                <button id="btn-rotate-break">BREAK</button>
+            <div id="rotation-controls" class="menu-section">
+                <div class="rotation-dpad">
+                    <button id="btn-rotate-upright" class="dpad-btn dpad-up">&uarr;</button>
+                    <button id="btn-rotate-left" class="dpad-btn dpad-left">&larr;</button>
+                    <button id="btn-flip" class="dpad-btn dpad-center">&#x27F3;</button>
+                    <button id="btn-rotate-right" class="dpad-btn dpad-right">&rarr;</button>
+                    <button id="btn-rotate-invert" class="dpad-btn dpad-down">&darr;</button>
+                </div>
+
+                <button id="btn-rotate-break" class="control-btn break-btn">BREAK</button>
             </div>
         </div>
     </div>

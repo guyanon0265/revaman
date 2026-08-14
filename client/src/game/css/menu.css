@@ -1,73 +1,3 @@
-.action-menu {
-    position: fixed;
-    display: none;
-    flex-direction: column;
-    z-index: 200;
-    background: rgba(15, 15, 15, 0.98);
-    border: 1px solid #333;
-    border-radius: 12px;
-    padding: 10px;
-    gap: 8px;
-    width: 210px;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.6);
-    box-sizing: border-box;
-}
-.menu-page { display: none; flex-direction: column; gap: 8px; }
-.menu-page.active { display: flex; }
-.menu-title { color: #aaa; font-size: 12px; font-weight: bold; text-align: center; width: 100%; }
-.menu-section {
-    display: flex;
-    justify-content: center;
-    gap: 5px;
-    flex-wrap: wrap;
-}
-.menu-section.counters { align-items: center; }
-.counter-control {
-    display: flex;
-    align-items: center;
-    background: #222;
-    border-radius: 20px;
-    padding: 4px 10px;
-    color: #fff;
-    font-size: 11px;
-    gap: 8px;
-}
-.action-menu button {
-    background: #252525;
-    border: 1px solid #333;
-    color: white;
-    padding: 8px 11px;
-    min-height: 34px;
-    font-size: 11px;
-    border-radius: 0.7vh;
-    font-weight: bold;
-    cursor: pointer;
-    box-sizing: border-box;
-}
-.action-menu .cancel-btn { background: #801515; border-color: #a31616; }
-.close-btn {
-    width: 3.4vh;
-    height: 3.4vh;
-    border-radius: 50%;
-    background: rgba(239, 68, 68, 0.2);
-    border: 1px solid var(--border-subtle, rgba(239, 68, 68, 0.4));
-    color: #cfd6e2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    flex-shrink: 0;
-}
-
-.close-btn:hover {
-    color: #fca5a5;
-}
-/* ==========================================================================
-   PILE BROWSER -- left-side floating off-canvas panel
-   ========================================================================== */
-
 .side-panel {
     position: fixed;
     top: max(1.4vh, env(safe-area-inset-top, 0px));
@@ -231,4 +161,213 @@
     .side-panel.collapsed {
         transform: translateY(calc(100% + 3vh));
     }
+}
+
+/* Action Menu */
+.menu-tabs { display: flex; gap: 0.6vh; flex: 1; min-width: 0; }
+
+.btn-menu-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3vh;
+    background-color: transparent;
+    border: 1px solid transparent;
+    color: #7d8494;
+    padding: 0.8vh 0.2vh;
+    font-size: 1.4vh;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border-radius: 1vh;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    min-width: 0;
+}
+.btn-menu-tab span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.btn-menu-tab .icon { width: 1.7vh; height: 1.7vh; }
+
+.btn-menu-tab:hover { color: #fff; background: rgba(255, 255, 255, 0.05); }
+
+.btn-menu-tab.active {
+    background-color: rgba(47, 111, 237, 0.18);
+    color: #7db8ff;
+}
+
+.menu-page { 
+    display: none;
+    flex-direction: column;
+    gap: 8px; 
+}
+.menu-page.active { display: flex; }
+.menu-title { color: #aaa; font-size: 12px; font-weight: bold; text-align: center; width: 100%; }
+.menu-section {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+.menu-section.counters { align-items: center; flex-direction: column;}
+.counter-control {
+    display: flex;
+    align-items: center;
+    background: #222;
+    border-radius: 20px;
+    padding: 4px 10px;
+    color: #fff;
+    font-size: 11px;
+    gap: 8px;
+}
+.action-menu button {
+    background: #252525;
+    border: 1px solid #333;
+    color: white;
+    padding: 8px 11px;
+    min-height: 34px;
+    font-size: 11px;
+    border-radius: 0.7vh;
+    font-weight: bold;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   Card Controls
+   ========================================================================== */
+
+#card-controls-tab {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2vh;
+}
+
+#card-controls-tab.active {
+    display: flex;
+}
+
+#markers-section,
+#rotation-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+}
+
+
+/* --------------------------------------------------------------------------
+   Generic control buttons
+   -------------------------------------------------------------------------- */
+
+.control-btn,
+#card-controls-tab button {
+    background: #252525;
+    border: 1px solid #333;
+    color: #fff;
+    min-height: 4.2vh;
+    padding: 0.8vh 1.1vh;
+    font-size: 1.5vh;
+    border-radius: 0.7vh;
+    font-weight: 700;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease,
+        transform 0.08s ease;
+}
+
+#card-controls-tab button:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.16);
+}
+
+#card-controls-tab button:active {
+    transform: scale(0.96);
+}
+
+
+/* --------------------------------------------------------------------------
+   Rotation D-pad
+   -------------------------------------------------------------------------- */
+
+.rotation-dpad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 4.8vh);
+    gap: 0.5vh;
+    width: min(100%, 24vh);
+    margin: 0 auto;
+}
+
+.dpad-btn {
+    width: 100%;
+    height: 100%;
+    min-height: 0 !important;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.9vh !important;
+    font-size: 3vh !important;
+}
+
+.dpad-up {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.dpad-left {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.dpad-center {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.dpad-right {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+.dpad-down {
+    grid-column: 2;
+    grid-row: 3;
+}
+
+
+/* --------------------------------------------------------------------------
+   BREAK
+   -------------------------------------------------------------------------- */
+
+.break-btn {
+    width: 100%;
+    background: rgba(239, 68, 68, 0.12) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: #fca5a5 !important;
+}
+
+.break-btn:hover {
+    background: rgba(239, 68, 68, 0.2) !important;
+    border-color: rgba(239, 68, 68, 0.45) !important;
+}
+
+.close-btn {
+    width: 3.4vh;
+    height: 3.4vh;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid var(--border-subtle, rgba(239, 68, 68, 0.4));
+    color: #cfd6e2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.close-btn:hover {
+    color: #fca5a5;
 }
