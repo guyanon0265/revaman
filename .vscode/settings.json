@@ -2,7 +2,7 @@
   "liveServer.settings.port": 5500,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnType": false,
-  "editor.formatOnSave": false,
+  "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
     "source.fixAll.stylelint": "explicit"
