@@ -31,95 +31,87 @@ let currentZone = null;
 // a pile, attachments, or anything else. The caller supplies the sections
 // and interaction handlers.
 export function renderBrowserGrid(sections, onCardClick, onCardContextMenu) {
-    gridEl.innerHTML = '';
-    sections.forEach(section => {
-        if (section.cards.length === 0) return;
+  gridEl.innerHTML = '';
+  sections.forEach((section) => {
+    if (section.cards.length === 0) return;
 
-        const wrap = document.createElement('div');
-        wrap.className = 'pile-browser-section';
+    const wrap = document.createElement('div');
+    wrap.className = 'pile-browser-section';
 
-        if (section.label) {
-            const heading = document.createElement('div');
-            heading.className = 'pile-browser-section-label';
-            heading.textContent = section.label;
-            wrap.appendChild(heading);
-        }
+    if (section.label) {
+      const heading = document.createElement('div');
+      heading.className = 'pile-browser-section-label';
+      heading.textContent = section.label;
+      wrap.appendChild(heading);
+    }
 
-        const grid = document.createElement('div');
-        grid.className = 'pile-browser-section-grid';
-        section.cards.forEach(card => {
-            const img = document.createElement('img');
-            img.className = 'pile-browser-thumbnail';
-            img.src = card.imageUrl;
-            img.alt = card.name;
-            img.draggable = false;
-            img.addEventListener('click', () => onCardClick(card));
-            img.addEventListener('contextmenu', e => {
-                e.preventDefault();
-                onCardContextMenu(card);
-            });
-            grid.appendChild(img);
-        });
-        wrap.appendChild(grid);
-        gridEl.appendChild(wrap);
+    const grid = document.createElement('div');
+    grid.className = 'pile-browser-section-grid';
+    section.cards.forEach((card) => {
+      const img = document.createElement('img');
+      img.className = 'pile-browser-thumbnail';
+      img.src = card.imageUrl;
+      img.alt = card.name;
+      img.draggable = false;
+      img.addEventListener('click', () => onCardClick(card));
+      img.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        onCardContextMenu(card);
+      });
+      grid.appendChild(img);
     });
+    wrap.appendChild(grid);
+    gridEl.appendChild(wrap);
+  });
 }
 
 function renderPileGrid() {
-    if (!currentZone) return;
-    const cards = [...(gameState.zones[currentZone] || [])].reverse(); // top-first, LIFO
+  if (!currentZone) return;
+  const cards = [...(gameState.zones[currentZone] || [])].reverse(); // top-first, LIFO
 
-    titleEl.textContent = ZONE_LABELS[currentZone] || currentZone;
-    countEl.textContent = `${cards.length} card${cards.length === 1 ? '' : 's'}`;
+  titleEl.textContent = ZONE_LABELS[currentZone] || currentZone;
+  countEl.textContent = `${cards.length} card${cards.length === 1 ? '' : 's'}`;
 
-    renderBrowserGrid(
-        [{ label: null, cards }],
-        handleBrowserCardClick,
-        handleBrowserCardContextMenu
-    );
+  renderBrowserGrid([{ label: null, cards }], handleBrowserCardClick, handleBrowserCardContextMenu);
 }
 
 function selectBrowserCard(card) {
-    clientState.selectedInstanceId = card.instanceId;
-    clientState.selectedZone = currentZone;
-    clientState.selectedKind = 'card';
-    clientState.selectedParentId = null;
+  clientState.selectedInstanceId = card.instanceId;
+  clientState.selectedZone = currentZone;
+  clientState.selectedKind = 'card';
+  clientState.selectedParentId = null;
 }
 
 function handleBrowserCardClick(card) {
-    selectBrowserCard(card);
-    openCardView(card);
-    clearSelection();
+  selectBrowserCard(card);
+  openCardView(card);
+  clearSelection();
 }
 
 function handleBrowserCardContextMenu(card) {
-    selectBrowserCard(card);
-    moveCardToZone(
-        card.instanceId,
-        currentZone,
-        `${card.owner}-hand`
-    );
-    clearSelection();
-    renderPileGrid();
-    renderEntireBoard();
+  selectBrowserCard(card);
+  moveCardToZone(card.instanceId, currentZone, `${card.owner}-hand`);
+  clearSelection();
+  renderPileGrid();
+  renderEntireBoard();
 }
 
 export function openPileBrowser(zone) {
-    currentZone = zone;
-    renderPileGrid();
-    browserEl.classList.remove('collapsed');
+  currentZone = zone;
+  renderPileGrid();
+  browserEl.classList.remove('collapsed');
 }
 
 export function closePileBrowser() {
-    browserEl.classList.add('collapsed');
-    currentZone = null;
+  browserEl.classList.add('collapsed');
+  currentZone = null;
 }
 
 export function refreshPileBrowser() {
-    if (!currentZone) return;
-    renderPileGrid();
+  if (!currentZone) return;
+  renderPileGrid();
 }
 
 export function initPileBrowser() {
-    document.getElementById('btn-pile-browser-close').addEventListener('click', closePileBrowser);
+  document.getElementById('btn-pile-browser-close').addEventListener('click', closePileBrowser);
 }

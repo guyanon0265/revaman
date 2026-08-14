@@ -25,15 +25,19 @@ import { GameLogger } from '../../sidebar/chat/chatlog.js';
 // ---------------------------------------------------------------------
 
 const ZONE_SUFFIX_LABELS = {
-    deck: 'Deck', hand: 'Hand', active: 'Active',
-    bench: 'Bench', discard: 'Discard', prizes: 'Prizes'
+  deck: 'Deck',
+  hand: 'Hand',
+  active: 'Active',
+  bench: 'Bench',
+  discard: 'Discard',
+  prizes: 'Prizes',
 };
 
 const SHARED_ZONE_LABELS = {
-    'stadium': 'Stadium',
-    'lost-zone': 'Lost Zone',
-    'table-left': 'Table (Left)',
-    'table-right': 'Table (Right)'
+  stadium: 'Stadium',
+  'lost-zone': 'Lost Zone',
+  'table-left': 'Table (Left)',
+  'table-right': 'Table (Right)',
 };
 
 // Logs an action, always attributed to the local acting viewer
@@ -44,21 +48,21 @@ const SHARED_ZONE_LABELS = {
 // same card — this fixes that. Matches the client-authoritative model:
 // a client only ever logs its own actions.
 function logAction(actionText) {
-    GameLogger.logAction(runtimeState.mySlot, actionText);
+  GameLogger.logAction(runtimeState.mySlot, actionText);
 }
 
 function zoneLabel(zoneId) {
-    if (zoneId.startsWith('p1-') || zoneId.startsWith('p2-')) {
-        const slot = zoneId.slice(0, 2);
-        const suffix = zoneId.slice(3);
-        const base = ZONE_SUFFIX_LABELS[suffix] || suffix;
-        return slot === runtimeState.mySlot ? base : `Opponent's ${base}`;
-    }
-    return SHARED_ZONE_LABELS[zoneId] || zoneId;
+  if (zoneId.startsWith('p1-') || zoneId.startsWith('p2-')) {
+    const slot = zoneId.slice(0, 2);
+    const suffix = zoneId.slice(3);
+    const base = ZONE_SUFFIX_LABELS[suffix] || suffix;
+    return slot === runtimeState.mySlot ? base : `Opponent's ${base}`;
+  }
+  return SHARED_ZONE_LABELS[zoneId] || zoneId;
 }
 
 function findCard(zoneId, instanceId) {
-    return gameState.zones[zoneId]?.find(c => c.instanceId === instanceId) || null;
+  return gameState.zones[zoneId]?.find((c) => c.instanceId === instanceId) || null;
 }
 
 // ---------------------------------------------------------------------
@@ -79,43 +83,41 @@ function findCard(zoneId, instanceId) {
 let pendingBatch = null;
 
 function flushPendingBatch() {
-    if (!pendingBatch) return;
-    const { cardName, statLabel, netDelta, finalValue } = pendingBatch;
-    const sign = netDelta > 0 ? '+' : '';
-    logAction(`changed ${statLabel} on ${cardName} by ${sign}${netDelta} (now ${finalValue}).`);
-    pendingBatch = null;
+  if (!pendingBatch) return;
+  const { cardName, statLabel, netDelta, finalValue } = pendingBatch;
+  const sign = netDelta > 0 ? '+' : '';
+  logAction(`changed ${statLabel} on ${cardName} by ${sign}${netDelta} (now ${finalValue}).`);
+  pendingBatch = null;
 }
 
 function applyDelta(statLabel, engineFn, instanceId, zone, delta) {
-    const before = findCard(zone, instanceId);
-    const card = engineFn(instanceId, zone, delta);
-    if (!before || !card) return card;
+  const before = findCard(zone, instanceId);
+  const card = engineFn(instanceId, zone, delta);
+  if (!before || !card) return card;
 
-    const key = `${instanceId}:${statLabel}`;
-    const finalValue = statLabel === 'damage' ? card.damage
-        : statLabel === 'overheal' ? card.overheal
-        : card.counter;
+  const key = `${instanceId}:${statLabel}`;
+  const finalValue = statLabel === 'damage' ? card.damage : statLabel === 'overheal' ? card.overheal : card.counter;
 
-    if (pendingBatch && pendingBatch.key === key) {
-        pendingBatch.netDelta += delta;
-        pendingBatch.finalValue = finalValue;
-    } else {
-        flushPendingBatch();
-        pendingBatch = { key, zone, cardName: card.name, statLabel, netDelta: delta, finalValue };
-    }
-    return card;
+  if (pendingBatch && pendingBatch.key === key) {
+    pendingBatch.netDelta += delta;
+    pendingBatch.finalValue = finalValue;
+  } else {
+    flushPendingBatch();
+    pendingBatch = { key, zone, cardName: card.name, statLabel, netDelta: delta, finalValue };
+  }
+  return card;
 }
 
 export function applyDamageDelta(instanceId, zone, delta) {
-    return applyDelta('damage', engine.applyDamageDelta, instanceId, zone, delta);
+  return applyDelta('damage', engine.applyDamageDelta, instanceId, zone, delta);
 }
 
 export function applyOverhealDelta(instanceId, zone, delta) {
-    return applyDelta('overheal', engine.applyOverhealDelta, instanceId, zone, delta);
+  return applyDelta('overheal', engine.applyOverhealDelta, instanceId, zone, delta);
 }
 
 export function applyCounterDelta(instanceId, zone, delta) {
-    return applyDelta('counter', engine.applyCounterDelta, instanceId, zone, delta);
+  return applyDelta('counter', engine.applyCounterDelta, instanceId, zone, delta);
 }
 
 // ---------------------------------------------------------------------
@@ -125,136 +127,136 @@ export function applyCounterDelta(instanceId, zone, delta) {
 // ---------------------------------------------------------------------
 
 export function moveCardToZone(instanceId, fromZone, toZone, position = 'top') {
-    flushPendingBatch();
-    const card = engine.moveCardToZone(instanceId, fromZone, toZone, position);
-    if (card) logAction(`moved ${card.name} from ${zoneLabel(fromZone)} to ${zoneLabel(toZone)}.`);
-    return card;
+  flushPendingBatch();
+  const card = engine.moveCardToZone(instanceId, fromZone, toZone, position);
+  if (card) logAction(`moved ${card.name} from ${zoneLabel(fromZone)} to ${zoneLabel(toZone)}.`);
+  return card;
 }
 
 export function moveToTopOfDeck(instanceId, fromZone, toZone) {
-    flushPendingBatch();
-    const card = engine.moveToTopOfDeck(instanceId, fromZone, toZone);
-    if (card) logAction(`put ${card.name} on top of the ${zoneLabel(toZone)} (from ${zoneLabel(fromZone)}).`);
-    return card;
+  flushPendingBatch();
+  const card = engine.moveToTopOfDeck(instanceId, fromZone, toZone);
+  if (card) logAction(`put ${card.name} on top of the ${zoneLabel(toZone)} (from ${zoneLabel(fromZone)}).`);
+  return card;
 }
 
 export function moveToBottomOfDeck(instanceId, fromZone, toZone) {
-    flushPendingBatch();
-    const card = engine.moveToBottomOfDeck(instanceId, fromZone, toZone);
-    if (card) logAction(`put ${card.name} on the bottom of the ${zoneLabel(toZone)} (from ${zoneLabel(fromZone)}).`);
-    return card;
+  flushPendingBatch();
+  const card = engine.moveToBottomOfDeck(instanceId, fromZone, toZone);
+  if (card) logAction(`put ${card.name} on the bottom of the ${zoneLabel(toZone)} (from ${zoneLabel(fromZone)}).`);
+  return card;
 }
 
 export function drawTopCard(fromZone, toZone) {
-    flushPendingBatch();
-    const card = engine.drawTopCard(fromZone, toZone);
-    if (card) logAction(`drew ${card.name}.`);
-    return card;
+  flushPendingBatch();
+  const card = engine.drawTopCard(fromZone, toZone);
+  if (card) logAction(`drew ${card.name}.`);
+  return card;
 }
 
 export function drawCards(fromZone, toZone, count) {
-    flushPendingBatch();
-    const before = gameState.zones[toZone]?.length ?? 0;
-    engine.drawCards(fromZone, toZone, count);
-    const actualDrawn = (gameState.zones[toZone]?.length ?? 0) - before;
-    if (actualDrawn > 0) {
-        logAction(`drew ${actualDrawn} card${actualDrawn === 1 ? '' : 's'} into ${zoneLabel(toZone)}.`);
-    }
+  flushPendingBatch();
+  const before = gameState.zones[toZone]?.length ?? 0;
+  engine.drawCards(fromZone, toZone, count);
+  const actualDrawn = (gameState.zones[toZone]?.length ?? 0) - before;
+  if (actualDrawn > 0) {
+    logAction(`drew ${actualDrawn} card${actualDrawn === 1 ? '' : 's'} into ${zoneLabel(toZone)}.`);
+  }
 }
 
 export function shuffleZone(zoneId) {
-    flushPendingBatch();
-    engine.shuffleZone(zoneId);
-    logAction(`shuffled ${zoneLabel(zoneId)}.`);
+  flushPendingBatch();
+  engine.shuffleZone(zoneId);
+  logAction(`shuffled ${zoneLabel(zoneId)}.`);
 }
 
 export function shuffleDiscardIntoDeck(discardZone, deckZone) {
-    flushPendingBatch();
-    const count = gameState.zones[discardZone]?.length ?? 0;
-    engine.shuffleDiscardIntoDeck(discardZone, deckZone);
-    if (count > 0) {
-        logAction(`shuffled ${count} card${count === 1 ? '' : 's'} from ${zoneLabel(discardZone)} into ${zoneLabel(deckZone)}.`);
-    }
+  flushPendingBatch();
+  const count = gameState.zones[discardZone]?.length ?? 0;
+  engine.shuffleDiscardIntoDeck(discardZone, deckZone);
+  if (count > 0) {
+    logAction(`shuffled ${count} card${count === 1 ? '' : 's'} from ${zoneLabel(discardZone)} into ${zoneLabel(deckZone)}.`);
+  }
 }
 
 export function attachCardToTarget(selectedId, fromZone, targetId, targetZone) {
-    flushPendingBatch();
-    const selectedBefore = findCard(fromZone, selectedId);
-    const targetBefore = findCard(targetZone, targetId);
-    const kind = selectedBefore ? classifyType(selectedBefore.type) : null;
-    const result = engine.attachCardToTarget(selectedId, fromZone, targetId, targetZone);
-    if (!result || !targetBefore) return result;
+  flushPendingBatch();
+  const selectedBefore = findCard(fromZone, selectedId);
+  const targetBefore = findCard(targetZone, targetId);
+  const kind = selectedBefore ? classifyType(selectedBefore.type) : null;
+  const result = engine.attachCardToTarget(selectedId, fromZone, targetId, targetZone);
+  if (!result || !targetBefore) return result;
 
-    if (kind === 'energy') {
-        logAction(`attached ${result.name} to ${targetBefore.name} as energy.`);
-    } else if (kind === 'trainer') {
-        logAction(`attached ${result.name} to ${targetBefore.name}.`);
-    } else {
-        logAction(`evolved ${targetBefore.name} into ${result.name}.`);
-    }
-    return result;
+  if (kind === 'energy') {
+    logAction(`attached ${result.name} to ${targetBefore.name} as energy.`);
+  } else if (kind === 'trainer') {
+    logAction(`attached ${result.name} to ${targetBefore.name}.`);
+  } else {
+    logAction(`evolved ${targetBefore.name} into ${result.name}.`);
+  }
+  return result;
 }
 
 export function detachCard(parentId, parentZone, attachmentId, attachmentKind, toHandZone) {
-    flushPendingBatch();
-    const parent = findCard(parentZone, parentId);
-    const card = engine.detachCard(parentId, parentZone, attachmentId, attachmentKind, toHandZone);
-    if (card) {
-        logAction(`detached ${card.name} from ${parent ? parent.name : 'a card'}, returning it to hand.`);
-    }
-    return card;
+  flushPendingBatch();
+  const parent = findCard(parentZone, parentId);
+  const card = engine.detachCard(parentId, parentZone, attachmentId, attachmentKind, toHandZone);
+  if (card) {
+    logAction(`detached ${card.name} from ${parent ? parent.name : 'a card'}, returning it to hand.`);
+  }
+  return card;
 }
 
 export function devolveCard(cardId, zone, targetInstanceId) {
-    flushPendingBatch();
-    const current = findCard(zone, cardId);
-    const previous = engine.devolveCard(cardId, zone, targetInstanceId);
-    if (previous && current) {
-        logAction(`devolved ${current.name} back into ${previous.name}, returning it to hand.`);
-    }
-    return previous;
+  flushPendingBatch();
+  const current = findCard(zone, cardId);
+  const previous = engine.devolveCard(cardId, zone, targetInstanceId);
+  if (previous && current) {
+    logAction(`devolved ${current.name} back into ${previous.name}, returning it to hand.`);
+  }
+  return previous;
 }
 
 export function toggleStatus(instanceId, zone, status) {
-    flushPendingBatch();
-    const before = findCard(zone, instanceId);
-    const wasActive = before ? before.statuses.includes(status) : false;
-    const card = engine.toggleStatus(instanceId, zone, status);
-    if (card) logAction(`${wasActive ? 'removed' : 'added'} ${status} on ${card.name}.`);
-    return card;
+  flushPendingBatch();
+  const before = findCard(zone, instanceId);
+  const wasActive = before ? before.statuses.includes(status) : false;
+  const card = engine.toggleStatus(instanceId, zone, status);
+  if (card) logAction(`${wasActive ? 'removed' : 'added'} ${status} on ${card.name}.`);
+  return card;
 }
 
 export function toggleAbility(instanceId, zone) {
-    flushPendingBatch();
-    const card = engine.toggleAbility(instanceId, zone);
-    if (card) logAction(`marked ${card.name}'s ability as ${card.abilityUsed ? 'used' : 'ready'}.`);
-    return card;
+  flushPendingBatch();
+  const card = engine.toggleAbility(instanceId, zone);
+  if (card) logAction(`marked ${card.name}'s ability as ${card.abilityUsed ? 'used' : 'ready'}.`);
+  return card;
 }
 
 export function toggleFlip(instanceId, zone) {
-    flushPendingBatch();
-    const card = engine.toggleFlip(instanceId, zone);
-    if (card) logAction(`turned ${card.name} face ${card.isFaceDown ? 'down' : 'up'}.`);
-    return card;
+  flushPendingBatch();
+  const card = engine.toggleFlip(instanceId, zone);
+  if (card) logAction(`turned ${card.name} face ${card.isFaceDown ? 'down' : 'up'}.`);
+  return card;
 }
 
 export function setRotation(instanceId, zone, degrees) {
-    flushPendingBatch();
-    const card = engine.setRotation(instanceId, zone, degrees);
-    if (card) logAction(`rotated ${card.name} to ${degrees}°.`);
-    return card;
+  flushPendingBatch();
+  const card = engine.setRotation(instanceId, zone, degrees);
+  if (card) logAction(`rotated ${card.name} to ${degrees}°.`);
+  return card;
 }
 
 export function setUpright(instanceId, zone) {
-    flushPendingBatch();
-    const card = engine.setUpright(instanceId, zone);
-    if (card) logAction(`reset ${card.name} to upright.`);
-    return card;
+  flushPendingBatch();
+  const card = engine.setUpright(instanceId, zone);
+  if (card) logAction(`reset ${card.name} to upright.`);
+  return card;
 }
 
 export function toggleBreak(instanceId, zone) {
-    flushPendingBatch();
-    const card = engine.toggleBreak(instanceId, zone);
-    if (card) logAction(`${card.isBreakActive ? 'activated' : 'deactivated'} BREAK on ${card.name}.`);
-    return card;
+  flushPendingBatch();
+  const card = engine.toggleBreak(instanceId, zone);
+  if (card) logAction(`${card.isBreakActive ? 'activated' : 'deactivated'} BREAK on ${card.name}.`);
+  return card;
 }

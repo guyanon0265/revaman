@@ -3,36 +3,36 @@ import { parseDeckCSV } from '../../gameboard/logic/parser.js';
 import { renderEntireBoard } from '../../gameboard/ui/render.js';
 
 export function promptForCSVAndParse(slot) {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.csv,text/csv';
-    input.style.display = 'none';
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.csv,text/csv';
+  input.style.display = 'none';
 
-    input.addEventListener('change', () => {
-        const file = input.files[0];
-        if (!file) return;
+  input.addEventListener('change', () => {
+    const file = input.files[0];
+    if (!file) return;
 
-        const reader = new FileReader();
-        reader.onload = () => {
-            parseDeckCSV(reader.result, slot);
-            renderEntireBoard();
-        };
-        reader.readAsText(file);
-    });
+    const reader = new FileReader();
+    reader.onload = () => {
+      parseDeckCSV(reader.result, slot);
+      renderEntireBoard();
+    };
+    reader.readAsText(file);
+  });
 
-    document.body.appendChild(input);
-    input.click();
-    input.remove();
+  document.body.appendChild(input);
+  input.click();
+  input.remove();
 }
 
 export function initDeckActions() {
-    const btnLoadDeck = document.getElementById('btn-load-deck');
+  const btnLoadDeck = document.getElementById('btn-load-deck');
 
-    if (btnLoadDeck) {
-        btnLoadDeck.addEventListener('click', () => {
-            promptForCSVAndParse(runtimeState.mySlot);
-        });
-    }
+  if (btnLoadDeck) {
+    btnLoadDeck.addEventListener('click', () => {
+      promptForCSVAndParse(runtimeState.mySlot);
+    });
+  }
 }
 
 //-----------------------------
@@ -49,7 +49,7 @@ export function initDeckActions() {
 // Your code needs to check for two distinct criteria:
 
 //    1. Are we inside an installed PWA? We check display-mode: standalone.
-//    2. Are we on mobile or desktop? We check navigator.userAgentData.mobile (or use window width as a safe fallback). [1, 2] 
+//    2. Are we on mobile or desktop? We check navigator.userAgentData.mobile (or use window width as a safe fallback). [1, 2]
 
 // ------------------------------
 // ## The Code Solution
@@ -60,7 +60,7 @@ export function initDeckActions() {
 //   const isPWA = window.matchMedia('(display-mode: standalone)').matches;
 
 //   // Check if the current device is a mobile phone/tablet
-//   const isMobile = navigator.userAgentData?.mobile || 
+//   const isMobile = navigator.userAgentData?.mobile ||
 //                    window.matchMedia('(max-width: 768px)').matches;
 
 //   if (isPWA) {
@@ -75,8 +75,8 @@ export function initDeckActions() {
 //       window.open(url, '_blank', 'width=800,height=600,noopener,noreferrer');
 //     }
 //   }
-  
-//   // Rule 1: Standard Web Browser -> Do nothing! 
+
+//   // Rule 1: Standard Web Browser -> Do nothing!
 //   // The event flows naturally to the HTML link, honoring target="_blank"
 // }
 
@@ -91,7 +91,6 @@ export function initDeckActions() {
 // ------------------------------
 // ## How Each Environment Responds to this Setup
 
-// * In a standard Web Browser (Chrome/Safari/Firefox): isPWA evaluates to false. The JavaScript function exits instantly without touching the event. The browser naturally executes the HTML default: opening a standard new browser tab via target="_blank". [3, 4] 
+// * In a standard Web Browser (Chrome/Safari/Firefox): isPWA evaluates to false. The JavaScript function exits instantly without touching the event. The browser naturally executes the HTML default: opening a standard new browser tab via target="_blank". [3, 4]
 // * In the Desktop PWA App Window: isPWA evaluates to true and isMobile evaluates to false. The JavaScript blocks the default link event and forces a floating, independent mini-window wrapper onto the user's desktop.
 // * In the Mobile PWA App Window: isPWA evaluates to true and isMobile evaluates to true. The JavaScript blocks the link event and safely overwrites window.location.href, forcing a clean, seamless in-app page redirect.
-

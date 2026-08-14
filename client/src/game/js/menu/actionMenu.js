@@ -22,75 +22,59 @@ import { openViewAttached } from '../gameboard/ui/overlays/viewAttached.js';
 
 const menuEl = document.getElementById('action-menu');
 
-
 // ============================================================================
 // Page Navigation
 // ============================================================================
 
 function showPage(pageId) {
-    document
-        .querySelectorAll('#action-menu .menu-page')
-        .forEach(page => page.classList.remove('active'));
+  document.querySelectorAll('#action-menu .menu-page').forEach((page) => page.classList.remove('active'));
 
-    const page = document.getElementById(pageId);
+  const page = document.getElementById(pageId);
 
-    if (!page) return;
+  if (!page) return;
 
-    page.classList.add('active');
+  page.classList.add('active');
 
-    if (pageId === 'card-controls-tab') {
-        refreshControls();
-    }
+  if (pageId === 'card-controls-tab') {
+    refreshControls();
+  }
 }
-
 
 // ============================================================================
 // Menu Open / Close
 // ============================================================================
 
 function openMenu() {
-    menuEl.style.display = 'flex';
-    showPage('card-controls-tab');
-    refreshControls();
+  menuEl.style.display = 'flex';
+  showPage('card-controls-tab');
+  refreshControls();
 }
 
 function closeMenu() {
-    menuEl.style.display = 'none';
+  menuEl.style.display = 'none';
 
-    document
-        .querySelectorAll('#action-menu .menu-page')
-        .forEach(page => page.classList.remove('active'));
+  document.querySelectorAll('#action-menu .menu-page').forEach((page) => page.classList.remove('active'));
 }
-
 
 // ============================================================================
 // Controls
 // ============================================================================
 
 function refreshControls() {
-    const card = getSelectedCard();
+  const card = getSelectedCard();
 
-    if (!card) return;
+  if (!card) return;
 
-    document.getElementById('txt-menu-dmg').textContent = card.damage;
-    document.getElementById('txt-menu-ohl').textContent = card.overheal;
-    document.getElementById('txt-menu-counter').textContent = card.counter;
+  document.getElementById('txt-menu-dmg').textContent = card.damage;
+  document.getElementById('txt-menu-ohl').textContent = card.overheal;
+  document.getElementById('txt-menu-counter').textContent = card.counter;
 
-    document
-        .querySelectorAll('#markers-section .status-chip')
-        .forEach(chip => {
-            chip.classList.toggle(
-                'active',
-                card.statuses.includes(chip.dataset.status)
-            );
-        });
+  document.querySelectorAll('#markers-section .status-chip').forEach((chip) => {
+    chip.classList.toggle('active', card.statuses.includes(chip.dataset.status));
+  });
 
-    document.getElementById('btn-ability').textContent =
-        card.abilityUsed
-            ? 'Ability: Used'
-            : 'Ability: Ready';
+  document.getElementById('btn-ability').textContent = card.abilityUsed ? 'Ability: Used' : 'Ability: Ready';
 }
-
 
 // ============================================================================
 // Board Selection
@@ -105,263 +89,200 @@ function refreshControls() {
 // never reaches this handler.
 
 function handleSelectionClick(e) {
-    if (e.target.closest('.click-handling')) return;
-    if (clientState.attachmentModeActive) return;
+  if (e.target.closest('.click-handling')) return;
+  if (clientState.attachmentModeActive) return;
 
-    const cardEl = e.target.closest('.card');
+  const cardEl = e.target.closest('.card');
 
-    if (
-        cardEl &&
-        clientState.selectedInstanceId === cardEl.dataset.instanceId
-    ) {
-        if (isPileZone(clientState.selectedZone)) {
-            return;
-        }
-
-        openMenu();
-        return;
+  if (cardEl && clientState.selectedInstanceId === cardEl.dataset.instanceId) {
+    if (isPileZone(clientState.selectedZone)) {
+      return;
     }
 
-    // If the board selection was cleared, close the menu.
-    //
-    // Do not clear the selection here. ui.js owns selection changes.
-    if (!clientState.selectedInstanceId) {
-        closeMenu();
-    }
+    openMenu();
+    return;
+  }
+
+  // If the board selection was cleared, close the menu.
+  //
+  // Do not clear the selection here. ui.js owns selection changes.
+  if (!clientState.selectedInstanceId) {
+    closeMenu();
+  }
 }
-
 
 // ============================================================================
 // Menu Click Handling
 // ============================================================================
 
 function handleMenuClick(e) {
-    const target = e.target;
+  const target = e.target;
 
-    // ------------------------------------------------------------------------
-    // Page navigation
-    // ------------------------------------------------------------------------
+  // ------------------------------------------------------------------------
+  // Page navigation
+  // ------------------------------------------------------------------------
 
-    if (target.id === 'btn-section-controls') {
-        showPage('card-controls-tab');
-        return;
-    }
+  if (target.id === 'btn-section-controls') {
+    showPage('card-controls-tab');
+    return;
+  }
 
-    if (target.id === 'btn-section-attached') {
-        showPage('view-attached-tab');
-        return;
-    }
+  if (target.id === 'btn-section-attached') {
+    showPage('view-attached-tab');
+    return;
+  }
 
+  // ------------------------------------------------------------------------
+  // Close
+  // ------------------------------------------------------------------------
 
-    // ------------------------------------------------------------------------
-    // Close
-    // ------------------------------------------------------------------------
+  if (target.id === 'btn-action-menu-close') {
+    closeMenu();
+    return;
+  }
 
-    if (target.id === 'btn-action-menu-close') {
-        closeMenu();
-        return;
-    }
+  // ------------------------------------------------------------------------
+  // View Card
+  // ------------------------------------------------------------------------
 
+  if (target.id === 'btn-view-card') {
+    const card = getSelectedCard();
 
-    // ------------------------------------------------------------------------
-    // View Card
-    // ------------------------------------------------------------------------
+    if (!card) return;
 
-    if (target.id === 'btn-view-card') {
-        const card = getSelectedCard();
+    closeMenu();
+    openCardView(card);
+    return;
+  }
 
-        if (!card) return;
+  // ------------------------------------------------------------------------
+  // View Attached
+  // ------------------------------------------------------------------------
 
-        closeMenu();
-        openCardView(card);
-        return;
-    }
+  if (target.id === 'btn-view-attach') {
+    const card = getSelectedCard();
 
+    if (!card) return;
 
-    // ------------------------------------------------------------------------
-    // View Attached
-    // ------------------------------------------------------------------------
+    openViewAttached();
+    return;
+  }
 
-    if (target.id === 'btn-view-attach') {
-        const card = getSelectedCard();
+  // ------------------------------------------------------------------------
+  // Markers
+  // ------------------------------------------------------------------------
 
-        if (!card) return;
+  if (target.id === 'btn-dmg-up') {
+    engine.applyDamageDelta(clientState.selectedInstanceId, clientState.selectedZone, 10);
 
-        openViewAttached();
-        return;
-    }
+    refreshControls();
+    renderEntireBoard();
+    return;
+  }
+  if (target.id === 'btn-dmg-down') {
+    engine.applyDamageDelta(clientState.selectedInstanceId, clientState.selectedZone, -10);
 
+    refreshControls();
+    renderEntireBoard();
+    return;
+  }
+  if (target.id === 'btn-ohl-up') {
+    engine.applyOverhealDelta(clientState.selectedInstanceId, clientState.selectedZone, 10);
 
-    // ------------------------------------------------------------------------
-    // Markers
-    // ------------------------------------------------------------------------
+    refreshControls();
+    renderEntireBoard();
+    return;
+  }
+  if (target.id === 'btn-ohl-down') {
+    engine.applyOverhealDelta(clientState.selectedInstanceId, clientState.selectedZone, -10);
 
-    if (target.id === 'btn-dmg-up') {
-        engine.applyDamageDelta(
-            clientState.selectedInstanceId,
-            clientState.selectedZone,
-            10
-        );
+    refreshControls();
+    renderEntireBoard();
+    return;
+  }
+  if (target.id === 'btn-counter-up') {
+    engine.applyCounterDelta(clientState.selectedInstanceId, clientState.selectedZone, 1);
 
-        refreshControls();
-        renderEntireBoard();
-        return;
-    }
-    if (target.id === 'btn-dmg-down') {
-        engine.applyDamageDelta(
-            clientState.selectedInstanceId,
-            clientState.selectedZone,
-            -10
-        );
+    refreshControls();
+    renderEntireBoard();
+    return;
+  }
+  if (target.id === 'btn-counter-down') {
+    engine.applyCounterDelta(clientState.selectedInstanceId, clientState.selectedZone, -1);
 
-        refreshControls();
-        renderEntireBoard();
-        return;
-    }
-    if (target.id === 'btn-ohl-up') {
-        engine.applyOverhealDelta(
-            clientState.selectedInstanceId,
-            clientState.selectedZone,
-            10
-        );
+    refreshControls();
+    renderEntireBoard();
+    return;
+  }
+  if (target.classList.contains('status-chip')) {
+    engine.toggleStatus(clientState.selectedInstanceId, clientState.selectedZone, target.dataset.status);
 
-        refreshControls();
-        renderEntireBoard();
-        return;
-    }
-    if (target.id === 'btn-ohl-down') {
-        engine.applyOverhealDelta(
-            clientState.selectedInstanceId,
-            clientState.selectedZone,
-            -10
-        );
+    refreshControls();
+    renderEntireBoard();
+    return;
+  }
+  if (target.id === 'btn-ability') {
+    engine.toggleAbility(clientState.selectedInstanceId, clientState.selectedZone);
 
-        refreshControls();
-        renderEntireBoard();
-        return;
-    }
-    if (target.id === 'btn-counter-up') {
-        engine.applyCounterDelta(
-            clientState.selectedInstanceId,
-            clientState.selectedZone,
-            1
-        );
+    refreshControls();
+    renderEntireBoard();
+    return;
+  }
 
-        refreshControls();
-        renderEntireBoard();
-        return;
-    }
-    if (target.id === 'btn-counter-down') {
-        engine.applyCounterDelta(
-            clientState.selectedInstanceId,
-            clientState.selectedZone,
-            -1
-        );
+  // ------------------------------------------------------------------------
+  // Rotation / Flip
+  // ------------------------------------------------------------------------
 
-        refreshControls();
-        renderEntireBoard();
-        return;
-    }
-    if (target.classList.contains('status-chip')) {
-        engine.toggleStatus(
-            clientState.selectedInstanceId,
-            clientState.selectedZone,
-            target.dataset.status
-        );
+  if (target.id === 'btn-rotate-left') {
+    engine.setRotation(clientState.selectedInstanceId, clientState.selectedZone, -90);
 
-        refreshControls();
-        renderEntireBoard();
-        return;
-    }
-    if (target.id === 'btn-ability') {
-        engine.toggleAbility(
-            clientState.selectedInstanceId,
-            clientState.selectedZone
-        );
+    closeMenu();
+    renderEntireBoard();
+    return;
+  }
+  if (target.id === 'btn-rotate-right') {
+    engine.setRotation(clientState.selectedInstanceId, clientState.selectedZone, 90);
 
-        refreshControls();
-        renderEntireBoard();
-        return;
-    }
+    closeMenu();
+    renderEntireBoard();
+    return;
+  }
+  if (target.id === 'btn-rotate-invert') {
+    engine.setRotation(clientState.selectedInstanceId, clientState.selectedZone, 180);
 
+    closeMenu();
+    renderEntireBoard();
+    return;
+  }
+  if (target.id === 'btn-rotate-upright') {
+    engine.setRotation(clientState.selectedInstanceId, clientState.selectedZone, 0);
 
-    // ------------------------------------------------------------------------
-    // Rotation / Flip
-    // ------------------------------------------------------------------------
+    closeMenu();
+    renderEntireBoard();
+    return;
+  }
 
-    if (target.id === 'btn-rotate-left') {
-        engine.setRotation(
-            clientState.selectedInstanceId,
-            clientState.selectedZone,
-            -90
-        );
+  if (target.id === 'btn-flip') {
+    engine.toggleFlip(clientState.selectedInstanceId, clientState.selectedZone);
 
-        closeMenu();
-        renderEntireBoard();
-        return;
-    }
-    if (target.id === 'btn-rotate-right') {
-        engine.setRotation(
-            clientState.selectedInstanceId,
-            clientState.selectedZone,
-            90
-        );
+    closeMenu();
+    renderEntireBoard();
+    return;
+  }
+  if (target.id === 'btn-rotate-break') {
+    engine.toggleBreak(clientState.selectedInstanceId, clientState.selectedZone);
 
-        closeMenu();
-        renderEntireBoard();
-        return;
-    }
-    if (target.id === 'btn-rotate-invert') {
-        engine.setRotation(
-            clientState.selectedInstanceId,
-            clientState.selectedZone,
-            180
-        );
-
-        closeMenu();
-        renderEntireBoard();
-        return;
-    }
-    if (target.id === 'btn-rotate-upright') {
-        engine.setRotation(
-            clientState.selectedInstanceId,
-            clientState.selectedZone,
-            0
-        );
-
-        closeMenu();
-        renderEntireBoard();
-        return;
-    }
-
-    if (target.id === 'btn-flip') {
-        engine.toggleFlip(
-            clientState.selectedInstanceId,
-            clientState.selectedZone
-        );
-
-        closeMenu();
-        renderEntireBoard();
-        return;
-    }
-    if (target.id === 'btn-rotate-break') {
-        engine.toggleBreak(
-            clientState.selectedInstanceId,
-            clientState.selectedZone
-        );
-
-        closeMenu();
-        renderEntireBoard();
-        return;
-    }
+    closeMenu();
+    renderEntireBoard();
+    return;
+  }
 }
-
 
 // ============================================================================
 // Initialization
 // ============================================================================
 
 export function initActionMenu() {
-    document.addEventListener('click', handleSelectionClick);
-    menuEl.addEventListener('click', handleMenuClick);
+  document.addEventListener('click', handleSelectionClick);
+  menuEl.addEventListener('click', handleMenuClick);
 }

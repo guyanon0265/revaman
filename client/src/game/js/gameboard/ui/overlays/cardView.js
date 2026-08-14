@@ -12,33 +12,33 @@ const imgEl = document.getElementById('card-view-img');
 let viewedCard = null;
 
 export function openCardView(card) {
-    if (!card) return;
+  if (!card) return;
 
-    viewedCard = card;
+  viewedCard = card;
 
-    imgEl.classList.remove('break-rotated');
+  imgEl.classList.remove('break-rotated');
 
-    imgEl.src = viewedCard.imageUrl;
-    imgEl.alt = viewedCard.name;
+  imgEl.src = viewedCard.imageUrl;
+  imgEl.alt = viewedCard.name;
 
-    if (viewedCard.isBreakActive) {
-        imgEl.classList.add('break-rotated');
-    }
+  if (viewedCard.isBreakActive) {
+    imgEl.classList.add('break-rotated');
+  }
 
-    overlayEl.style.display = 'flex';
+  overlayEl.style.display = 'flex';
 }
 
 export function closeCardView() {
-    viewedCard = null;
-    overlayEl.style.display = 'none';
+  viewedCard = null;
+  overlayEl.style.display = 'none';
 }
 
 function handleOverlayClick(e) {
-    if (e.target === overlayEl || e.target.id === 'btn-close-card-view') {
-        closeCardView();
-    }
+  if (e.target === overlayEl || e.target.id === 'btn-close-card-view') {
+    closeCardView();
+  }
 }
 
 export function initCardView() {
-    overlayEl.addEventListener('click', handleOverlayClick);
+  overlayEl.addEventListener('click', handleOverlayClick);
 }
