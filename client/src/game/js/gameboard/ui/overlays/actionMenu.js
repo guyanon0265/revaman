@@ -13,12 +13,12 @@
 // The Action Menu itself does not own temporary PBrowser selection and
 // does not clear the root selection merely because it closes.
 
-import { clientState, getSelectedCard } from '../gameboard/logic/state.js';
-import * as engine from '../gameboard/logic/loggingEngine.js';
-import { renderEntireBoard } from '../gameboard/ui/render.js';
-import { isPileZone } from '../utils.js';
-import { openCardView } from '../gameboard/ui/overlays/cardView.js';
-import { openViewAttached } from '../gameboard/ui/overlays/viewAttached.js';
+import { clientState, getSelectedCard } from '../../logic/state.js';
+import * as engine from '../../logic/loggingEngine.js';
+import { renderEntireBoard } from '../render.js';
+import { isPileZone } from '../../../utils.js';
+import { openCardView } from './cardView.js';
+import { openViewAttached } from './viewAttached.js';
 
 const menuEl = document.getElementById('action-menu');
 
