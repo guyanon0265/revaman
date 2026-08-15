@@ -1,28 +1,36 @@
-// menu/actionmenu.js — wiring for the #action-menu contextual panel.
+// gameboard/ui/overlays/actionMenu.js — wiring for the #action-menu
+// contextual panel.
 //
 // The Action Menu has two pages: Controls and View Attached.
 //
 // The root card is captured locally (rootId/rootZone) exactly once, when
-// the menu opens via openCardMenu(). Every Controls-tab action reads that
-// local capture, never clientState directly — this decouples the menu
-// from the board's live selection, so left-clicking a different card
-// elsewhere on the board while the menu is open cannot cause a control
-// button to silently mutate the wrong card.
+// the menu opens via openActionMenu(). Every Controls-tab action reads
+// that local capture, never clientState directly — this decouples the
+// menu from the board's live selection, so left-clicking a different
+// card elsewhere on the board while the menu is open cannot cause a
+// control button to silently mutate the wrong card.
 //
 // Card View is opened alongside the menu and closed alongside it too:
 // opening the menu opens Card View on the root card; closing the menu
 // (via the X button) closes Card View. Switching to the View Attached
 // tab may temporarily swap Card View to an attachment; switching back to
 // Controls reverts it to the root card.
+//
+// Two board operations can replace WHICH card occupies rootZone out from
+// under this menu: devolving (handled inside viewAttached.js, which
+// calls back into handleRootChanged) and evolving via a board attach
+// (handled by click.js calling notifyCardReplaced, exported below).
+// Both funnel through the same sync logic.
 
-import { gameState } from '../../../gameboard/logic/state.js';
-import * as engine from '../../../gameboard/logic/loggingEngine.js';
+import { gameState, clientState } from '../../logic/state.js';
+import * as engine from '../../logic/loggingEngine.js';
 import { renderEntireBoard } from '../render.js';
 import { openCardView, closeCardView } from './cardView.js';
 import {
   openViewAttached,
   revertViewAttachedSelection,
   closeViewAttached,
+  syncRootIdentity,
 } from './viewAttached.js';
 
 const menuEl = document.getElementById('action-menu');
@@ -68,28 +76,27 @@ function showPage(pageId) {
 }
 
 // ============================================================================
-// Root card identity changes
-// ============================================================================
-//
-// devolveCard() (called from within View Attached) promotes a buried
-// evolution stage onto the board, replacing which card occupies this
-// zone slot. If that happens while this menu is bound to the card being
-// replaced, viewAttached.js calls this back with the newly-promoted card
-// so the menu's own bookkeeping (rootId, the title in the header) stays
-// in sync. Card View itself is refreshed by viewAttached.js right after
-// this fires, not here — see its onContextMenu handler.
-
-function handleRootChanged(newCard) {
-  if (!newCard) return;
-
-  rootId = newCard.instanceId;
-  // rootZone is unchanged — devolve promotes into the same board slot.
-  nameEl.textContent = newCard.name;
-}
-
-// ============================================================================
 // Menu Open / Close
 // ============================================================================
+
+export function openActionMenu(cardId, zone) {
+  rootId = cardId;
+  rootZone = zone;
+
+  const card = getRootCard();
+
+  if (!card) {
+    rootId = null;
+    rootZone = null;
+    return;
+  }
+
+  nameEl.textContent = card.name;
+  openCardView(card);
+
+  menuEl.classList.remove('collapsed');
+  showPage('card-controls-tab');
+}
 
 function closeMenu() {
   menuEl.classList.add('collapsed');
@@ -103,6 +110,57 @@ function closeMenu() {
 
   rootId = null;
   rootZone = null;
+}
+
+// ============================================================================
+// Root card identity changes
+// ============================================================================
+//
+// devolveCard() (called from within View Attached) and attachCardToTarget()
+// evolution branch (called from click.js on a board attach) can both
+// replace which card occupies this menu's rootZone. Whichever caller
+// detects that calls this back with the new card so the menu's own
+// bookkeeping (rootId, the header title) stays in sync.
+
+function handleRootChanged(newCard) {
+  if (!newCard) return;
+
+  rootId = newCard.instanceId;
+  // rootZone is unchanged — both devolve and evolve promote into the
+  // same board slot, never a different zone.
+  nameEl.textContent = newCard.name;
+
+  // clientState.selectedInstanceId was set once by click.js's
+  // contextmenu handler and is otherwise never read by this menu (see
+  // module header). But the board's own "selected" highlight is keyed
+  // off clientState, and this just changed which card lives at that
+  // zone slot — without this, the highlight silently sticks to the
+  // stale id and ends up outlining whatever now occupies the slot.
+  // This only ever fires while the menu is bound to exactly the slot
+  // that changed, so the sync is unconditional: a one-way push
+  // reflecting a change WE just caused, not a live read of clientState.
+  clientState.selectedInstanceId = newCard.instanceId;
+  clientState.selectedZone = rootZone;
+  clientState.selectedKind = 'card';
+  renderEntireBoard();
+}
+
+// Called by click.js after a board attach. attachCardToTarget() now
+// returns whatever actually occupies targetZone post-mutation: the same
+// card for energy/trainer attaches (occupant.instanceId === targetInstanceId,
+// a no-op below), or the newly-evolved card for an evolution attach.
+// Guarded so this only acts if the menu is currently bound to exactly
+// the slot that changed; if the menu is open on a different card, or
+// closed, this is a silent no-op.
+export function notifyCardReplaced(oldInstanceId, zone, newCard) {
+  if (!newCard || newCard.instanceId === oldInstanceId) return;
+  if (rootId !== oldInstanceId || rootZone !== zone) return;
+
+  // Sync viewAttached.js's own parentId BEFORE anyone re-renders its
+  // grid (e.g. click.js's subsequent refreshViewAttached() call) —
+  // otherwise it's still looking up the old, now-nested-away id.
+  syncRootIdentity(oldInstanceId, zone, newCard);
+  handleRootChanged(newCard);
 }
 
 // ============================================================================
@@ -216,12 +274,9 @@ function handleMenuClick(e) {
   // ------------------------------------------------------------------------
   // Rotation / Flip
   //
-  // NOTE: previously these closed the whole menu after a single click.
-  // Changed to leave the menu (and Card View) open, since closing on
-  // every rotate now also tears down Card View, which seems like an
-  // unwanted side effect once the two are coupled. Flagging this as a
-  // deliberate deviation — revert if the old close-on-rotate behavior
-  // was actually wanted.
+  // These leave the menu (and Card View) open — see prior discussion:
+  // closing on every rotate would also tear down Card View as an
+  // unwanted side effect now that the two are coupled.
   // ------------------------------------------------------------------------
 
   if (target.id === 'btn-rotate-left') {
@@ -255,29 +310,6 @@ function handleMenuClick(e) {
     openCardView(getRootCard()); // image/orientation changed — refresh the stale snapshot
     return;
   }
-}
-
-// ============================================================================
-// Public entry point — called by click.js's contextmenu handler
-// ============================================================================
-
-export function openActionMenu(cardId, zone) {
-  rootId = cardId;
-  rootZone = zone;
-
-  const card = getRootCard();
-
-  if (!card) {
-    rootId = null;
-    rootZone = null;
-    return;
-  }
-
-  nameEl.textContent = card.name;
-  openCardView(card);
-
-  menuEl.classList.remove('collapsed');
-  showPage('card-controls-tab');
 }
 
 // ============================================================================

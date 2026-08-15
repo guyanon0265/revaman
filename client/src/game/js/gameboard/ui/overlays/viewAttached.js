@@ -163,6 +163,19 @@ export function revertViewAttachedSelection() {
   if (root) openCardView(root);
 }
 
+// Called by actionMenu.js when a board interaction OUTSIDE this module
+// (an evolve via board attach, not a devolve triggered from this grid's
+// own context menu) replaces the card at parentZone. Devolve already
+// updates parentId itself, inline, before calling onRootChanged upward —
+// this covers the other direction, so a subsequent refreshViewAttached()
+// doesn't look up a now-nonexistent instanceId and silently close.
+export function syncRootIdentity(oldId, zone, newCard) {
+  if (!newCard) return;
+  if (parentId === oldId && parentZone === zone) {
+    parentId = newCard.instanceId;
+  }
+}
+
 export function closeViewAttached() {
   parentId = null;
   parentZone = null;

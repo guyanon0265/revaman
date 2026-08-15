@@ -118,7 +118,16 @@ export function attachCardToTarget(selectedId, fromZone, targetId, targetZone) {
     ];
     targetArr[targetIdx] = selectedCard;
   }
-  return selectedCard;
+
+  // Return whatever actually occupies the slot after this call, not
+  // unconditionally selectedCard. For energy/trainer that's targetCard
+  // (unchanged identity — callers can treat a same-id return as a
+  // no-op). For evolution it's selectedCard, since that's what now
+  // occupies targetZone[targetIdx]. Callers that need to know "did this
+  // replace the board occupant" should compare the returned card's
+  // instanceId against targetId rather than re-deriving classifyType()
+  // themselves.
+  return targetArr[targetIdx];
 }
 
 export function detachCard(

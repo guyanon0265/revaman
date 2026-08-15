@@ -7,7 +7,8 @@ import {
 import { isPileZone } from '../../utils.js';
 import { domIdToStateZone, renderEntireBoard } from './render.js';
 import { openPileBrowser, refreshPileBrowser } from './overlays/pileBrowser.js';
-import { openActionMenu } from './overlays/actionMenu.js';
+import { openActionMenu, notifyCardReplaced } from './overlays/actionMenu.js';
+import { refreshViewAttached } from './overlays/viewAttached.js';
 
 function handleBoardClick(e) {
   if (e.target.closest('.click-handling')) return; // menu clicks are a different domain entirely
@@ -57,7 +58,11 @@ function handleBoardClick(e) {
     }
 
     if (targetInstanceId !== clientState.selectedInstanceId) {
-      attachCardToTarget(
+      // attachCardToTarget now returns whatever actually occupies
+      // targetZone post-mutation: the same card for energy/trainer
+      // attaches (occupant.instanceId === targetInstanceId, a no-op
+      // below), or the newly-evolved card for an evolution attach.
+      const occupant = attachCardToTarget(
         clientState.selectedInstanceId,
         clientState.selectedZone,
         targetInstanceId,
@@ -66,6 +71,17 @@ function handleBoardClick(e) {
 
       clearSelection();
       renderEntireBoard();
+
+      // Must run BEFORE refreshViewAttached() below — this is what
+      // syncs viewAttached.js's parentId on an evolution attach. If the
+      // grid refreshes first, it's still looking up the old id, which
+      // no longer exists at the top level (it's nested inside the new
+      // card's evolutionStack now), and silently closes instead of
+      // showing the updated attachments.
+      if (occupant) notifyCardReplaced(targetInstanceId, targetZone, occupant);
+
+      refreshViewAttached();
+
       return;
     }
   }
