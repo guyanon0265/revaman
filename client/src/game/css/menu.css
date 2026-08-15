@@ -253,6 +253,9 @@
 #rotation-controls {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  align-items: center;
+  justify-content: space-evenly;
   gap: 1vh;
 }
 
@@ -265,7 +268,6 @@
 
 .menu-section.counters {
   align-items: center;
-  flex-direction: column;
 }
 
 .counter-control {
@@ -279,8 +281,7 @@
   gap: 8px;
 }
 
-.control-btn,
-#card-controls-tab button {
+.controls-tab button {
   background: #252525;
   border: 1px solid #333;
   color: #fff;
@@ -298,19 +299,34 @@
     transform 0.08s ease;
 }
 
-#card-controls-tab button:hover {
+.controls-tab button:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.16);
 }
 
-#card-controls-tab button:active {
+.controls-tab button:active {
   transform: scale(0.96);
 }
 
-.status-chip.active {
-  background-color: rgba(47, 111, 237, 0.18);
-  border-color: rgba(125, 184, 255, 0.4);
-  color: #7db8ff;
+.status-chip.active[data-status='PAR'] {
+  background: #e6b800;
+  color: #000;
+}
+.status-chip.active[data-status='BRN'] {
+  background: #ff6600;
+}
+.status-chip.active[data-status='PSN'] {
+  background: #9900cc;
+}
+.status-chip.active[data-status='SLP'] {
+  background: #0066ff;
+}
+.status-chip.active[data-status='FRZ'] {
+  background: #33ccff;
+}
+.status-chip.active[data-status='CON'] {
+  background: #ddd;
+  color: #000;
 }
 
 /* --------------------------------------------------------------------------
@@ -326,16 +342,16 @@
   margin: 0 auto;
 }
 
-.dpad-btn {
+.controls-tab .dpad-btn {
   width: 100%;
   height: 100%;
-  min-height: 0 !important;
-  padding: 0 !important;
+  min-height: 0;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.9vh !important;
-  font-size: 3vh !important;
+  border-radius: 0.9vh;
+  font-size: 1.5vh;
 }
 
 .dpad-up {
@@ -367,16 +383,8 @@
    BREAK
    -------------------------------------------------------------------------- */
 
-.break-btn {
-  width: 100%;
-  background: rgba(239, 68, 68, 0.12) !important;
-  border-color: rgba(239, 68, 68, 0.3) !important;
-  color: #fca5a5 !important;
-}
-
-.break-btn:hover {
-  background: rgba(239, 68, 68, 0.2) !important;
-  border-color: rgba(239, 68, 68, 0.45) !important;
+.controls-tab .break-btn {
+  font-style: italic;
 }
 
 /* ==========================================================================
