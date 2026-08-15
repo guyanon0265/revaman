@@ -14,16 +14,32 @@
 // deselecting does — here it REVERTS Card View back to the root card
 // rather than closing it, since the Action Menu keeps Card View open for
 // as long as the menu itself is open.
+//
+// Right-click moves an attachment back to hand. Evolutions and
+// Trainers/Energy use genuinely different engine calls — detachCard()
+// pulls a nested attachment straight out of the parent's arrays, while
+// devolveCard() promotes a buried evolution stage back onto the board,
+// which means the card OCCUPYING this zone slot changes identity.
+//
+// Because of that, openViewAttached() takes an optional onRootChanged
+// callback. When a devolve happens, this module updates its own local
+// parentId to the newly-promoted card AND calls onRootChanged(newCard)
+// so the caller (actionmenu.js) can keep its own rootId/title in sync.
+// Card View is refreshed here, after parentId is already updated, so it
+// always ends up showing the new root correctly.
 
 import { gameState } from '../../logic/state.js';
 import { renderBrowserGrid } from './pileBrowser.js';
 import { openCardView } from './cardView.js';
+import { detachCard, devolveCard } from '../../logic/loggingEngine.js';
+import { renderEntireBoard } from '../render.js';
 
 const gridEl = document.getElementById('view-attached-grid');
 
 let parentId = null;
 let parentZone = null;
 let overrideActive = false; // true while an attachment is temporarily shown in Card View
+let onRootChanged = null; // notified when devolve replaces the card at parentZone/parentId
 
 function getParentCard() {
   if (!parentId || !parentZone) return null;
@@ -58,9 +74,9 @@ function renderAttachedGrid() {
   renderBrowserGrid(
     gridEl,
     [
-      { label: 'Evolutions', cards: attachments.evolution },
-      { label: 'Trainers', cards: attachments.trainers },
-      { label: 'Energy', cards: attachments.energy },
+      { label: 'Evolutions', kind: 'evolution', cards: attachments.evolution },
+      { label: 'Trainers', kind: 'trainer', cards: attachments.trainers },
+      { label: 'Energy', kind: 'energy', cards: attachments.energy },
     ],
     {
       onSelect: (card) => {
@@ -72,15 +88,42 @@ function renderAttachedGrid() {
         const root = getParentCard();
         if (root) openCardView(root);
       },
-      // No onContextMenu — View Attached does not support moving
-      // attachments to hand.
+      onContextMenu: (card, section) => {
+        if (!parentId || !parentZone) return;
+
+        if (section.kind === 'evolution') {
+          const promoted = devolveCard(parentId, parentZone, card.instanceId);
+
+          if (promoted) {
+            parentId = promoted.instanceId;
+            onRootChanged?.(promoted);
+          }
+        } else {
+          const handZone = parentZone.split('-')[0] + '-hand';
+          detachCard(
+            parentId,
+            parentZone,
+            card.instanceId,
+            section.kind,
+            handZone
+          );
+        }
+
+        overrideActive = false;
+        renderAttachedGrid();
+        renderEntireBoard();
+
+        const root = getParentCard();
+        if (root) openCardView(root);
+      },
     }
   );
 }
 
-export function openViewAttached(cardId, zone) {
+export function openViewAttached(cardId, zone, rootChangedCallback) {
   parentId = cardId;
   parentZone = zone;
+  onRootChanged = rootChangedCallback || null;
 
   if (!parentId || !parentZone) return;
 
@@ -124,4 +167,5 @@ export function closeViewAttached() {
   parentId = null;
   parentZone = null;
   overrideActive = false;
+  onRootChanged = null;
 }

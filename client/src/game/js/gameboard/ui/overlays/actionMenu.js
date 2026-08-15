@@ -63,8 +63,28 @@ function showPage(pageId) {
     refreshControls();
   } else if (pageId === 'view-attached-tab') {
     document.getElementById('btn-view-attach').classList.add('active');
-    openViewAttached(rootId, rootZone);
+    openViewAttached(rootId, rootZone, handleRootChanged);
   }
+}
+
+// ============================================================================
+// Root card identity changes
+// ============================================================================
+//
+// devolveCard() (called from within View Attached) promotes a buried
+// evolution stage onto the board, replacing which card occupies this
+// zone slot. If that happens while this menu is bound to the card being
+// replaced, viewAttached.js calls this back with the newly-promoted card
+// so the menu's own bookkeeping (rootId, the title in the header) stays
+// in sync. Card View itself is refreshed by viewAttached.js right after
+// this fires, not here — see its onContextMenu handler.
+
+function handleRootChanged(newCard) {
+  if (!newCard) return;
+
+  rootId = newCard.instanceId;
+  // rootZone is unchanged — devolve promotes into the same board slot.
+  nameEl.textContent = newCard.name;
 }
 
 // ============================================================================
@@ -232,6 +252,7 @@ function handleMenuClick(e) {
   if (target.id === 'btn-rotate-break') {
     engine.toggleBreak(rootId, rootZone);
     renderEntireBoard();
+    openCardView(getRootCard()); // image/orientation changed — refresh the stale snapshot
     return;
   }
 }

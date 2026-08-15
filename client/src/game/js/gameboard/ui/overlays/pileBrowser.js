@@ -32,8 +32,15 @@ let currentZone = null;
 // Shared browser grid
 // ---------------------------------------------------------------------------
 //
-// sections: [{ label: string|null, cards: [] }, ...]
-// options: { onSelect(card), onDeselect(card), onContextMenu(card) }
+// sections: [{ label: string|null, cards: [], kind?: string }, ...]
+// options: { onSelect(card, section), onDeselect(card, section), onContextMenu(card, section) }
+//
+// `kind` is caller-defined and opaque to this function — it's passed
+// straight through to the callbacks so a caller with multiple sections
+// (e.g. View Attached's Evolutions/Trainers/Energy) can dispatch
+// differently per section without needing separate grids or separate
+// renderBrowserGrid() calls (which would break single-selection tracking
+// across sections).
 //
 // Empty sections are skipped entirely. Selecting a thumbnail highlights it
 // and deselects any previously-selected thumbnail in this grid; clicking
@@ -72,7 +79,7 @@ export function renderBrowserGrid(targetGridEl, sections, options = {}) {
         if (selectedImg === img) {
           img.classList.remove('selected');
           selectedImg = null;
-          onDeselect?.(card);
+          onDeselect?.(card, section);
           return;
         }
 
@@ -80,12 +87,12 @@ export function renderBrowserGrid(targetGridEl, sections, options = {}) {
 
         img.classList.add('selected');
         selectedImg = img;
-        onSelect?.(card);
+        onSelect?.(card, section);
       });
 
       img.addEventListener('contextmenu', (e) => {
         e.preventDefault();
-        onContextMenu?.(card);
+        onContextMenu?.(card, section);
       });
 
       grid.appendChild(img);
