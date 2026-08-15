@@ -135,5 +135,7 @@ export function refreshPileBrowser() {
 }
 
 export function initPileBrowser() {
-  document.getElementById('btn-pile-browser-close').addEventListener('click', closePileBrowser);
+  document
+    .getElementById('btn-pile-browser-close')
+    .addEventListener('click', closePileBrowser);
 }

@@ -62,7 +62,9 @@ function zoneLabel(zoneId) {
 }
 
 function findCard(zoneId, instanceId) {
-  return gameState.zones[zoneId]?.find((c) => c.instanceId === instanceId) || null;
+  return (
+    gameState.zones[zoneId]?.find((c) => c.instanceId === instanceId) || null
+  );
 }
 
 // ---------------------------------------------------------------------
@@ -86,7 +88,9 @@ function flushPendingBatch() {
   if (!pendingBatch) return;
   const { cardName, statLabel, netDelta, finalValue } = pendingBatch;
   const sign = netDelta > 0 ? '+' : '';
-  logAction(`changed ${statLabel} on ${cardName} by ${sign}${netDelta} (now ${finalValue}).`);
+  logAction(
+    `changed ${statLabel} on ${cardName} by ${sign}${netDelta} (now ${finalValue}).`
+  );
   pendingBatch = null;
 }
 
@@ -96,14 +100,26 @@ function applyDelta(statLabel, engineFn, instanceId, zone, delta) {
   if (!before || !card) return card;
 
   const key = `${instanceId}:${statLabel}`;
-  const finalValue = statLabel === 'damage' ? card.damage : statLabel === 'overheal' ? card.overheal : card.counter;
+  const finalValue =
+    statLabel === 'damage'
+      ? card.damage
+      : statLabel === 'overheal'
+        ? card.overheal
+        : card.counter;
 
   if (pendingBatch && pendingBatch.key === key) {
     pendingBatch.netDelta += delta;
     pendingBatch.finalValue = finalValue;
   } else {
     flushPendingBatch();
-    pendingBatch = { key, zone, cardName: card.name, statLabel, netDelta: delta, finalValue };
+    pendingBatch = {
+      key,
+      zone,
+      cardName: card.name,
+      statLabel,
+      netDelta: delta,
+      finalValue,
+    };
   }
   return card;
 }
@@ -113,11 +129,23 @@ export function applyDamageDelta(instanceId, zone, delta) {
 }
 
 export function applyOverhealDelta(instanceId, zone, delta) {
-  return applyDelta('overheal', engine.applyOverhealDelta, instanceId, zone, delta);
+  return applyDelta(
+    'overheal',
+    engine.applyOverhealDelta,
+    instanceId,
+    zone,
+    delta
+  );
 }
 
 export function applyCounterDelta(instanceId, zone, delta) {
-  return applyDelta('counter', engine.applyCounterDelta, instanceId, zone, delta);
+  return applyDelta(
+    'counter',
+    engine.applyCounterDelta,
+    instanceId,
+    zone,
+    delta
+  );
 }
 
 // ---------------------------------------------------------------------
@@ -129,21 +157,30 @@ export function applyCounterDelta(instanceId, zone, delta) {
 export function moveCardToZone(instanceId, fromZone, toZone, position = 'top') {
   flushPendingBatch();
   const card = engine.moveCardToZone(instanceId, fromZone, toZone, position);
-  if (card) logAction(`moved ${card.name} from ${zoneLabel(fromZone)} to ${zoneLabel(toZone)}.`);
+  if (card)
+    logAction(
+      `moved ${card.name} from ${zoneLabel(fromZone)} to ${zoneLabel(toZone)}.`
+    );
   return card;
 }
 
 export function moveToTopOfDeck(instanceId, fromZone, toZone) {
   flushPendingBatch();
   const card = engine.moveToTopOfDeck(instanceId, fromZone, toZone);
-  if (card) logAction(`put ${card.name} on top of the ${zoneLabel(toZone)} (from ${zoneLabel(fromZone)}).`);
+  if (card)
+    logAction(
+      `put ${card.name} on top of the ${zoneLabel(toZone)} (from ${zoneLabel(fromZone)}).`
+    );
   return card;
 }
 
 export function moveToBottomOfDeck(instanceId, fromZone, toZone) {
   flushPendingBatch();
   const card = engine.moveToBottomOfDeck(instanceId, fromZone, toZone);
-  if (card) logAction(`put ${card.name} on the bottom of the ${zoneLabel(toZone)} (from ${zoneLabel(fromZone)}).`);
+  if (card)
+    logAction(
+      `put ${card.name} on the bottom of the ${zoneLabel(toZone)} (from ${zoneLabel(fromZone)}).`
+    );
   return card;
 }
 
@@ -160,7 +197,9 @@ export function drawCards(fromZone, toZone, count) {
   engine.drawCards(fromZone, toZone, count);
   const actualDrawn = (gameState.zones[toZone]?.length ?? 0) - before;
   if (actualDrawn > 0) {
-    logAction(`drew ${actualDrawn} card${actualDrawn === 1 ? '' : 's'} into ${zoneLabel(toZone)}.`);
+    logAction(
+      `drew ${actualDrawn} card${actualDrawn === 1 ? '' : 's'} into ${zoneLabel(toZone)}.`
+    );
   }
 }
 
@@ -175,7 +214,9 @@ export function shuffleDiscardIntoDeck(discardZone, deckZone) {
   const count = gameState.zones[discardZone]?.length ?? 0;
   engine.shuffleDiscardIntoDeck(discardZone, deckZone);
   if (count > 0) {
-    logAction(`shuffled ${count} card${count === 1 ? '' : 's'} from ${zoneLabel(discardZone)} into ${zoneLabel(deckZone)}.`);
+    logAction(
+      `shuffled ${count} card${count === 1 ? '' : 's'} from ${zoneLabel(discardZone)} into ${zoneLabel(deckZone)}.`
+    );
   }
 }
 
@@ -184,7 +225,12 @@ export function attachCardToTarget(selectedId, fromZone, targetId, targetZone) {
   const selectedBefore = findCard(fromZone, selectedId);
   const targetBefore = findCard(targetZone, targetId);
   const kind = selectedBefore ? classifyType(selectedBefore.type) : null;
-  const result = engine.attachCardToTarget(selectedId, fromZone, targetId, targetZone);
+  const result = engine.attachCardToTarget(
+    selectedId,
+    fromZone,
+    targetId,
+    targetZone
+  );
   if (!result || !targetBefore) return result;
 
   if (kind === 'energy') {
@@ -197,12 +243,26 @@ export function attachCardToTarget(selectedId, fromZone, targetId, targetZone) {
   return result;
 }
 
-export function detachCard(parentId, parentZone, attachmentId, attachmentKind, toHandZone) {
+export function detachCard(
+  parentId,
+  parentZone,
+  attachmentId,
+  attachmentKind,
+  toHandZone
+) {
   flushPendingBatch();
   const parent = findCard(parentZone, parentId);
-  const card = engine.detachCard(parentId, parentZone, attachmentId, attachmentKind, toHandZone);
+  const card = engine.detachCard(
+    parentId,
+    parentZone,
+    attachmentId,
+    attachmentKind,
+    toHandZone
+  );
   if (card) {
-    logAction(`detached ${card.name} from ${parent ? parent.name : 'a card'}, returning it to hand.`);
+    logAction(
+      `detached ${card.name} from ${parent ? parent.name : 'a card'}, returning it to hand.`
+    );
   }
   return card;
 }
@@ -212,7 +272,9 @@ export function devolveCard(cardId, zone, targetInstanceId) {
   const current = findCard(zone, cardId);
   const previous = engine.devolveCard(cardId, zone, targetInstanceId);
   if (previous && current) {
-    logAction(`devolved ${current.name} back into ${previous.name}, returning it to hand.`);
+    logAction(
+      `devolved ${current.name} back into ${previous.name}, returning it to hand.`
+    );
   }
   return previous;
 }
@@ -222,21 +284,26 @@ export function toggleStatus(instanceId, zone, status) {
   const before = findCard(zone, instanceId);
   const wasActive = before ? before.statuses.includes(status) : false;
   const card = engine.toggleStatus(instanceId, zone, status);
-  if (card) logAction(`${wasActive ? 'removed' : 'added'} ${status} on ${card.name}.`);
+  if (card)
+    logAction(`${wasActive ? 'removed' : 'added'} ${status} on ${card.name}.`);
   return card;
 }
 
 export function toggleAbility(instanceId, zone) {
   flushPendingBatch();
   const card = engine.toggleAbility(instanceId, zone);
-  if (card) logAction(`marked ${card.name}'s ability as ${card.abilityUsed ? 'used' : 'ready'}.`);
+  if (card)
+    logAction(
+      `marked ${card.name}'s ability as ${card.abilityUsed ? 'used' : 'ready'}.`
+    );
   return card;
 }
 
 export function toggleFlip(instanceId, zone) {
   flushPendingBatch();
   const card = engine.toggleFlip(instanceId, zone);
-  if (card) logAction(`turned ${card.name} face ${card.isFaceDown ? 'down' : 'up'}.`);
+  if (card)
+    logAction(`turned ${card.name} face ${card.isFaceDown ? 'down' : 'up'}.`);
   return card;
 }
 
@@ -257,6 +324,9 @@ export function setUpright(instanceId, zone) {
 export function toggleBreak(instanceId, zone) {
   flushPendingBatch();
   const card = engine.toggleBreak(instanceId, zone);
-  if (card) logAction(`${card.isBreakActive ? 'activated' : 'deactivated'} BREAK on ${card.name}.`);
+  if (card)
+    logAction(
+      `${card.isBreakActive ? 'activated' : 'deactivated'} BREAK on ${card.name}.`
+    );
   return card;
 }

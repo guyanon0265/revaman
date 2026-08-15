@@ -38,7 +38,11 @@ export function moveCardToZone(instanceId, fromZone, toZone, position = 'top') {
 
   if (isPileZone(toZone) || toZone.endsWith('-hand')) {
     const toArr = gameState.zones[toZone];
-    [...card.trainerAttachments, ...card.energyAttachments, ...card.evolutionStack].forEach((att) => toArr.push(att));
+    [
+      ...card.trainerAttachments,
+      ...card.energyAttachments,
+      ...card.evolutionStack,
+    ].forEach((att) => toArr.push(att));
     resetToFresh(card);
   }
 
@@ -97,20 +101,41 @@ export function attachCardToTarget(selectedId, fromZone, targetId, targetZone) {
   } else {
     // evolution: selectedCard takes the target's board position;
     // targetCard gets buried beneath it, carrying its history along
-    selectedCard.energyAttachments = [...selectedCard.energyAttachments, ...targetCard.energyAttachments];
-    selectedCard.trainerAttachments = [...selectedCard.trainerAttachments, ...targetCard.trainerAttachments];
+    selectedCard.energyAttachments = [
+      ...selectedCard.energyAttachments,
+      ...targetCard.energyAttachments,
+    ];
+    selectedCard.trainerAttachments = [
+      ...selectedCard.trainerAttachments,
+      ...targetCard.trainerAttachments,
+    ];
     selectedCard.damage = targetCard.damage;
     selectedCard.statuses = targetCard.statuses;
-    selectedCard.evolutionStack = [...selectedCard.evolutionStack, ...targetCard.evolutionStack, previousCard];
+    selectedCard.evolutionStack = [
+      ...selectedCard.evolutionStack,
+      ...targetCard.evolutionStack,
+      previousCard,
+    ];
     targetArr[targetIdx] = selectedCard;
   }
   return selectedCard;
 }
 
-export function detachCard(parentId, parentZone, attachmentId, attachmentKind, toHandZone) {
-  const parent = gameState.zones[parentZone].find((c) => c.instanceId === parentId);
+export function detachCard(
+  parentId,
+  parentZone,
+  attachmentId,
+  attachmentKind,
+  toHandZone
+) {
+  const parent = gameState.zones[parentZone].find(
+    (c) => c.instanceId === parentId
+  );
   if (!parent) return null;
-  const list = attachmentKind === 'energy' ? parent.energyAttachments : parent.trainerAttachments;
+  const list =
+    attachmentKind === 'energy'
+      ? parent.energyAttachments
+      : parent.trainerAttachments;
   const idx = list.findIndex((c) => c.instanceId === attachmentId);
   if (idx === -1) return null;
   const [card] = list.splice(idx, 1);
@@ -124,7 +149,9 @@ export function devolveCard(cardId, zone, targetInstanceId) {
   if (idx === -1) return null;
 
   const current = arr[idx];
-  const targetIdx = current.evolutionStack.findIndex((c) => c.instanceId === targetInstanceId);
+  const targetIdx = current.evolutionStack.findIndex(
+    (c) => c.instanceId === targetInstanceId
+  );
   if (targetIdx === -1) return null; // clicked card wasn't actually in this card's evolutionStack
 
   const previous = current.evolutionStack[targetIdx];

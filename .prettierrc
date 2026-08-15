@@ -1,14 +1,14 @@
 {
   "tabWidth": 2,
   "useTabs": false,
-  "printWidth": 10000,
+  "printWidth": 80,
   "proseWrap": "never",
   "singleAttributePerLine": false,
   "overrides": [
     {
-      "files": "*.json",
+      "files": ["*.html", "*.yaml"],
       "options": {
-        "printWidth": 80
+        "printWidth": 10000
       }
     }
   ],

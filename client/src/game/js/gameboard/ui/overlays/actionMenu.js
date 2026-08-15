@@ -19,7 +19,11 @@ import { gameState } from '../../../gameboard/logic/state.js';
 import * as engine from '../../../gameboard/logic/loggingEngine.js';
 import { renderEntireBoard } from '../render.js';
 import { openCardView, closeCardView } from './cardView.js';
-import { openViewAttached, revertViewAttachedSelection, closeViewAttached } from './viewAttached.js';
+import {
+  openViewAttached,
+  revertViewAttachedSelection,
+  closeViewAttached,
+} from './viewAttached.js';
 
 const menuEl = document.getElementById('action-menu');
 const nameEl = document.getElementById('menu-card-name');
@@ -29,7 +33,9 @@ let rootZone = null;
 
 function getRootCard() {
   if (!rootId || !rootZone) return null;
-  return gameState.zones[rootZone]?.find((c) => c.instanceId === rootId) || null;
+  return (
+    gameState.zones[rootZone]?.find((c) => c.instanceId === rootId) || null
+  );
 }
 
 // ============================================================================
@@ -37,9 +43,13 @@ function getRootCard() {
 // ============================================================================
 
 function showPage(pageId) {
-  document.querySelectorAll('#action-menu .menu-page').forEach((page) => page.classList.remove('active'));
+  document
+    .querySelectorAll('#action-menu .menu-page')
+    .forEach((page) => page.classList.remove('active'));
 
-  document.querySelectorAll('#action-menu .panel-tab-btn').forEach((btn) => btn.classList.remove('active'));
+  document
+    .querySelectorAll('#action-menu .panel-tab-btn')
+    .forEach((btn) => btn.classList.remove('active'));
 
   const page = document.getElementById(pageId);
 
@@ -64,7 +74,9 @@ function showPage(pageId) {
 function closeMenu() {
   menuEl.classList.add('collapsed');
 
-  document.querySelectorAll('#action-menu .menu-page').forEach((page) => page.classList.remove('active'));
+  document
+    .querySelectorAll('#action-menu .menu-page')
+    .forEach((page) => page.classList.remove('active'));
 
   closeViewAttached();
   closeCardView();
@@ -87,10 +99,15 @@ function refreshControls() {
   document.getElementById('txt-menu-counter').textContent = card.counter;
 
   document.querySelectorAll('#markers-section .status-chip').forEach((chip) => {
-    chip.classList.toggle('active', card.statuses.includes(chip.dataset.status));
+    chip.classList.toggle(
+      'active',
+      card.statuses.includes(chip.dataset.status)
+    );
   });
 
-  document.getElementById('btn-ability').textContent = card.abilityUsed ? 'Ability: Used' : 'Ability: Ready';
+  document.getElementById('btn-ability').textContent = card.abilityUsed
+    ? 'Ability: Used'
+    : 'Ability: Ready';
 }
 
 // ============================================================================

@@ -2,13 +2,28 @@
 export function classifyType(type) {
   const t = (type || '').toLowerCase();
   if (t.includes('energy')) return 'energy';
-  if (t.includes('trainer') || t.includes('item') || t.includes('supporter') || t.includes('stadium') || t.includes('tool')) return 'trainer';
+  if (
+    t.includes('trainer') ||
+    t.includes('item') ||
+    t.includes('supporter') ||
+    t.includes('stadium') ||
+    t.includes('tool')
+  )
+    return 'trainer';
   return 'pokemon';
 }
 
 export const ALL_STATUSES = ['BRN', 'PAR', 'PSN', 'FRZ', 'SLP', 'CON'];
 
-export const PILE_ZONES = ['p1-deck', 'p1-discard', 'p1-prizes', 'p2-deck', 'p2-discard', 'p2-prizes', 'lost-zone'];
+export const PILE_ZONES = [
+  'p1-deck',
+  'p1-discard',
+  'p1-prizes',
+  'p2-deck',
+  'p2-discard',
+  'p2-prizes',
+  'lost-zone',
+];
 
 export const ZONE_LABELS = {
   'p1-deck': 'Deck',
@@ -22,14 +37,29 @@ export const ZONE_LABELS = {
 };
 
 /*-render.js-*/
-export const OWNED_SUFFIXES = ['deck', 'hand', 'active', 'bench', 'discard', 'prizes', 'table-half'];
+export const OWNED_SUFFIXES = [
+  'deck',
+  'hand',
+  'active',
+  'bench',
+  'discard',
+  'prizes',
+  'table-half',
+];
 export const SHARED_ZONE_IDS = ['stadium', 'lost-zone'];
-export const COUNT_BADGE_SUFFIXES = ['deck', 'hand', 'discard', 'prizes', 'bench'];
+export const COUNT_BADGE_SUFFIXES = [
+  'deck',
+  'hand',
+  'discard',
+  'prizes',
+  'bench',
+];
 
 /*-render.js & cardview.js-*/
 export function isHidden(card, stateZoneId) {
   if (card.isFaceDown) return true;
-  if (stateZoneId.endsWith('-deck') || stateZoneId.endsWith('-prizes')) return true;
+  if (stateZoneId.endsWith('-deck') || stateZoneId.endsWith('-prizes'))
+    return true;
   return false;
 }
 
@@ -38,7 +68,11 @@ export function isPileZone(zone) {
   return PILE_ZONES.includes(zone);
 }
 
-const PILE_MENU_PAGES = { deck: 'deck-pile-menu', discard: 'discard-pile-menu', prizes: 'prizes-pile-menu' };
+const PILE_MENU_PAGES = {
+  deck: 'deck-pile-menu',
+  discard: 'discard-pile-menu',
+  prizes: 'prizes-pile-menu',
+};
 
 export function pileMenuPageFor(zone) {
   if (zone === 'lost-zone') return 'lost-zone-pile-menu';

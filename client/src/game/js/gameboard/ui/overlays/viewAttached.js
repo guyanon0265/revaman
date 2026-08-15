@@ -28,7 +28,10 @@ let overrideActive = false; // true while an attachment is temporarily shown in 
 function getParentCard() {
   if (!parentId || !parentZone) return null;
 
-  return gameState.zones[parentZone]?.find((card) => card.instanceId === parentId) || null;
+  return (
+    gameState.zones[parentZone]?.find((card) => card.instanceId === parentId) ||
+    null
+  );
 }
 
 function getAttachedCards() {

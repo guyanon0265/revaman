@@ -40,14 +40,25 @@ export function getSelectedCard() {
   const zoneArr = gameState.zones[clientState.selectedZone];
 
   if (clientState.selectedKind === 'card') {
-    return zoneArr.find((c) => c.instanceId === clientState.selectedInstanceId) || null;
+    return (
+      zoneArr.find((c) => c.instanceId === clientState.selectedInstanceId) ||
+      null
+    );
   }
 
   // Attachment/evolution selection — resolve the parent first, then
   // search its nested arrays.
-  const parent = zoneArr.find((c) => c.instanceId === clientState.selectedParentId);
+  const parent = zoneArr.find(
+    (c) => c.instanceId === clientState.selectedParentId
+  );
   if (!parent) return null;
-  return [...parent.energyAttachments, ...parent.trainerAttachments, ...parent.evolutionStack].find((c) => c.instanceId === clientState.selectedInstanceId) || null;
+  return (
+    [
+      ...parent.energyAttachments,
+      ...parent.trainerAttachments,
+      ...parent.evolutionStack,
+    ].find((c) => c.instanceId === clientState.selectedInstanceId) || null
+  );
 }
 
 export function clearSelection() {

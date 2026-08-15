@@ -17,7 +17,13 @@ import { runtimeState } from '../../gameboard/logic/state.js';
 // usernameClass: 'player' | 'opp' | 'system' — CSS modifier for the tag.
 // messageText: the body of the entry.
 // typeClass: 'system' | 'action' | 'chat' — CSS modifier for the row.
-function appendLogEntry(logDisplay, usernameText, usernameClass, messageText, typeClass) {
+function appendLogEntry(
+  logDisplay,
+  usernameText,
+  usernameClass,
+  messageText,
+  typeClass
+) {
   if (!logDisplay) return;
 
   const entry = document.createElement('div');
@@ -43,7 +49,10 @@ function appendLogEntry(logDisplay, usernameText, usernameClass, messageText, ty
 // runtimeState defaults ('Player 1' / 'Player 2') until Task 7 wires a
 // real value in via the multiplayer room-join handshake.
 function usernameForSlot(slot) {
-  return (runtimeState.usernames && runtimeState.usernames[slot]) || (slot === 'p1' ? 'Player 1' : 'Player 2');
+  return (
+    (runtimeState.usernames && runtimeState.usernames[slot]) ||
+    (slot === 'p1' ? 'Player 1' : 'Player 2')
+  );
 }
 
 // Resolve a slot to its styling class relative to the local viewer.

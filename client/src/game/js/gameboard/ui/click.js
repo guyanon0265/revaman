@@ -1,5 +1,9 @@
 import { clientState, clearSelection } from '../logic/state.js';
-import { moveCardToZone, attachCardToTarget, drawCards } from '../logic/loggingEngine.js';
+import {
+  moveCardToZone,
+  attachCardToTarget,
+  drawCards,
+} from '../logic/loggingEngine.js';
 import { isPileZone } from '../../utils.js';
 import { domIdToStateZone, renderEntireBoard } from './render.js';
 import { openPileBrowser, refreshPileBrowser } from './overlays/pileBrowser.js';
@@ -14,7 +18,10 @@ function handleBoardClick(e) {
   if (zoneEl) {
     const targetZone = domIdToStateZone(zoneEl.id);
 
-    if (!clientState.selectedInstanceId && (targetZone.endsWith('-deck') || targetZone.endsWith('-prizes'))) {
+    if (
+      !clientState.selectedInstanceId &&
+      (targetZone.endsWith('-deck') || targetZone.endsWith('-prizes'))
+    ) {
       const ownerSlot = targetZone.split('-')[0];
 
       drawCards(targetZone, `${ownerSlot}-hand`, 1);
@@ -33,8 +40,16 @@ function handleBoardClick(e) {
     const targetInstanceId = cardEl.dataset.instanceId;
     const targetZone = cardEl.dataset.zone;
 
-    if (targetZone === 'stadium' || targetZone.endsWith('-hand') || isPileZone(targetZone)) {
-      moveCardToZone(clientState.selectedInstanceId, clientState.selectedZone, targetZone);
+    if (
+      targetZone === 'stadium' ||
+      targetZone.endsWith('-hand') ||
+      isPileZone(targetZone)
+    ) {
+      moveCardToZone(
+        clientState.selectedInstanceId,
+        clientState.selectedZone,
+        targetZone
+      );
       clearSelection();
       renderEntireBoard();
       refreshPileBrowser();
@@ -42,7 +57,12 @@ function handleBoardClick(e) {
     }
 
     if (targetInstanceId !== clientState.selectedInstanceId) {
-      attachCardToTarget(clientState.selectedInstanceId, clientState.selectedZone, targetInstanceId, cardEl.dataset.zone);
+      attachCardToTarget(
+        clientState.selectedInstanceId,
+        clientState.selectedZone,
+        targetInstanceId,
+        cardEl.dataset.zone
+      );
 
       clearSelection();
       renderEntireBoard();
@@ -56,7 +76,11 @@ function handleBoardClick(e) {
 
     // Only move if it's a different zone than where the card currently is
     if (targetZone !== clientState.selectedZone) {
-      moveCardToZone(clientState.selectedInstanceId, clientState.selectedZone, targetZone);
+      moveCardToZone(
+        clientState.selectedInstanceId,
+        clientState.selectedZone,
+        targetZone
+      );
       clearSelection();
       renderEntireBoard();
       refreshPileBrowser();

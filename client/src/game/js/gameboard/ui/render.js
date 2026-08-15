@@ -1,5 +1,10 @@
 import { gameState, clientState, runtimeState } from '../logic/state.js';
-import { OWNED_SUFFIXES, SHARED_ZONE_IDS, COUNT_BADGE_SUFFIXES, isHidden } from '../../utils.js';
+import {
+  OWNED_SUFFIXES,
+  SHARED_ZONE_IDS,
+  COUNT_BADGE_SUFFIXES,
+  isHidden,
+} from '../../utils.js';
 
 // DOM element id -> actual gameState.zones key it should render/target.
 export function domIdToStateZone(domId) {
@@ -39,8 +44,11 @@ function buildCardEl(card, stateZoneId) {
   el.style.setProperty('--card-rotate', `${card.rotation}deg`);
 
   const hidden = isHidden(card, stateZoneId);
-  const breakDisplay = !hidden && card.isBreakActive && card.evolutionStack.length > 0;
-  const previousEvolution = breakDisplay ? card.evolutionStack[card.evolutionStack.length - 1] : null;
+  const breakDisplay =
+    !hidden && card.isBreakActive && card.evolutionStack.length > 0;
+  const previousEvolution = breakDisplay
+    ? card.evolutionStack[card.evolutionStack.length - 1]
+    : null;
 
   // Buried evolutions — middle column, vertical stack, most-recently
   // evolved-into on top (last array entry = last DOM child = top,
@@ -48,13 +56,17 @@ function buildCardEl(card, stateZoneId) {
   // While BREAK is active, the immediate previous evolution is already
   // shown full-size as the background image, so it's excluded here to
   // avoid showing it twice.
-  const evolutionThumbnails = breakDisplay ? card.evolutionStack.slice(0, -1) : card.evolutionStack;
+  const evolutionThumbnails = breakDisplay
+    ? card.evolutionStack.slice(0, -1)
+    : card.evolutionStack;
 
   if (!hidden && evolutionThumbnails.length > 0) {
     const evoBox = document.createElement('div');
     evoBox.className = 'evolution-stack';
     evolutionThumbnails.forEach((prev) => {
-      evoBox.appendChild(buildAttachmentImg(prev, card.instanceId, 'evolution-stack-card'));
+      evoBox.appendChild(
+        buildAttachmentImg(prev, card.instanceId, 'evolution-stack-card')
+      );
     });
     el.appendChild(evoBox);
   }
@@ -64,7 +76,9 @@ function buildCardEl(card, stateZoneId) {
     const trainerBox = document.createElement('div');
     trainerBox.className = 'trainer-attachments';
     card.trainerAttachments.forEach((t) => {
-      trainerBox.appendChild(buildAttachmentImg(t, card.instanceId, 'trainer-attachment-card'));
+      trainerBox.appendChild(
+        buildAttachmentImg(t, card.instanceId, 'trainer-attachment-card')
+      );
     });
     el.appendChild(trainerBox);
   }
@@ -95,7 +109,14 @@ function buildCardEl(card, stateZoneId) {
     el.appendChild(breakImg);
   }
 
-  if (!hidden && (card.damage > 0 || card.overheal > 0 || card.counter > 0 || card.statuses.length > 0 || card.abilityUsed)) {
+  if (
+    !hidden &&
+    (card.damage > 0 ||
+      card.overheal > 0 ||
+      card.counter > 0 ||
+      card.statuses.length > 0 ||
+      card.abilityUsed)
+  ) {
     const overlay = document.createElement('div');
     overlay.className = 'card-stats-overlay';
 
@@ -142,7 +163,9 @@ function buildCardEl(card, stateZoneId) {
     const energyBox = document.createElement('div');
     energyBox.className = 'energy-attachments';
     card.energyAttachments.forEach((en) => {
-      energyBox.appendChild(buildAttachmentImg(en, card.instanceId, 'energy-attachment-card'));
+      energyBox.appendChild(
+        buildAttachmentImg(en, card.instanceId, 'energy-attachment-card')
+      );
     });
     el.appendChild(energyBox);
   }
