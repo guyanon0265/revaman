@@ -1,3 +1,15 @@
+/* ==========================================================================
+   menu.css
+   Shared side-panel shell (.side-panel) + generic panel components
+   (.panel-header, .panel-tabs, .panel-grid, .browser-*) used by both
+   #action-menu and #pile-browser, followed by content specific to the
+   Action Menu's Controls tab and the Card View overlay.
+   ========================================================================== */
+
+/* ==========================================================================
+   Side Panel shell — generic sliding panel container
+   ========================================================================== */
+
 .side-panel {
   position: fixed;
   top: max(1.4vh, env(safe-area-inset-top, 0px));
@@ -33,11 +45,30 @@
   pointer-events: none;
 }
 
+@media (max-width: 767px) {
+  .side-panel {
+    top: auto;
+    bottom: max(1.4vh, env(safe-area-inset-bottom, 0px));
+    left: 1.4vh;
+    right: 1.4vh;
+    width: auto;
+    height: min(50vh, 560px);
+    border-radius: 2.2vh;
+  }
+
+  .side-panel.collapsed {
+    transform: translateY(calc(100% + 3vh));
+  }
+}
+
 /* ==========================================================================
-   Header
+   Panel Header — shared by #action-menu and #pile-browser
+   Structure: .panel-header > (.panel-header-text, .btn-side-panel-close)
+   .panel-header-text holds the title plus either a .panel-subtext line
+   (pile browser) or a .panel-tabs tab-group (action menu).
    ========================================================================== */
 
-.side-panel-header {
+.panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -46,21 +77,27 @@
   flex-shrink: 0;
 }
 
+.panel-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4vh;
+  min-width: 0;
+  flex: 1;
+}
+
 .side-panel-title {
   color: #cfd6e2;
   font-size: 1.5vh;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-#pile-browser-count {
+.panel-subtext {
   color: #888;
   font-size: 1.15vh;
-  margin-top: 0.25vh;
 }
-
-/* ==========================================================================
-   Close
-   ========================================================================== */
 
 .btn-side-panel-close {
   width: 3.4vh;
@@ -83,10 +120,54 @@
 }
 
 /* ==========================================================================
-   Content
+   Panel Tabs — tab-group living inside .panel-header-text (Action Menu)
    ========================================================================== */
 
-#pile-browser-grid {
+.panel-tabs {
+  display: flex;
+  gap: 0.6vh;
+  flex: 1;
+  min-width: 0;
+}
+
+.panel-tab-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3vh;
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: #7d8494;
+  padding: 0.8vh 0.2vh;
+  font-size: 1vh;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border-radius: 1vh;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+  min-width: 0;
+}
+
+.panel-tab-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.panel-tab-btn.active {
+  background-color: rgba(47, 111, 237, 0.18);
+  color: #7db8ff;
+}
+
+/* ==========================================================================
+   Panel Grid — scrollable content area shared by #pile-browser-grid and
+   #view-attached-grid
+   ========================================================================== */
+
+.panel-grid {
   flex: 1;
   min-height: 0;
   background-color: var(--bg-recessed, #121419);
@@ -100,20 +181,20 @@
   gap: 18px;
 }
 
-#pile-browser-grid::-webkit-scrollbar {
+.panel-grid::-webkit-scrollbar {
   width: 6px;
 }
 
-#pile-browser-grid::-webkit-scrollbar-thumb {
+.panel-grid::-webkit-scrollbar-thumb {
   background-color: #3a3f4a;
   border-radius: 3px;
 }
 
 /* ==========================================================================
-   Sections
+   Browser Sections & Thumbnails — shared by pile browser and view-attached
    ========================================================================== */
 
-.pile-browser-section-label {
+.browser-section-label {
   color: #888;
   font-size: 1.15vh;
   font-weight: bold;
@@ -122,18 +203,14 @@
   margin-bottom: 6px;
 }
 
-.pile-browser-section-grid {
+.browser-section-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
   gap: 12px;
   justify-items: center;
 }
 
-/* ==========================================================================
-   Cards
-   ========================================================================== */
-
-.pile-browser-thumbnail {
+.browser-thumbnail {
   width: 100%;
   aspect-ratio: 5 / 7;
   object-fit: cover;
@@ -142,139 +219,33 @@
   cursor: pointer;
   transition:
     transform 0.1s ease,
-    border-color 0.15s ease;
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
-.pile-browser-thumbnail:hover {
+.browser-thumbnail:hover {
   transform: translateY(-2px);
   border-color: #555;
 }
 
-@media (max-width: 767px) {
-  .side-panel {
-    top: auto;
-    bottom: max(1.4vh, env(safe-area-inset-bottom, 0px));
-    left: 1.4vh;
-    right: 1.4vh;
-    width: auto;
-    height: min(50vh, 560px);
-    border-radius: 2.2vh;
-  }
-
-  .side-panel.collapsed {
-    transform: translateY(calc(100% + 3vh));
-  }
+.browser-thumbnail.selected {
+  border-color: #7db8ff;
+  box-shadow: 0 0 0 2px rgba(47, 111, 237, 0.45);
 }
 
-/* Action Menu */
-.menu-tabs {
-  display: flex;
-  gap: 0.6vh;
-  flex: 1;
-  min-width: 0;
-}
-
-.btn-menu-tab {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.3vh;
-  background-color: transparent;
-  border: 1px solid transparent;
-  color: #7d8494;
-  padding: 0.8vh 0.2vh;
-  font-size: 1.4vh;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  border-radius: 1vh;
-  cursor: pointer;
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease;
-  min-width: 0;
-}
-.btn-menu-tab span {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-.btn-menu-tab .icon {
-  width: 1.7vh;
-  height: 1.7vh;
-}
-
-.btn-menu-tab:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.btn-menu-tab.active {
-  background-color: rgba(47, 111, 237, 0.18);
-  color: #7db8ff;
-}
+/* ==========================================================================
+   Action Menu — Controls tab content
+   ========================================================================== */
 
 .menu-page {
   display: none;
   flex-direction: column;
-  gap: 8px;
-}
-.menu-page.active {
-  display: flex;
-}
-.menu-title {
-  color: #aaa;
-  font-size: 12px;
-  font-weight: bold;
-  text-align: center;
-  width: 100%;
-}
-.menu-section {
-  display: flex;
-  justify-content: center;
-  gap: 5px;
-  flex-wrap: wrap;
-}
-.menu-section.counters {
-  align-items: center;
-  flex-direction: column;
-}
-.counter-control {
-  display: flex;
-  align-items: center;
-  background: #222;
-  border-radius: 20px;
-  padding: 4px 10px;
-  color: #fff;
-  font-size: 11px;
-  gap: 8px;
-}
-.action-menu button {
-  background: #252525;
-  border: 1px solid #333;
-  color: white;
-  padding: 8px 11px;
-  min-height: 34px;
-  font-size: 11px;
-  border-radius: 0.7vh;
-  font-weight: bold;
-  cursor: pointer;
-  box-sizing: border-box;
-}
-
-/* ==========================================================================
-   Card Controls
-   ========================================================================== */
-
-#card-controls-tab {
-  display: flex;
-  flex-direction: column;
   gap: 1.2vh;
+  flex: 1;
+  min-height: 0;
 }
 
-#card-controls-tab.active {
+.menu-page.active {
   display: flex;
 }
 
@@ -285,9 +256,28 @@
   gap: 1vh;
 }
 
-/* --------------------------------------------------------------------------
-   Generic control buttons
-   -------------------------------------------------------------------------- */
+.menu-section {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.menu-section.counters {
+  align-items: center;
+  flex-direction: column;
+}
+
+.counter-control {
+  display: flex;
+  align-items: center;
+  background: #222;
+  border-radius: 20px;
+  padding: 4px 10px;
+  color: #fff;
+  font-size: 11px;
+  gap: 8px;
+}
 
 .control-btn,
 #card-controls-tab button {
@@ -315,6 +305,12 @@
 
 #card-controls-tab button:active {
   transform: scale(0.96);
+}
+
+.status-chip.active {
+  background-color: rgba(47, 111, 237, 0.18);
+  border-color: rgba(125, 184, 255, 0.4);
+  color: #7db8ff;
 }
 
 /* --------------------------------------------------------------------------
@@ -382,6 +378,10 @@
   background: rgba(239, 68, 68, 0.2) !important;
   border-color: rgba(239, 68, 68, 0.45) !important;
 }
+
+/* ==========================================================================
+   Card View overlay close button
+   ========================================================================== */
 
 .close-btn {
   width: 3.4vh;
