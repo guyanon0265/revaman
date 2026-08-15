@@ -29,7 +29,7 @@
 // always ends up showing the new root correctly.
 
 import { gameState } from '../../logic/state.js';
-import { renderBrowserGrid } from './pileBrowser.js';
+import { renderBrowserGrid } from '../../../utils.js';
 import { openCardView } from './cardView.js';
 import { detachCard, devolveCard } from '../../logic/loggingEngine.js';
 import { renderEntireBoard } from '../render.js';
