@@ -1,6 +1,6 @@
 import { gameState, clientState, runtimeState } from '../logic/state.js';
 import {
-  OWNED_SUFFIXES,
+  OWNED_ZONE_SUFFIXES,
   SHARED_ZONE_IDS,
   COUNT_BADGE_SUFFIXES,
   isHidden,
@@ -179,7 +179,7 @@ function buildCardEl(card, stateZoneId) {
 
 export function renderEntireBoard() {
   // Owned zones (deck/hand/active/bench/discard/prizes), both sides
-  for (const suffix of OWNED_SUFFIXES) {
+  for (const suffix of OWNED_ZONE_SUFFIXES) {
     const playerContainer = document.getElementById(`player-${suffix}`);
     const oppContainer = document.getElementById(`opp-${suffix}`);
 

@@ -16,7 +16,7 @@
 // the board's selection state.
 
 import { gameState } from '../../logic/state.js';
-import { renderBrowserGrid, ZONE_LABELS } from '../../../utils.js';
+import { renderBrowserGrid, PILE_ZONE_LABELS } from '../../../utils.js';
 import { openCardView, closeCardView } from './cardView.js';
 import { moveCardToZone } from '../../logic/loggingEngine.js';
 import { renderEntireBoard } from '../render.js';
@@ -32,7 +32,7 @@ function renderPileGrid() {
   if (!currentZone) return;
   const cards = [...(gameState.zones[currentZone] || [])].reverse(); // top-first, LIFO
 
-  titleEl.textContent = ZONE_LABELS[currentZone] || currentZone;
+  titleEl.textContent = PILE_ZONE_LABELS[currentZone] || currentZone;
   countEl.textContent = `${cards.length} card${cards.length === 1 ? '' : 's'}`;
 
   renderBrowserGrid(gridEl, [{ label: null, cards }], {

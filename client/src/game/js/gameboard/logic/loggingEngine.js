@@ -15,35 +15,15 @@
 
 import * as engine from './engine.js';
 import { gameState, runtimeState } from './state.js';
-import { classifyType } from '../../utils.js';
+import {
+  classifyType,
+  SHARED_ZONE_LABELS,
+  OWNED_ZONE_SUFFIX_LABELS,
+} from '../../utils.js';
 import { GameLogger } from '../../sidebar/chat/chatlog.js';
 import { pushSnapshot } from './undoManager.js';
 
 export { undo, redo, canUndo, canRedo } from './undoManager.js';
-
-// ---------------------------------------------------------------------
-// Zone/slot helpers. GameLogger's API is slot-based ('p1' | 'p2') and
-// resolves the real username + player/opp styling itself, so these only
-// need to say *whose* card an action touched — not how to label them.
-// Perspective-aware via runtimeState.mySlot, so this stays correct once
-// Task 1 (switch seat) and Task 7 (multiplayer) are wired in.
-// ---------------------------------------------------------------------
-
-const ZONE_SUFFIX_LABELS = {
-  deck: 'Deck',
-  hand: 'Hand',
-  active: 'Active',
-  bench: 'Bench',
-  discard: 'Discard',
-  prizes: 'Prizes',
-};
-
-const SHARED_ZONE_LABELS = {
-  stadium: 'Stadium',
-  'lost-zone': 'Lost Zone',
-  'table-left': 'Table (Left)',
-  'table-right': 'Table (Right)',
-};
 
 // Logs an action, always attributed to the local acting viewer
 // (runtimeState.mySlot) — NOT derived from the zone a card happens to be
@@ -57,10 +37,11 @@ function logAction(actionText) {
 }
 
 function zoneLabel(zoneId) {
+  if (zoneId.endsWith('table-half')) return `Board`;
   if (zoneId.startsWith('p1-') || zoneId.startsWith('p2-')) {
     const slot = zoneId.slice(0, 2);
     const suffix = zoneId.slice(3);
-    const base = ZONE_SUFFIX_LABELS[suffix] || suffix;
+    const base = OWNED_ZONE_SUFFIX_LABELS[suffix] || suffix;
     return slot === runtimeState.mySlot ? base : `Opponent's ${base}`;
   }
   return SHARED_ZONE_LABELS[zoneId] || zoneId;

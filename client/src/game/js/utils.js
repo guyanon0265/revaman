@@ -1,4 +1,59 @@
-/*-engine.js-*/
+export const ALL_STATUSES = ['BRN', 'PAR', 'PSN', 'FRZ', 'SLP', 'CON'];
+
+export const PILE_ZONE_IDS = [
+  'p1-deck',
+  'p1-discard',
+  'p1-prizes',
+  'p2-deck',
+  'p2-discard',
+  'p2-prizes',
+  'lost-zone',
+];
+
+export const PILE_ZONE_LABELS = {
+  'p1-deck': 'Deck',
+  'p1-discard': 'Discard',
+  'p1-prizes': 'Prizes',
+  'p2-deck': "Opponent's Deck",
+  'p2-discard': "Opponent's Discard",
+  'p2-prizes': "Opponent's Prizes",
+  'lost-zone': 'Lost Zone',
+};
+
+export const SHARED_ZONE_IDS = ['stadium', 'lost-zone'];
+
+export const SHARED_ZONE_LABELS = {
+  stadium: 'Stadium',
+  'lost-zone': 'Lost Zone',
+};
+
+export const OWNED_ZONE_SUFFIXES = [
+  'deck',
+  'hand',
+  'active',
+  'bench',
+  'discard',
+  'prizes',
+  'table-half',
+];
+
+export const OWNED_ZONE_SUFFIX_LABELS = {
+  deck: 'Deck',
+  hand: 'Hand',
+  active: 'Active',
+  bench: 'Bench',
+  discard: 'Discard',
+  prizes: 'Prizes',
+};
+
+export const COUNT_BADGE_SUFFIXES = [
+  'deck',
+  'hand',
+  'discard',
+  'prizes',
+  'bench',
+];
+
 export function classifyType(type) {
   const t = (type || '').toLowerCase();
   if (t.includes('energy')) return 'energy';
@@ -13,49 +68,6 @@ export function classifyType(type) {
   return 'pokemon';
 }
 
-export const ALL_STATUSES = ['BRN', 'PAR', 'PSN', 'FRZ', 'SLP', 'CON'];
-
-export const PILE_ZONES = [
-  'p1-deck',
-  'p1-discard',
-  'p1-prizes',
-  'p2-deck',
-  'p2-discard',
-  'p2-prizes',
-  'lost-zone',
-];
-
-export const ZONE_LABELS = {
-  'p1-deck': 'Deck',
-  'p1-discard': 'Discard',
-  'p1-prizes': 'Prizes',
-  'p2-deck': "Opponent's Deck",
-  'p2-discard': "Opponent's Discard",
-  'p2-prizes': "Opponent's Prizes",
-  stadium: 'Stadium',
-  'lost-zone': 'Lost Zone',
-};
-
-/*-render.js-*/
-export const OWNED_SUFFIXES = [
-  'deck',
-  'hand',
-  'active',
-  'bench',
-  'discard',
-  'prizes',
-  'table-half',
-];
-export const SHARED_ZONE_IDS = ['stadium', 'lost-zone'];
-export const COUNT_BADGE_SUFFIXES = [
-  'deck',
-  'hand',
-  'discard',
-  'prizes',
-  'bench',
-];
-
-/*-render.js & cardview.js-*/
 export function isHidden(card, stateZoneId) {
   if (card.isFaceDown) return true;
   if (stateZoneId.endsWith('-deck') || stateZoneId.endsWith('-prizes'))
@@ -63,9 +75,8 @@ export function isHidden(card, stateZoneId) {
   return false;
 }
 
-/*-actionmenu.js-*/
 export function isPileZone(zone) {
-  return PILE_ZONES.includes(zone);
+  return PILE_ZONE_IDS.includes(zone);
 }
 
 // ---------------------------------------------------------------------------
