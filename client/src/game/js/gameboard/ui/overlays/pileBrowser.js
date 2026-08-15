@@ -1,14 +1,23 @@
-// gameboard/pilebrowser.js — shared card-browser grid plus the standalone
-// pile browser.
+// gameboard/ui/overlays/pileBrowser.js — shared card-browser grid plus the
+// standalone pile browser.
 //
-// The grid renderer is intentionally context-free: callers provide the
-// sections and interaction handlers. The standalone pile browser owns its
-// own title/count header. View Attached can reuse the same grid without
-// inheriting pile-browser semantics.
+// renderBrowserGrid() is context-free: callers supply the target grid
+// element, the sections to render, and onSelect/onDeselect/onContextMenu
+// callbacks. It owns click-to-select/click-again-to-deselect highlighting
+// internally (via the .selected class) but has no opinion on what select
+// or deselect *means* — that's entirely up to the caller. This lets the
+// standalone pile browser (deselect = close Card View) and View Attached
+// (deselect = revert Card View to the root card) share the same grid and
+// highlight mechanics while differing on what a deselect does.
+//
+// Neither this module nor its callers write to clientState. Card View
+// takes its card as an explicit argument and moveCardToZone takes an
+// explicit instanceId/zone, so nothing here needs — or should touch —
+// the board's selection state.
 
-import { gameState, clientState, clearSelection } from '../../logic/state.js';
+import { gameState } from '../../logic/state.js';
 import { ZONE_LABELS } from '../../../utils.js';
-import { openCardView } from './cardView.js';
+import { openCardView, closeCardView } from './cardView.js';
 import { moveCardToZone } from '../../logic/loggingEngine.js';
 import { renderEntireBoard } from '../render.js';
 
@@ -24,44 +33,66 @@ let currentZone = null;
 // ---------------------------------------------------------------------------
 //
 // sections: [{ label: string|null, cards: [] }, ...]
+// options: { onSelect(card), onDeselect(card), onContextMenu(card) }
 //
-// Empty sections are skipped entirely.
-//
-// This function deliberately knows nothing about whether the cards came from
-// a pile, attachments, or anything else. The caller supplies the sections
-// and interaction handlers.
-export function renderBrowserGrid(sections, onCardClick, onCardContextMenu) {
-  gridEl.innerHTML = '';
+// Empty sections are skipped entirely. Selecting a thumbnail highlights it
+// and deselects any previously-selected thumbnail in this grid; clicking
+// the already-selected thumbnail deselects it.
+export function renderBrowserGrid(targetGridEl, sections, options = {}) {
+  const { onSelect, onDeselect, onContextMenu } = options;
+
+  targetGridEl.innerHTML = '';
+
+  let selectedImg = null;
+
   sections.forEach((section) => {
     if (section.cards.length === 0) return;
 
     const wrap = document.createElement('div');
-    wrap.className = 'pile-browser-section';
+    wrap.className = 'browser-section';
 
     if (section.label) {
       const heading = document.createElement('div');
-      heading.className = 'pile-browser-section-label';
+      heading.className = 'browser-section-label';
       heading.textContent = section.label;
       wrap.appendChild(heading);
     }
 
     const grid = document.createElement('div');
-    grid.className = 'pile-browser-section-grid';
+    grid.className = 'browser-section-grid';
+
     section.cards.forEach((card) => {
       const img = document.createElement('img');
-      img.className = 'pile-browser-thumbnail';
+      img.className = 'browser-thumbnail';
       img.src = card.imageUrl;
       img.alt = card.name;
       img.draggable = false;
-      img.addEventListener('click', () => onCardClick(card));
+
+      img.addEventListener('click', () => {
+        if (selectedImg === img) {
+          img.classList.remove('selected');
+          selectedImg = null;
+          onDeselect?.(card);
+          return;
+        }
+
+        if (selectedImg) selectedImg.classList.remove('selected');
+
+        img.classList.add('selected');
+        selectedImg = img;
+        onSelect?.(card);
+      });
+
       img.addEventListener('contextmenu', (e) => {
         e.preventDefault();
-        onCardContextMenu(card);
+        onContextMenu?.(card);
       });
+
       grid.appendChild(img);
     });
+
     wrap.appendChild(grid);
-    gridEl.appendChild(wrap);
+    targetGridEl.appendChild(wrap);
   });
 }
 
@@ -72,28 +103,15 @@ function renderPileGrid() {
   titleEl.textContent = ZONE_LABELS[currentZone] || currentZone;
   countEl.textContent = `${cards.length} card${cards.length === 1 ? '' : 's'}`;
 
-  renderBrowserGrid([{ label: null, cards }], handleBrowserCardClick, handleBrowserCardContextMenu);
-}
-
-function selectBrowserCard(card) {
-  clientState.selectedInstanceId = card.instanceId;
-  clientState.selectedZone = currentZone;
-  clientState.selectedKind = 'card';
-  clientState.selectedParentId = null;
-}
-
-function handleBrowserCardClick(card) {
-  selectBrowserCard(card);
-  openCardView(card);
-  clearSelection();
-}
-
-function handleBrowserCardContextMenu(card) {
-  selectBrowserCard(card);
-  moveCardToZone(card.instanceId, currentZone, `${card.owner}-hand`);
-  clearSelection();
-  renderPileGrid();
-  renderEntireBoard();
+  renderBrowserGrid(gridEl, [{ label: null, cards }], {
+    onSelect: (card) => openCardView(card),
+    onDeselect: () => closeCardView(),
+    onContextMenu: (card) => {
+      moveCardToZone(card.instanceId, currentZone, `${card.owner}-hand`);
+      renderPileGrid();
+      renderEntireBoard();
+    },
+  });
 }
 
 export function openPileBrowser(zone) {
@@ -105,6 +123,10 @@ export function openPileBrowser(zone) {
 export function closePileBrowser() {
   browserEl.classList.add('collapsed');
   currentZone = null;
+
+  // Whatever Card View was showing (opened by selecting a thumbnail)
+  // has nowhere left to hang once the browser it came from is gone.
+  closeCardView();
 }
 
 export function refreshPileBrowser() {

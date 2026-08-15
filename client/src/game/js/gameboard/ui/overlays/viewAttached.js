@@ -1,19 +1,29 @@
-// gameboard/ui/viewAttached.js
+// gameboard/ui/overlays/viewAttached.js
 //
-// View Attached is a specialized PBrowser view for the attachments of one
-// root card.
+// View Attached is a specialized grid, living inside #action-menu's own
+// view-attached-tab, showing the attachments of one root card.
 //
-// The root card is captured from clientState exactly once when this view
-// opens. Attachment cards are temporary browser selections and do not
-// replace the root selection.
+// The root card id/zone are passed in explicitly by actionmenu.js (which
+// captures them from clientState exactly once when the Action Menu opens)
+// rather than read from clientState here. This module has no dependency
+// on clientState at all.
 //
-// The browser itself remains open while Card View is displayed.
+// Attachment thumbnails behave like pile browser thumbnails: click to
+// select (temporarily swaps Card View to that attachment), click again
+// to deselect. The difference from the standalone pile browser is what
+// deselecting does — here it REVERTS Card View back to the root card
+// rather than closing it, since the Action Menu keeps Card View open for
+// as long as the menu itself is open.
 
-import { gameState, clientState } from '../../logic/state.js';
-import { renderBrowserGrid, openPileBrowser, closePileBrowser } from './pileBrowser.js';
+import { gameState } from '../../logic/state.js';
+import { renderBrowserGrid } from './pileBrowser.js';
+import { openCardView } from './cardView.js';
+
+const gridEl = document.getElementById('view-attached-grid');
 
 let parentId = null;
 let parentZone = null;
+let overrideActive = false; // true while an attachment is temporarily shown in Card View
 
 function getParentCard() {
   if (!parentId || !parentZone) return null;
@@ -42,41 +52,32 @@ function getAttachedCards() {
 function renderAttachedGrid() {
   const attachments = getAttachedCards();
 
-  const total = attachments.evolution.length + attachments.trainers.length + attachments.energy.length;
-
   renderBrowserGrid(
+    gridEl,
     [
-      {
-        label: 'Evolutions',
-        cards: attachments.evolution,
-      },
-      {
-        label: 'Trainers',
-        cards: attachments.trainers,
-      },
-      {
-        label: 'Energy',
-        cards: attachments.energy,
-      },
+      { label: 'Evolutions', cards: attachments.evolution },
+      { label: 'Trainers', cards: attachments.trainers },
+      { label: 'Energy', cards: attachments.energy },
     ],
-    (card) => {
-      // Attachment cards are temporary browser cards.
-      //
-      // Do NOT replace clientState's root selection with this card.
-      // PileBrowser/Card View tracks the temporary viewed card.
-    },
-    (card) => {
-      // View Attached does not support moving attachments to hand.
-      // Its context-menu behavior therefore does nothing.
+    {
+      onSelect: (card) => {
+        overrideActive = true;
+        openCardView(card);
+      },
+      onDeselect: () => {
+        overrideActive = false;
+        const root = getParentCard();
+        if (root) openCardView(root);
+      },
+      // No onContextMenu — View Attached does not support moving
+      // attachments to hand.
     }
   );
-
-  return total;
 }
 
-export function openViewAttached() {
-  parentId = clientState.selectedInstanceId;
-  parentZone = clientState.selectedZone;
+export function openViewAttached(cardId, zone) {
+  parentId = cardId;
+  parentZone = zone;
 
   if (!parentId || !parentZone) return;
 
@@ -88,8 +89,8 @@ export function openViewAttached() {
     return;
   }
 
+  overrideActive = false;
   renderAttachedGrid();
-  openPileBrowser();
 }
 
 export function refreshViewAttached() {
@@ -105,8 +106,19 @@ export function refreshViewAttached() {
   renderAttachedGrid();
 }
 
+// Called when navigating away from the View Attached tab back to
+// Controls, while the Action Menu itself stays open. If an attachment
+// was temporarily overriding Card View, this puts the root card back.
+export function revertViewAttachedSelection() {
+  if (!overrideActive) return;
+
+  overrideActive = false;
+  const root = getParentCard();
+  if (root) openCardView(root);
+}
+
 export function closeViewAttached() {
   parentId = null;
   parentZone = null;
-  closePileBrowser();
+  overrideActive = false;
 }
