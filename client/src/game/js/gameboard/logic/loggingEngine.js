@@ -1,20 +1,25 @@
 // loggingEngine.js — thin wrapper around engine.js that adds GameLogger
-// calls without touching engine.js itself (engine.js's own header says
-// "pure, DOM-free ... no document/window access, ever" — GameLogger
-// reaches into the DOM, so it can't live inside engine.js).
+// calls and undo/redo snapshotting, without touching engine.js itself
+// (engine.js's own header says "pure, DOM-free ... no document/window
+// access, ever" — neither GameLogger nor snapshotting belongs there).
 //
 // Every exported function here has the exact same name and signature
 // as its engine.js counterpart. Callers only need to change their
 // import path from './engine.js' (or '../gameboard/engine.js') to
 // this file — no call-site logic changes required.
 //
-// This is also the seam Task 3 (Undo/Redo) will want for its
-// before/after gameState snapshots — same call sites, same wrapper.
+// pushSnapshot() fires immediately before each logical action's first
+// mutation, so undo granularity matches log-line granularity: a run of
+// damage clicks that batches into one log line also undoes as one step,
+// not one click at a time.
 
 import * as engine from './engine.js';
 import { gameState, runtimeState } from './state.js';
 import { classifyType } from '../../utils.js';
 import { GameLogger } from '../../sidebar/chat/chatlog.js';
+import { pushSnapshot } from './undoManager.js';
+
+export { undo, redo, canUndo, canRedo } from './undoManager.js';
 
 // ---------------------------------------------------------------------
 // Zone/slot helpers. GameLogger's API is slot-based ('p1' | 'p2') and
@@ -69,22 +74,32 @@ function findCard(zoneId, instanceId) {
 
 // ---------------------------------------------------------------------
 // Damage / overheal / counter deltas — batched. Consecutive clicks on
-// the SAME stat of the SAME card accumulate into one pending entry.
-// Any other logged call — a different stat, a different card, or any
-// non-delta action — flushes the pending batch first, via
-// flushPendingBatch() at the top of every other wrapped function.
+// the SAME stat of the SAME card accumulate into one pending entry,
+// which is also one undo step: pushSnapshot() fires once, when the
+// batch STARTS (before that first mutation), not on every click that
+// extends it.
 //
-// Known gap: if the very last action of a session is a delta with
-// nothing logged after it, that final batch is never flushed (nothing
-// ever triggers the flush). The underlying gameState mutation still
-// happens correctly either way — only that log line would be missing.
-// Acceptable for now; revisit with an idle-timer or beforeunload flush
-// if it turns out to matter in practice.
+// The batch flushes (logs + clears) via a short timer after the last
+// click, rather than waiting for some other action to trigger it. That
+// used to be lazy-flush-on-next-action, which meant a damage log line
+// could sit invisible for an arbitrarily long time and then appear
+// bundled together with an unrelated later action's log line the
+// moment ANYTHING else happened — or, if nothing else ever happened in
+// the session, never appear at all. The timer fixes both: the log
+// appears promptly on its own once clicking stops, independent of
+// whatever else does or doesn't happen afterward.
 // ---------------------------------------------------------------------
 
+const BATCH_FLUSH_DELAY_MS = 600;
+
 let pendingBatch = null;
+let pendingBatchTimer = null;
 
 function flushPendingBatch() {
+  if (pendingBatchTimer) {
+    clearTimeout(pendingBatchTimer);
+    pendingBatchTimer = null;
+  }
   if (!pendingBatch) return;
   const { cardName, statLabel, netDelta, finalValue } = pendingBatch;
   const sign = netDelta > 0 ? '+' : '';
@@ -94,12 +109,32 @@ function flushPendingBatch() {
   pendingBatch = null;
 }
 
+function scheduleBatchFlush() {
+  if (pendingBatchTimer) clearTimeout(pendingBatchTimer);
+  pendingBatchTimer = setTimeout(() => {
+    pendingBatchTimer = null;
+    flushPendingBatch();
+  }, BATCH_FLUSH_DELAY_MS);
+}
+
 function applyDelta(statLabel, engineFn, instanceId, zone, delta) {
   const before = findCard(zone, instanceId);
-  const card = engineFn(instanceId, zone, delta);
-  if (!before || !card) return card;
+  if (!before) return null;
 
   const key = `${instanceId}:${statLabel}`;
+  const isNewBatch = !(pendingBatch && pendingBatch.key === key);
+
+  // Must be decided BEFORE the mutation below — pushSnapshot() has to
+  // fire pre-mutation, and whether this is a new batch is exactly what
+  // determines whether a snapshot is needed at all.
+  if (isNewBatch) {
+    flushPendingBatch();
+    pushSnapshot();
+  }
+
+  const card = engineFn(instanceId, zone, delta);
+  if (!card) return card;
+
   const finalValue =
     statLabel === 'damage'
       ? card.damage
@@ -107,11 +142,7 @@ function applyDelta(statLabel, engineFn, instanceId, zone, delta) {
         ? card.overheal
         : card.counter;
 
-  if (pendingBatch && pendingBatch.key === key) {
-    pendingBatch.netDelta += delta;
-    pendingBatch.finalValue = finalValue;
-  } else {
-    flushPendingBatch();
+  if (isNewBatch) {
     pendingBatch = {
       key,
       zone,
@@ -120,7 +151,12 @@ function applyDelta(statLabel, engineFn, instanceId, zone, delta) {
       netDelta: delta,
       finalValue,
     };
+  } else {
+    pendingBatch.netDelta += delta;
+    pendingBatch.finalValue = finalValue;
   }
+
+  scheduleBatchFlush();
   return card;
 }
 
@@ -149,13 +185,15 @@ export function applyCounterDelta(instanceId, zone, delta) {
 }
 
 // ---------------------------------------------------------------------
-// Everything else — logs immediately, one line per call. Each of
-// these flushes any pending delta batch first, since a non-delta
-// action always ends whatever batch was in progress.
+// Everything else — logs immediately, one line per call, and each is
+// its own undo step: pushSnapshot() fires before the mutation, right
+// after flushing whatever delta batch was pending (a non-delta action
+// always ends a batch — it can't be folded into one).
 // ---------------------------------------------------------------------
 
 export function moveCardToZone(instanceId, fromZone, toZone, position = 'top') {
   flushPendingBatch();
+  pushSnapshot();
   const card = engine.moveCardToZone(instanceId, fromZone, toZone, position);
   if (card)
     logAction(
@@ -166,6 +204,7 @@ export function moveCardToZone(instanceId, fromZone, toZone, position = 'top') {
 
 export function moveToTopOfDeck(instanceId, fromZone, toZone) {
   flushPendingBatch();
+  pushSnapshot();
   const card = engine.moveToTopOfDeck(instanceId, fromZone, toZone);
   if (card)
     logAction(
@@ -176,6 +215,7 @@ export function moveToTopOfDeck(instanceId, fromZone, toZone) {
 
 export function moveToBottomOfDeck(instanceId, fromZone, toZone) {
   flushPendingBatch();
+  pushSnapshot();
   const card = engine.moveToBottomOfDeck(instanceId, fromZone, toZone);
   if (card)
     logAction(
@@ -186,6 +226,7 @@ export function moveToBottomOfDeck(instanceId, fromZone, toZone) {
 
 export function drawTopCard(fromZone, toZone) {
   flushPendingBatch();
+  pushSnapshot();
   const card = engine.drawTopCard(fromZone, toZone);
   if (card) logAction(`drew ${card.name}.`);
   return card;
@@ -193,6 +234,7 @@ export function drawTopCard(fromZone, toZone) {
 
 export function drawCards(fromZone, toZone, count) {
   flushPendingBatch();
+  pushSnapshot();
   const before = gameState.zones[toZone]?.length ?? 0;
   engine.drawCards(fromZone, toZone, count);
   const actualDrawn = (gameState.zones[toZone]?.length ?? 0) - before;
@@ -205,12 +247,14 @@ export function drawCards(fromZone, toZone, count) {
 
 export function shuffleZone(zoneId) {
   flushPendingBatch();
+  pushSnapshot();
   engine.shuffleZone(zoneId);
   logAction(`shuffled ${zoneLabel(zoneId)}.`);
 }
 
 export function shuffleDiscardIntoDeck(discardZone, deckZone) {
   flushPendingBatch();
+  pushSnapshot();
   const count = gameState.zones[discardZone]?.length ?? 0;
   engine.shuffleDiscardIntoDeck(discardZone, deckZone);
   if (count > 0) {
@@ -222,6 +266,7 @@ export function shuffleDiscardIntoDeck(discardZone, deckZone) {
 
 export function attachCardToTarget(selectedId, fromZone, targetId, targetZone) {
   flushPendingBatch();
+  pushSnapshot();
   const selectedBefore = findCard(fromZone, selectedId);
   const targetBefore = findCard(targetZone, targetId);
   const kind = selectedBefore ? classifyType(selectedBefore.type) : null;
@@ -251,6 +296,7 @@ export function detachCard(
   toHandZone
 ) {
   flushPendingBatch();
+  pushSnapshot();
   const parent = findCard(parentZone, parentId);
   const card = engine.detachCard(
     parentId,
@@ -269,6 +315,7 @@ export function detachCard(
 
 export function devolveCard(cardId, zone, targetInstanceId) {
   flushPendingBatch();
+  pushSnapshot();
   const current = findCard(zone, cardId);
   const previous = engine.devolveCard(cardId, zone, targetInstanceId);
   if (previous && current) {
@@ -281,6 +328,7 @@ export function devolveCard(cardId, zone, targetInstanceId) {
 
 export function toggleStatus(instanceId, zone, status) {
   flushPendingBatch();
+  pushSnapshot();
   const before = findCard(zone, instanceId);
   const wasActive = before ? before.statuses.includes(status) : false;
   const card = engine.toggleStatus(instanceId, zone, status);
@@ -291,6 +339,7 @@ export function toggleStatus(instanceId, zone, status) {
 
 export function toggleAbility(instanceId, zone) {
   flushPendingBatch();
+  pushSnapshot();
   const card = engine.toggleAbility(instanceId, zone);
   if (card)
     logAction(
@@ -301,6 +350,7 @@ export function toggleAbility(instanceId, zone) {
 
 export function toggleFlip(instanceId, zone) {
   flushPendingBatch();
+  pushSnapshot();
   const card = engine.toggleFlip(instanceId, zone);
   if (card)
     logAction(`turned ${card.name} face ${card.isFaceDown ? 'down' : 'up'}.`);
@@ -309,6 +359,7 @@ export function toggleFlip(instanceId, zone) {
 
 export function setRotation(instanceId, zone, degrees) {
   flushPendingBatch();
+  pushSnapshot();
   const card = engine.setRotation(instanceId, zone, degrees);
   if (card) logAction(`rotated ${card.name} to ${degrees}°.`);
   return card;
@@ -316,6 +367,7 @@ export function setRotation(instanceId, zone, degrees) {
 
 export function setUpright(instanceId, zone) {
   flushPendingBatch();
+  pushSnapshot();
   const card = engine.setUpright(instanceId, zone);
   if (card) logAction(`reset ${card.name} to upright.`);
   return card;
@@ -323,6 +375,7 @@ export function setUpright(instanceId, zone) {
 
 export function toggleBreak(instanceId, zone) {
   flushPendingBatch();
+  pushSnapshot();
   const card = engine.toggleBreak(instanceId, zone);
   if (card)
     logAction(

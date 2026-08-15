@@ -319,3 +319,11 @@ function handleMenuClick(e) {
 export function initActionMenu() {
   menuEl.addEventListener('click', handleMenuClick);
 }
+
+// Exposed for undo/redo (gameboard/ui/gameActions.js): after a restore,
+// this menu — if open — may be bound to a card/zone/state that no
+// longer makes sense. Undo/redo can jump state around far more
+// drastically than devolve/evolve alone, so rather than trying to
+// re-sync every open panel against an arbitrary prior state, undo/redo
+// just closes everything.
+export { closeMenu as closeActionMenu };
