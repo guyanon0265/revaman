@@ -1,0 +1,47 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+.pnpm-store/
+
+# Build and distribution outputs
+dist/
+build/
+.next/
+out/
+.nuxt/
+
+# Version control and system files
+.git/
+.svn/
+.hg/
+.DS_Store
+Thumbs.db
+
+# Environment variables and secrets
+.env
+.env.*
+*.local
+
+# Lockfiles
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
+# Generated metadata or cache files
+.eslintcache
+.stylelintcache
+.prettiercache
+.nyc_output
+coverage/
+
+# Media and asset files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
+*.mp4
+*.mp3
+*.pdf
