@@ -7,7 +7,7 @@ const localtunnelBin = require.resolve('localtunnel/bin/lt.js');
 
 const tunnel = spawn(
   process.execPath,
-  [localtunnelBin, '--port', String(PORT)],
+  [localtunnelBin, '--port', String(PORT), '--subdomain', 'revaman'],
   {
     stdio: 'inherit',
   }

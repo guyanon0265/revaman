@@ -29,10 +29,6 @@ import { onLogChanged } from './gameboard/logic/logChangeBus.js';
 import { onChatChanged } from './gameboard/logic/chatChangeBus.js';
 import { GameLogger } from './sidebar/chat/chatlog.js';
 
-// Placeholder — point this at your actual deployed relay. Matches
-// server.js's default PORT for local dev out of the box.
-const RELAY_URL = 'http://localhost:8080';
-
 let lastAppliedSeq = 0;
 
 function setStatus(text) {
@@ -62,7 +58,7 @@ function applyIncomingState({ seq, zones, cardbacks }) {
 export function joinRoom(room, username) {
   if (runtimeState.socket) return; // already connected — one connection per session
 
-  const socket = io(RELAY_URL);
+  const socket = io();
   runtimeState.socket = socket;
   setStatus('Connecting…');
 
