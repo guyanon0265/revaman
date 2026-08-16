@@ -67,11 +67,6 @@ body {
   min-height: 0;
   container-type: size;
   container-name: board;
-  /* display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: center; */
-
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;

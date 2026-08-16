@@ -87,8 +87,8 @@
 
 .side-panel-title {
   color: #cfd6e2;
-  font-size: 1.5vh;
-  font-weight: 600;
+  font-size: 1.6vh;
+  font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -96,7 +96,8 @@
 
 .panel-subtext {
   color: #888;
-  font-size: 1.15vh;
+  font-size: 1.3vh;
+  font-weight: 600;
 }
 
 .btn-side-panel-close {
@@ -141,7 +142,7 @@
   border: 1px solid transparent;
   color: #7d8494;
   padding: 0.8vh 0.2vh;
-  font-size: 1vh;
+  font-size: 1.5vh;
   font-weight: 700;
   letter-spacing: 0.02em;
   border-radius: 1vh;
@@ -196,7 +197,7 @@
 
 .browser-section-label {
   color: #888;
-  font-size: 1.15vh;
+  font-size: 1.5vh;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -277,7 +278,7 @@
   border-radius: 20px;
   padding: 4px 10px;
   color: #fff;
-  font-size: 11px;
+  font-size: 1.5vh;
   gap: 8px;
 }
 
@@ -351,7 +352,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 0.9vh;
-  font-size: 1.5vh;
+  font-size: 2vh;
 }
 
 .dpad-up {
