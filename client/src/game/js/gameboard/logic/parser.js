@@ -33,7 +33,6 @@ export function parseDeckCSV(csvText, slot) {
         type,
         imageUrl: url,
         damage: 0,
-        overheal: 0,
         counter: 0,
         rotation: 0,
         statuses: [],

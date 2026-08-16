@@ -173,7 +173,6 @@ function refreshControls() {
   if (!card) return;
 
   document.getElementById('txt-menu-dmg').textContent = card.damage;
-  document.getElementById('txt-menu-ohl').textContent = card.overheal;
   document.getElementById('txt-menu-counter').textContent = card.counter;
 
   document.querySelectorAll('#markers-section .status-chip').forEach((chip) => {
@@ -230,18 +229,6 @@ function handleMenuClick(e) {
   }
   if (target.id === 'btn-dmg-down') {
     engine.applyDamageDelta(rootId, rootZone, -10);
-    refreshControls();
-    renderEntireBoard();
-    return;
-  }
-  if (target.id === 'btn-ohl-up') {
-    engine.applyOverhealDelta(rootId, rootZone, 10);
-    refreshControls();
-    renderEntireBoard();
-    return;
-  }
-  if (target.id === 'btn-ohl-down') {
-    engine.applyOverhealDelta(rootId, rootZone, -10);
     refreshControls();
     renderEntireBoard();
     return;

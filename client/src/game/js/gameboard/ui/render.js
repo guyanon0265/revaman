@@ -123,7 +123,7 @@ function buildCardEl(card, stateZoneId) {
   if (
     !hidden &&
     (card.damage > 0 ||
-      card.overheal > 0 ||
+      card.damage < 0 ||
       card.counter > 0 ||
       card.statuses.length > 0 ||
       card.abilityUsed)
@@ -138,10 +138,10 @@ function buildCardEl(card, stateZoneId) {
       overlay.appendChild(dmg);
     }
 
-    if (card.overheal > 0) {
+    if (card.damage < 0) {
       const ohl = document.createElement('span');
       ohl.className = 'stat-badge badge-ohl';
-      ohl.textContent = card.overheal;
+      ohl.textContent = Math.abs(card.damage);
       overlay.appendChild(ohl);
     }
 

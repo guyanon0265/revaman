@@ -21,7 +21,6 @@ function removeFromZone(zoneId, instanceId) {
 
 function resetToFresh(card) {
   card.damage = 0;
-  card.overheal = 0;
   card.counter = 0;
   card.statuses = [];
   card.abilityUsed = false;
@@ -172,7 +171,6 @@ export function devolveCard(cardId, zone, targetInstanceId) {
   // there is only ever ONE live set of markers/attachments per evo
   // line at a time, carried by whichever stage is currently active.
   previous.damage = current.damage;
-  previous.overheal = current.overheal;
   previous.counter = current.counter;
   previous.statuses = [...current.statuses];
   previous.abilityUsed = current.abilityUsed;
@@ -202,14 +200,7 @@ export function devolveCard(cardId, zone, targetInstanceId) {
 export function applyDamageDelta(instanceId, zone, delta) {
   const card = gameState.zones[zone]?.find((c) => c.instanceId === instanceId);
   if (!card) return null;
-  card.damage = Math.max(0, card.damage + delta);
-  return card;
-}
-
-export function applyOverhealDelta(instanceId, zone, delta) {
-  const card = gameState.zones[zone]?.find((c) => c.instanceId === instanceId);
-  if (!card) return null;
-  card.overheal = Math.max(0, card.overheal + delta);
+  card.damage += delta;
   return card;
 }
 

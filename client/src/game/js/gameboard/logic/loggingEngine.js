@@ -76,6 +76,12 @@ const BATCH_FLUSH_DELAY_MS = 600;
 let pendingBatch = null;
 let pendingBatchTimer = null;
 
+function formatDamageValue(value) {
+  if (value > 0) return `${value} damage`;
+  if (value < 0) return `${Math.abs(value)} overheal`;
+  return '0 damage';
+}
+
 function flushPendingBatch() {
   if (pendingBatchTimer) {
     clearTimeout(pendingBatchTimer);
@@ -84,8 +90,10 @@ function flushPendingBatch() {
   if (!pendingBatch) return;
   const { cardName, statLabel, netDelta, finalValue } = pendingBatch;
   const sign = netDelta > 0 ? '+' : '';
+  const finalText =
+    statLabel === 'damage' ? formatDamageValue(finalValue) : `${finalValue}`;
   logAction(
-    `changed ${statLabel} on ${cardName} by ${sign}${netDelta} (now ${finalValue}).`
+    `changed ${statLabel} on ${cardName} by ${sign}${netDelta} (now ${finalText}).`
   );
   pendingBatch = null;
 }
@@ -116,12 +124,7 @@ function applyDelta(statLabel, engineFn, instanceId, zone, delta) {
   const card = engineFn(instanceId, zone, delta);
   if (!card) return card;
 
-  const finalValue =
-    statLabel === 'damage'
-      ? card.damage
-      : statLabel === 'overheal'
-        ? card.overheal
-        : card.counter;
+  const finalValue = statLabel === 'damage' ? card.damage : card.counter;
 
   if (isNewBatch) {
     pendingBatch = {
@@ -143,16 +146,6 @@ function applyDelta(statLabel, engineFn, instanceId, zone, delta) {
 
 export function applyDamageDelta(instanceId, zone, delta) {
   return applyDelta('damage', engine.applyDamageDelta, instanceId, zone, delta);
-}
-
-export function applyOverhealDelta(instanceId, zone, delta) {
-  return applyDelta(
-    'overheal',
-    engine.applyOverhealDelta,
-    instanceId,
-    zone,
-    delta
-  );
 }
 
 export function applyCounterDelta(instanceId, zone, delta) {
