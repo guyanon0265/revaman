@@ -25,6 +25,9 @@ import { gameState, runtimeState } from './gameboard/logic/state.js';
 import { onStateChanged } from './gameboard/logic/stateChangeBus.js';
 import { renderEntireBoard } from './gameboard/ui/render.js';
 import { closeAllOverlays } from './sidebar/actions/gameActions.js';
+import { onLogChanged } from './gameboard/logic/logChangeBus.js';
+import { onChatChanged } from './gameboard/logic/chatChangeBus.js';
+import { GameLogger } from './sidebar/chat/chatlog.js';
 
 // Placeholder — point this at your actual deployed relay. Matches
 // server.js's default PORT for local dev out of the box.
@@ -39,17 +42,19 @@ function setStatus(text) {
 
 function sendState() {
   if (runtimeState.mode !== 'multiplayer' || !runtimeState.socket) return;
-  runtimeState.socket.emit('state', gameState.zones);
+  runtimeState.socket.emit('state', {
+    zones: gameState.zones,
+    cardbacks: runtimeState.cardbacks,
+  });
 }
 
-function applyIncomingState({ seq, zones }) {
-  if (seq <= lastAppliedSeq) return; // stale relative to what we've already applied — discard
+function applyIncomingState({ seq, zones, cardbacks }) {
+  if (seq <= lastAppliedSeq) return;
   lastAppliedSeq = seq;
 
   gameState.zones = zones;
+  if (cardbacks) runtimeState.cardbacks = cardbacks;
 
-  // A remote push can invalidate any locally-open overlay just as
-  // drastically as an undo/redo restore can — same treatment.
   closeAllOverlays();
   renderEntireBoard();
 }
@@ -65,13 +70,22 @@ export function joinRoom(room, username) {
     socket.emit('join', { room, username });
   });
 
-  socket.on('joined', ({ slot }) => {
+  socket.on('joined', ({ slot, peers }) => {
     runtimeState.mode = 'multiplayer';
     runtimeState.mySlot = slot;
     runtimeState.oppSlot = slot === 'p1' ? 'p2' : 'p1';
-    lastAppliedSeq = 0; // fresh room, relative to this session — matches server.js's own no-persistence stance
+    runtimeState.usernames[slot] = username;
+    if (peers && Array.isArray(peers)) {
+      peers.forEach((p) => {
+        runtimeState.usernames[p.slot] = p.username;
+      });
+    }
+    lastAppliedSeq = 0;
     setStatus(
       `Connected as ${slot === 'p1' ? 'Player 1' : 'Player 2'} in room "${room}".`
+    );
+    GameLogger.logSystem(
+      `You joined the room as ${slot === 'p1' ? 'Player 1' : 'Player 2'}.`
     );
   });
 
@@ -81,19 +95,23 @@ export function joinRoom(room, username) {
     runtimeState.socket = null;
   });
 
-  socket.on('peer-joined', () => {
-    // Someone just joined an already-in-progress room — catch them up.
-    // The relay holds no state of its own to replay for them; this is
-    // the peer-cooperation substitute (see server.js's own header).
+  socket.on('peer-joined', ({ username: peerUsername, slot: peerSlot }) => {
+    runtimeState.usernames[peerSlot] = peerUsername;
     sendState();
     setStatus('Opponent connected.');
+    GameLogger.logSystem(`${peerUsername} joined the room.`);
   });
 
   socket.on('peer-left', () => {
     setStatus('Opponent disconnected.');
+    GameLogger.logSystem(
+      `${runtimeState.usernames[runtimeState.oppSlot]} left the room.`
+    );
   });
 
   socket.on('state', applyIncomingState);
+  socket.on('log', (text) => GameLogger.logAction(runtimeState.oppSlot, text));
+  socket.on('chat', (text) => GameLogger.logChat(runtimeState.oppSlot, text));
 
   socket.on('disconnect', () => {
     runtimeState.socket = null;
@@ -107,6 +125,7 @@ export function joinRoom(room, username) {
 
 export function leaveRoom() {
   if (!runtimeState.socket) return;
+  GameLogger.logSystem('You left the room.');
 
   runtimeState.socket.disconnect();
   runtimeState.socket = null;
@@ -122,3 +141,13 @@ export function leaveRoom() {
 // network traffic; loggingEngine.js and undoManager.js have no idea
 // networking exists, and never need to.
 onStateChanged(sendState);
+
+onLogChanged((text) => {
+  if (runtimeState.mode !== 'multiplayer' || !runtimeState.socket) return;
+  runtimeState.socket.emit('log', text);
+});
+
+onChatChanged((text) => {
+  if (runtimeState.mode !== 'multiplayer' || !runtimeState.socket) return;
+  runtimeState.socket.emit('chat', text);
+});

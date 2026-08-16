@@ -324,6 +324,7 @@
   border-bottom-color: rgba(239, 68, 68, 0.25);
 }
 .action-btn.danger {
+  background-color: var(--surface-elevated, rgb(35, 28, 28));
   border-color: rgba(239, 68, 68, 0.3);
   color: #fca5a5;
 }

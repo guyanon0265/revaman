@@ -1,5 +1,5 @@
 import { runtimeState } from '../../gameboard/logic/state.js';
-import { parseDeckCSV } from '../../gameboard/logic/parser.js';
+import { loadDeck } from '../../gameboard/logic/loggingEngine.js';
 import { renderEntireBoard } from '../../gameboard/ui/render.js';
 
 export function promptForCSVAndParse(slot) {
@@ -14,7 +14,7 @@ export function promptForCSVAndParse(slot) {
 
     const reader = new FileReader();
     reader.onload = () => {
-      parseDeckCSV(reader.result, slot);
+      loadDeck(reader.result, slot);
       renderEntireBoard();
     };
     reader.readAsText(file);

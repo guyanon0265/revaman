@@ -113,10 +113,9 @@ io.on('connection', (socket) => {
 
   socket.on('join', ({ room, username } = {}) => {
     if (!room) return;
-    if (joinedRoomId) return; // already joined a room on this connection — ignore a second join attempt
+    if (joinedRoomId) return;
 
     const roomState = getRoom(room);
-
     if (roomState.size >= MAX_CLIENTS_PER_ROOM) {
       socket.emit('join-error', { message: 'Room is full.' });
       return;
@@ -131,19 +130,39 @@ io.on('connection', (socket) => {
     socket.data.slot = slot;
     socket.data.username = username;
 
-    socket.emit('joined', { slot });
+    // Hand the newcomer everyone already in the room, by slot — the
+    // newcomer's own 'joined' response is the only place this info can
+    // travel, since 'peer-joined' only ever reaches EXISTING members.
+    const peers = [];
+    for (const socketId of io.sockets.adapter.rooms.get(room) || []) {
+      const peerSocket = io.sockets.sockets.get(socketId);
+      if (peerSocket && peerSocket !== socket) {
+        peers.push({
+          slot: peerSocket.data.slot,
+          username: peerSocket.data.username,
+        });
+      }
+    }
 
-    // Let whoever's already in the room know someone new arrived, so
-    // THEY can push a full-state catch-up broadcast — this relay holds
-    // no game state of its own to replay for the newcomer.
+    socket.emit('joined', { slot, peers });
     socket.to(room).emit('peer-joined', { username, slot });
   });
 
-  socket.on('state', (zones) => {
-    if (!joinedRoomId) return; // never joined a room — ignore silently, don't trust an unjoined socket
+  socket.on('state', (payload) => {
+    if (!joinedRoomId) return;
     const roomState = getRoom(joinedRoomId);
     roomState.seq += 1;
-    socket.to(joinedRoomId).emit('state', { seq: roomState.seq, zones });
+    socket.to(joinedRoomId).emit('state', { seq: roomState.seq, ...payload });
+  });
+
+  socket.on('chat', (payload) => {
+    if (!joinedRoomId) return;
+    socket.to(joinedRoomId).emit('chat', payload);
+  });
+
+  socket.on('log', (payload) => {
+    if (!joinedRoomId) return;
+    socket.to(joinedRoomId).emit('log', payload);
   });
 
   socket.on('disconnect', () => {

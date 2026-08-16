@@ -273,3 +273,10 @@ export function shuffleDiscardIntoDeck(discardZone, deckZone) {
   }
   shuffleZone(deckZone);
 }
+
+export function loadDeckIntoZone(cards, zone) {
+  const arr = gameState.zones[zone];
+  if (!arr) return 0;
+  cards.forEach((card) => arr.push(card));
+  return cards.length;
+}

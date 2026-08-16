@@ -23,7 +23,7 @@
 //     up live as you click.
 
 import * as engine from './engine.js';
-import { gameState, runtimeState } from './state.js';
+import { gameState, runtimeState, DEFAULT_CARDBACK } from './state.js';
 import {
   classifyType,
   SHARED_ZONE_LABELS,
@@ -32,6 +32,8 @@ import {
 import { GameLogger } from '../../sidebar/chat/chatlog.js';
 import { pushSnapshot } from './undoManager.js';
 import { emitStateChanged } from './stateChangeBus.js';
+import { parseDeckCSV } from './parser.js';
+import { emitLogChanged } from './logChangeBus.js'; // new — see chat/log section below
 
 export { undo, redo, canUndo, canRedo } from './undoManager.js';
 
@@ -44,6 +46,7 @@ export { undo, redo, canUndo, canRedo } from './undoManager.js';
 // a client only ever logs its own actions.
 function logAction(actionText) {
   GameLogger.logAction(runtimeState.mySlot, actionText);
+  emitLogChanged(actionText);
 }
 
 function zoneLabel(zoneId) {
@@ -264,6 +267,20 @@ export function shuffleDiscardIntoDeck(discardZone, deckZone) {
     );
     emitStateChanged();
   }
+}
+
+export function loadDeck(csvText, slot) {
+  const { cards, cardback } = parseDeckCSV(csvText, slot);
+  if (!cards.length && !cardback) return; // nothing parsed — don't waste an undo step or a broadcast
+
+  flushPendingBatch();
+  pushSnapshot();
+
+  runtimeState.cardbacks[slot] = cardback || DEFAULT_CARDBACK; // reset-to-default-if-absent, matching the old scan-before-reset behavior
+  const count = engine.loadDeckIntoZone(cards, `${slot}-deck`);
+
+  logAction(`loaded a ${count}-card deck into ${zoneLabel(`${slot}-deck`)}.`);
+  emitStateChanged();
 }
 
 export function attachCardToTarget(selectedId, fromZone, targetId, targetZone) {

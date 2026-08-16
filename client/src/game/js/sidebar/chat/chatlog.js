@@ -1,3 +1,4 @@
+import { emitChatChanged } from '../../gameboard/logic/chatChangeBus.js';
 import { runtimeState } from '../../gameboard/logic/state.js';
 
 /* ==========================================================================
@@ -70,6 +71,7 @@ function sendPlayerMessage(chatInput) {
   if (messageText === '') return;
 
   GameLogger.logChat(runtimeState.mySlot, messageText);
+  emitChatChanged(messageText); // new
 
   // Clear user input text box
   chatInput.value = '';
