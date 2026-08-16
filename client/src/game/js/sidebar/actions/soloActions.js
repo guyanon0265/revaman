@@ -5,7 +5,7 @@ import { promptForCSVAndParse } from './deckActions.js';
 export function initSoloActions() {
   const btnLoadOppDeck = document.getElementById('btn-load-opp-deck');
   const btnShowOppHand = document.getElementById('btn-show-opp-hand');
-  // Switch Seat
+  const btnSwitchSeat = document.getElementById('btn-switch-seat');
 
   if (btnLoadOppDeck) {
     btnLoadOppDeck.addEventListener('click', () => {
@@ -20,6 +20,19 @@ export function initSoloActions() {
       btnShowOppHand.textContent = clientState.showOpponentHand
         ? 'Hide Opponent Hand'
         : 'Show Opponent Hand';
+
+      renderEntireBoard();
+    });
+  }
+
+  if (btnSwitchSeat) {
+    btnSwitchSeat.addEventListener('click', () => {
+      if (runtimeState.mode !== 'solo') return;
+
+      const oldMySlot = runtimeState.mySlot;
+
+      runtimeState.mySlot = runtimeState.oppSlot;
+      runtimeState.oppSlot = oldMySlot;
 
       renderEntireBoard();
     });
