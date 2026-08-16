@@ -250,6 +250,14 @@
 #actions-panel {
   overflow-y: auto;
   padding-right: 0.2vh;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  scrollbar-width: none;
+
+  -ms-overflow-style: none;
 }
 
 /* --------------------------------------------------------------------
@@ -278,8 +286,8 @@
 
 .action-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.7vh;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5vh 0.7vh;
 }
 
 .action-btn {
