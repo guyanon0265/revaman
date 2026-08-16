@@ -1,10 +1,10 @@
 .card {
   width: var(--card-w-sm);
   height: var(--card-h-sm);
-  border-radius: 0.8vh;
+  border-radius: 0.8dvh;
   position: relative;
   cursor: pointer;
-  border: 0.2vh solid var(--border-color);
+  border: 0.2dvh solid var(--border-color);
   background: #0f172a;
   flex-shrink: 0;
   transform: rotate(var(--card-rotate, 0deg));
@@ -22,7 +22,7 @@
 }
 
 .hand .card {
-  margin-left: -4.5vh;
+  margin-left: -4.5dvh;
   pointer-events: auto;
 }
 
@@ -39,12 +39,12 @@
 }
 
 .card:hover {
-  transform: rotate(var(--card-rotate, 0deg)) translateY(-0.3vh);
+  transform: rotate(var(--card-rotate, 0deg)) translateY(-0.3dvh);
 }
 
 .card.selected {
-  border: 0.3vh solid #15b5fa;
-  box-shadow: 0 0 0 0.2vh rgba(21, 174, 250, 0.5);
+  border: 0.3dvh solid #15b5fa;
+  box-shadow: 0 0 0 0.2dvh rgba(21, 174, 250, 0.5);
 }
 
 .card-face {
@@ -54,30 +54,30 @@
   height: 100%;
   display: block;
   overflow: hidden;
-  border-radius: 0.6vh;
+  border-radius: 0.6dvh;
 }
 
 .card-stats-overlay {
   position: absolute;
-  top: 0.2vh;
-  left: 0.2vh;
-  right: 0.2vh;
+  top: 0.2dvh;
+  left: 0.2dvh;
+  right: 0.2dvh;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.15vh;
+  gap: 0.15dvh;
   z-index: 5;
   pointer-events: none;
 }
 
 .stat-badge {
   color: #fff;
-  font-size: 1vh;
+  font-size: 1dvh;
   font-weight: 700;
-  padding: 0.1vh 0.35vh;
-  border-radius: 0.3vh;
-  box-shadow: 0 0.1vh 0.2vh rgba(0, 0, 0, 0.4);
-  text-shadow: 0 0.1vh 0.1vh rgba(0, 0, 0, 0.8);
+  padding: 0.1dvh 0.35dvh;
+  border-radius: 0.3dvh;
+  box-shadow: 0 0.1dvh 0.2dvh rgba(0, 0, 0, 0.4);
+  text-shadow: 0 0.1dvh 0.1dvh rgba(0, 0, 0, 0.8);
 }
 
 .stat-badge.badge-dmg {
@@ -119,8 +119,8 @@
 
 .trainer-attachments {
   position: absolute;
-  bottom: -0.6vh;
-  left: -0.6vh;
+  bottom: -0.6dvh;
+  left: -0.6dvh;
   display: flex;
   flex-direction: column-reverse;
   z-index: 2;
@@ -128,7 +128,7 @@
 
 .evolution-stack {
   position: absolute;
-  bottom: -0.6vh;
+  bottom: -0.6dvh;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -138,8 +138,8 @@
 
 .energy-attachments {
   position: absolute;
-  bottom: -0.6vh;
-  right: -0.6vh;
+  bottom: -0.6dvh;
+  right: -0.6dvh;
   display: flex;
   flex-direction: column-reverse;
   z-index: 2;
@@ -150,10 +150,10 @@
 .evolution-stack-card {
   width: calc(var(--card-w-sm) / 3) !important;
   height: calc(var(--card-h-sm) / 3) !important;
-  border-radius: 0.3vh;
+  border-radius: 0.3dvh;
   object-fit: cover;
-  margin-top: -3.2vh;
-  box-shadow: 0 0.15vh 0.3vh rgba(0, 0, 0, 0.4);
+  margin-top: -3.2dvh;
+  box-shadow: 0 0.15dvh 0.3dvh rgba(0, 0, 0, 0.4);
   cursor: pointer;
 }
 
@@ -168,8 +168,8 @@
 }
 
 .selected-attachment {
-  outline: 0.3vh solid #00e6ff;
-  box-shadow: 0 0 1vh #00e6ff;
+  outline: 0.3dvh solid #00e6ff;
+  box-shadow: 0 0 1dvh #00e6ff;
   opacity: 1 !important;
   filter: none !important;
 }
@@ -181,8 +181,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 0.8vh;
-  border: 0.2vh solid var(--border-color);
+  border-radius: 0.8dvh;
+  border: 0.2dvh solid var(--border-color);
   transform: translateX(-50%) rotate(90deg);
   pointer-events: none;
   z-index: 2;
@@ -197,14 +197,14 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  gap: 2vh;
+  gap: 2dvh;
 }
 
 #card-view-img {
   max-width: 80vw;
-  max-height: 70vh;
-  border-radius: 1.5vh;
-  box-shadow: 0 0 4vh rgba(0, 0, 0, 0.6);
+  max-height: 70dvh;
+  border-radius: 1.5dvh;
+  box-shadow: 0 0 4dvh rgba(0, 0, 0, 0.6);
 }
 
 #card-view-img.break-rotated {
@@ -214,7 +214,7 @@
 @media (max-width: 767px) {
   #card-view-overlay {
     inset: 0 0 auto 0;
-    height: 50vh;
+    height: 50dvh;
   }
 
   #card-view-img {

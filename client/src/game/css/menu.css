@@ -12,16 +12,16 @@
 
 .side-panel {
   position: fixed;
-  top: max(1.4vh, env(safe-area-inset-top, 0px));
-  left: max(1.4vh, env(safe-area-inset-left, 0px));
-  bottom: max(1.4vh, env(safe-area-inset-bottom, 0px));
+  top: max(1.4dvh, env(safe-area-inset-top, 0px));
+  left: max(1.4dvh, env(safe-area-inset-left, 0px));
+  bottom: max(1.4dvh, env(safe-area-inset-bottom, 0px));
   width: min(520px, 92vw);
   background: var(--surface, #1b1e26);
   border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
-  border-radius: 1.8vh;
+  border-radius: 1.8dvh;
   display: flex;
   flex-direction: column;
-  padding: 1.4vh;
+  padding: 1.4dvh;
   font-family:
     system-ui,
     -apple-system,
@@ -40,7 +40,7 @@
 
 /* Slide OUT to the left */
 .side-panel.collapsed {
-  transform: translateX(calc(-100% - 3vh));
+  transform: translateX(calc(-100% - 3dvh));
   opacity: 0;
   pointer-events: none;
 }
@@ -48,16 +48,16 @@
 @media (max-width: 767px) {
   .side-panel {
     top: auto;
-    bottom: max(1.4vh, env(safe-area-inset-bottom, 0px));
-    left: 1.4vh;
-    right: 1.4vh;
+    bottom: max(1.4dvh, env(safe-area-inset-bottom, 0px));
+    left: 1.4dvh;
+    right: 1.4dvh;
     width: auto;
-    height: min(50vh, 560px);
-    border-radius: 2.2vh;
+    height: min(50dvh, 560px);
+    border-radius: 2.2dvh;
   }
 
   .side-panel.collapsed {
-    transform: translateY(calc(100% + 3vh));
+    transform: translateY(calc(100% + 3dvh));
   }
 }
 
@@ -72,22 +72,22 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.8vh;
-  margin-bottom: 1.2vh;
+  gap: 0.8dvh;
+  margin-bottom: 1.2dvh;
   flex-shrink: 0;
 }
 
 .panel-header-text {
   display: flex;
   flex-direction: column;
-  gap: 0.4vh;
+  gap: 0.4dvh;
   min-width: 0;
   flex: 1;
 }
 
 .side-panel-title {
   color: #cfd6e2;
-  font-size: 1.6vh;
+  font-size: 1.6dvh;
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
@@ -96,13 +96,13 @@
 
 .panel-subtext {
   color: #888;
-  font-size: 1.3vh;
+  font-size: 1.3dvh;
   font-weight: 600;
 }
 
 .btn-side-panel-close {
-  width: 3.4vh;
-  height: 3.4vh;
+  width: 3.4dvh;
+  height: 3.4dvh;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
@@ -126,7 +126,7 @@
 
 .panel-tabs {
   display: flex;
-  gap: 0.6vh;
+  gap: 0.6dvh;
   flex: 1;
   min-width: 0;
 }
@@ -137,15 +137,15 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.3vh;
+  gap: 0.3dvh;
   background-color: transparent;
   border: 1px solid transparent;
   color: #7d8494;
-  padding: 0.8vh 0.2vh;
-  font-size: 1.5vh;
+  padding: 0.8dvh 0.2dvh;
+  font-size: 1.5dvh;
   font-weight: 700;
   letter-spacing: 0.02em;
-  border-radius: 1vh;
+  border-radius: 1dvh;
   cursor: pointer;
   transition:
     background-color 0.15s ease,
@@ -173,8 +173,8 @@
   min-height: 0;
   background-color: var(--bg-recessed, #121419);
   border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
-  border-radius: 1.2vh;
-  padding: 1.4vh;
+  border-radius: 1.2dvh;
+  padding: 1.4dvh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   display: flex;
@@ -197,7 +197,7 @@
 
 .browser-section-label {
   color: #888;
-  font-size: 1.5vh;
+  font-size: 1.5dvh;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -241,7 +241,7 @@
 .menu-page {
   display: none;
   flex-direction: column;
-  gap: 1.2vh;
+  gap: 1.2dvh;
   flex: 1;
   min-height: 0;
 }
@@ -257,7 +257,7 @@
   flex: 1;
   align-items: center;
   justify-content: space-evenly;
-  gap: 1vh;
+  gap: 1dvh;
 }
 
 .menu-section {
@@ -278,7 +278,7 @@
   border-radius: 20px;
   padding: 4px 10px;
   color: #fff;
-  font-size: 1.5vh;
+  font-size: 1.5dvh;
   gap: 8px;
 }
 
@@ -286,10 +286,10 @@
   background: #252525;
   border: 1px solid #333;
   color: #fff;
-  min-height: 4.2vh;
-  padding: 0.8vh 1.1vh;
-  font-size: 1.5vh;
-  border-radius: 0.7vh;
+  min-height: 4.2dvh;
+  padding: 0.8dvh 1.1dvh;
+  font-size: 1.5dvh;
+  border-radius: 0.7dvh;
   font-weight: 700;
   cursor: pointer;
   box-sizing: border-box;
@@ -337,9 +337,9 @@
 .rotation-dpad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 4.8vh);
-  gap: 0.5vh;
-  width: min(100%, 24vh);
+  grid-template-rows: repeat(3, 4.8dvh);
+  gap: 0.5dvh;
+  width: min(100%, 24dvh);
   margin: 0 auto;
 }
 
@@ -351,8 +351,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.9vh;
-  font-size: 2vh;
+  border-radius: 0.9dvh;
+  font-size: 2dvh;
 }
 
 .dpad-up {
@@ -393,8 +393,8 @@
    ========================================================================== */
 
 .close-btn {
-  width: 3.4vh;
-  height: 3.4vh;
+  width: 3.4dvh;
+  height: 3.4dvh;
   border-radius: 50%;
   background: rgba(239, 68, 68, 0.2);
   border: 1px solid var(--border-subtle, rgba(239, 68, 68, 0.4));
