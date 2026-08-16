@@ -55,102 +55,6 @@
 
       <div id="player-hand" class="hand"></div>
 
-      <svg class="icon-defs" aria-hidden="true">
-        <defs>
-          <symbol id="i-chat" viewBox="0 0 24 24">
-            <path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" />
-            <circle cx="8" cy="11" r="1" />
-            <circle cx="12" cy="11" r="1" />
-            <circle cx="16" cy="11" r="1" />
-          </symbol>
-          <symbol id="i-grid" viewBox="0 0 24 24">
-            <rect x="4" y="4" width="7" height="7" rx="1.5" />
-            <rect x="13" y="4" width="7" height="7" rx="1.5" />
-            <rect x="4" y="13" width="7" height="7" rx="1.5" />
-            <rect x="13" y="13" width="7" height="7" rx="1.5" />
-          </symbol>
-          <symbol id="i-gear" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="3.2" />
-            <path d="M12 3v2.4M12 18.6V21M21 12h-2.4M5.4 12H3M18.1 5.9l-1.7 1.7M7.6 16.4l-1.7 1.7M18.1 18.1l-1.7-1.7M7.6 7.6 5.9 5.9" />
-          </symbol>
-          <symbol id="i-close" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19" /></symbol>
-          <symbol id="i-move" viewBox="0 0 24 24"><path d="M12 3v18M3 12h18M6 6 3 12l3 6M18 6l3 6-3 6M6 6l6-3 6 3M6 18l6 3 6-3" /></symbol>
-          <symbol id="i-link" viewBox="0 0 24 24">
-            <circle cx="8.5" cy="12" r="4" />
-            <circle cx="15.5" cy="12" r="4" />
-          </symbol>
-          <symbol id="i-target" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="8" />
-            <circle cx="12" cy="12" r="4" />
-            <circle cx="12" cy="12" r="0.6" fill="currentColor" stroke="none" />
-          </symbol>
-          <symbol id="i-rotate" viewBox="0 0 24 24">
-            <path d="M4 12a8 8 0 1 1 2.6 5.9" />
-            <path d="M4 12V7M4 12h5" />
-          </symbol>
-          <symbol id="i-flip" viewBox="0 0 24 24">
-            <path d="M7 7h6l-2-2M13 7l-2 2" />
-            <path d="M17 17H11l2 2M11 17l2-2" />
-            <path d="M4 12h16" stroke-dasharray="1 3" />
-          </symbol>
-          <symbol id="i-eye" viewBox="0 0 24 24">
-            <path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z" />
-            <circle cx="12" cy="12" r="2.6" />
-          </symbol>
-          <symbol id="i-dice" viewBox="0 0 24 24">
-            <rect x="4" y="4" width="16" height="16" rx="3" />
-            <circle cx="8.3" cy="8.3" r="1" fill="currentColor" stroke="none" />
-            <circle cx="15.7" cy="8.3" r="1" fill="currentColor" stroke="none" />
-            <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
-            <circle cx="8.3" cy="15.7" r="1" fill="currentColor" stroke="none" />
-            <circle cx="15.7" cy="15.7" r="1" fill="currentColor" stroke="none" />
-          </symbol>
-          <symbol id="i-cards" viewBox="0 0 24 24">
-            <rect x="3" y="6" width="12" height="15" rx="2" />
-            <path d="M9 6V4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-2" />
-          </symbol>
-          <symbol id="i-upload" viewBox="0 0 24 24">
-            <path d="M12 16V4M7 9l5-5 5 5" />
-            <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
-          </symbol>
-          <symbol id="i-download" viewBox="0 0 24 24">
-            <path d="M12 4v12M7 11l5 5 5-5" />
-            <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
-          </symbol>
-          <symbol id="i-undo" viewBox="0 0 24 24">
-            <path d="M5 12a7 7 0 1 1 2 4.9" />
-            <path d="M5 12V7M5 12h5" />
-          </symbol>
-          <symbol id="i-redo" viewBox="0 0 24 24">
-            <path d="M19 12a7 7 0 1 0-2 4.9" />
-            <path d="M19 12V7M19 12h-5" />
-          </symbol>
-          <symbol id="i-users" viewBox="0 0 24 24">
-            <circle cx="9" cy="8" r="3.2" />
-            <path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5" />
-            <circle cx="17.5" cy="9" r="2.6" />
-            <path d="M15.5 19c.2-2.4 1.9-4.2 4-4.6" />
-          </symbol>
-          <symbol id="i-trash" viewBox="0 0 24 24">
-            <path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13" />
-            <path d="M10 11v6M14 11v6" />
-          </symbol>
-          <symbol id="i-refresh" viewBox="0 0 24 24">
-            <path d="M4 12a8 8 0 0 1 14-5.2M20 12a8 8 0 0 1-14 5.2" />
-            <path d="M17.5 4v3.5H14M6.5 20v-3.5H10" />
-          </symbol>
-          <symbol id="i-power" viewBox="0 0 24 24">
-            <path d="M12 3v8" />
-            <path d="M7 5.5a8 8 0 1 0 10 0" />
-          </symbol>
-          <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-3-6-7-2Z" /></symbol>
-          <symbol id="i-plug" viewBox="0 0 24 24">
-            <path d="M9 3v5M15 3v5M7 8h10v3a5 5 0 0 1-5 5 5 5 0 0 1-5-5V8Z" />
-            <path d="M12 16v5" />
-          </symbol>
-        </defs>
-      </svg>
-
       <div class="hud-dock">
         <button id="sidebar-toggle" class="dock-btn" data-open-tab="actions" aria-label="Actions">&#9776;</button>
       </div>
@@ -158,19 +62,11 @@
       <div id="sidebar" class="collapsed">
         <div class="sidebar-header">
           <div class="sidebar-tabs">
-            <button class="tab-btn active" data-tab="chat">
-              <svg class="icon"><use href="#i-chat" /></svg><span>Chat</span>
-            </button>
-            <button class="tab-btn" data-tab="actions">
-              <svg class="icon"><use href="#i-grid" /></svg><span>Actions</span>
-            </button>
-            <button class="tab-btn" data-tab="multiplayer">
-              <svg class="icon"><use href="#i-plug" /></svg><span>Online</span>
-            </button>
+            <button class="tab-btn active" data-tab="chat">Chat</button>
+            <button class="tab-btn" data-tab="actions">Actions</button>
+            <button class="tab-btn" data-tab="multiplayer">Online</button>
           </div>
-          <button class="sidebar-close" data-close-sidebar aria-label="Close">
-            <svg class="icon"><use href="#i-close" /></svg>
-          </button>
+          <button class="sidebar-close" data-close-sidebar aria-label="Close">&times;</button>
         </div>
 
         <div id="chat-panel" class="tab-panel active">
@@ -183,9 +79,7 @@
 
           <div class="chat-input-container">
             <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off" />
-            <button id="send-btn" aria-label="Send">
-              <svg class="icon"><use href="#i-send" /></svg>
-            </button>
+            <button id="send-btn" aria-label="Send">&#10148;</button>
           </div>
         </div>
 
@@ -193,83 +87,49 @@
           <div class="action-section">
             <div class="section-label">Game Actions</div>
             <div class="action-grid">
-              <button class="action-btn" id="btn-flip-coin">
-                <svg class="icon"><use href="#i-dice" /></svg><span>Flip Coin</span>
-              </button>
-              <button class="action-btn" id="btn-setup">
-                <svg class="icon"><use href="#i-cards" /></svg><span>Set Up</span>
-              </button>
-              <button class="action-btn" id="btn-mulligan">
-                <svg class="icon"><use href="#i-refresh" /></svg><span>Mulligan</span>
-              </button>
-              <button class="action-btn" id="btn-discard-hand">
-                <svg class="icon"><use href="#i-trash" /></svg><span>Discard Hand</span>
-              </button>
-              <button class="action-btn" id="btn-show-hand">
-                <svg class="icon"><use href="#i-eye" /></svg><span>Show Hand</span>
-              </button>
-              <button class="action-btn" id="btn-open-builder">
-                <svg class="icon"><use href="#i-cards" /></svg><span>Deck Builder</span>
-              </button>
+              <button class="action-btn" id="btn-flip-coin">Flip Coin</button>
+              <button class="action-btn" id="btn-setup">Set Up</button>
+              <button class="action-btn" id="btn-mulligan">Mulligan</button>
+              <button class="action-btn" id="btn-discard-hand">Discard Hand</button>
+              <button class="action-btn" id="btn-show-hand">Show Hand</button>
+              <button class="action-btn" id="btn-open-builder">Deck Builder</button>
             </div>
             <div class="btn-row">
-              <button class="action-btn" id="btn-undo">
-                <svg class="icon"><use href="#i-undo" /></svg><span>Undo</span>
-              </button>
-              <button class="action-btn" id="btn-redo">
-                <svg class="icon"><use href="#i-redo" /></svg><span>Redo</span>
-              </button>
+              <button class="action-btn" id="btn-undo">Undo</button>
+              <button class="action-btn" id="btn-redo">Redo</button>
             </div>
           </div>
 
           <div class="action-section">
             <div class="section-label">Deck</div>
             <div class="action-grid">
-              <button class="action-btn" id="btn-load-deck">
-                <svg class="icon"><use href="#i-upload" /></svg><span>Load Deck</span>
-              </button>
+              <button class="action-btn" id="btn-load-deck">Load Deck</button>
             </div>
           </div>
 
           <div id="solo-actions-section" class="action-section">
             <div class="section-label">Solo Mode</div>
             <div class="action-grid">
-              <button class="action-btn" id="btn-show-opp-hand">
-                <svg class="icon"><use href="#i-eye" /></svg><span>Opp. Hand</span>
-              </button>
-              <button class="action-btn" id="btn-load-opp-deck">
-                <svg class="icon"><use href="#i-upload" /></svg><span>Opp. Deck</span>
-              </button>
-              <button class="action-btn" id="btn-switch-seat">
-                <svg class="icon"><use href="#i-users" /></svg><span>Switch Seat</span>
-              </button>
+              <button class="action-btn" id="btn-show-opp-hand">Opp. Hand</button>
+              <button class="action-btn" id="btn-load-opp-deck">Opp. Deck</button>
+              <button class="action-btn" id="btn-switch-seat">Switch Seat</button>
             </div>
           </div>
 
           <div class="action-section">
             <div class="section-label">Game State</div>
             <div class="action-grid">
-              <button class="action-btn" id="btn-load-state">
-                <svg class="icon"><use href="#i-upload" /></svg><span>Load</span>
-              </button>
-              <button class="action-btn" id="btn-export-state">
-                <svg class="icon"><use href="#i-download" /></svg><span>Export State</span>
-              </button>
-              <button class="action-btn" id="btn-export-log">
-                <svg class="icon"><use href="#i-download" /></svg><span>Export Log</span>
-              </button>
+              <button class="action-btn" id="btn-load-state">Load State</button>
+              <button class="action-btn" id="btn-export-state">Export State</button>
+              <button class="action-btn" id="btn-export-log">Export Log</button>
             </div>
           </div>
 
           <div class="action-section danger">
             <div class="section-label danger">Reset</div>
             <div class="action-grid">
-              <button class="action-btn danger" id="btn-reset-board">
-                <svg class="icon"><use href="#i-refresh" /></svg><span>Reset Board</span>
-              </button>
-              <button class="action-btn danger" id="btn-reset-game">
-                <svg class="icon"><use href="#i-power" /></svg><span>Reset Game</span>
-              </button>
+              <button class="action-btn danger" id="btn-reset-board">Reset Board</button>
+              <button class="action-btn danger" id="btn-reset-game">Reset Game</button>
             </div>
           </div>
         </div>
@@ -284,9 +144,7 @@
             <label class="mp-label" for="mp-room">Room ID</label>
             <input type="text" id="mp-room" class="mp-input" placeholder="Enter room ID" autocomplete="off" />
 
-            <button id="mp-join-btn" class="action-btn mp-join">
-              <svg class="icon"><use href="#i-plug" /></svg><span>Join Room</span>
-            </button>
+            <button id="mp-join-btn" class="action-btn mp-join">Join Room</button>
           </div>
 
           <div class="settings-zone">
@@ -296,13 +154,9 @@
                 <span class="settings-label">Light Mode</span>
                 <input id="light-mode-switch" type="checkbox" class="settings-checkbox" />
               </label>
-              <label class="settings-option" for="zone-label-switch">
-                <span class="settings-label">Hide Zone Labels</span>
-                <input id="zone-label-switch" type="checkbox" class="settings-checkbox" />
-              </label>
-              <label class="settings-option" for="zone-box-switch">
-                <span class="settings-label">Hide Zone Boxes</span>
-                <input id="zone-box-switch" type="checkbox" class="settings-checkbox" />
+              <label class="settings-option" for="sidebar-side-switch">
+                <span class="settings-label">Left Sided Sidebar</span>
+                <input id="sidebar-side-switch" type="checkbox" class="settings-checkbox" />
               </label>
             </div>
             <div class="action-section">
@@ -326,7 +180,7 @@
             <button id="btn-view-attach" class="panel-tab-btn">View Attached</button>
           </div>
         </div>
-        <button id="btn-action-menu-close" class="btn-side-panel-close">&#10005;</button>
+        <button id="btn-action-menu-close" class="btn-side-panel-close">&times;</button>
       </div>
 
       <div id="card-controls-tab" class="controls-tab menu-page active">
@@ -373,14 +227,14 @@
           <div id="pile-browser-title" class="side-panel-title"></div>
           <div id="pile-browser-count" class="panel-subtext"></div>
         </div>
-        <button id="btn-pile-browser-close" class="btn-side-panel-close">&#10005;</button>
+        <button id="btn-pile-browser-close" class="btn-side-panel-close">&times;</button>
       </div>
       <div id="pile-browser-grid" class="panel-grid"></div>
     </div>
 
     <div id="card-view-overlay" class="click-handling">
       <img id="card-view-img" src="" alt="" />
-      <button id="btn-close-card-view" class="close-btn">&#10005;</button>
+      <button id="btn-close-card-view" class="close-btn">&times;</button>
     </div>
 
     <script type="module" src="./js/game.js"></script>

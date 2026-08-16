@@ -1,30 +1,3 @@
-/* ==========================================================================
-   HUD DOCK -- always-visible floating icon buttons.
-   Replaces the old permanent 320px sidebar; the board now uses the
-   full screen and controls surface only when summoned.
-   ========================================================================== */
-.icon-defs {
-  position: absolute;
-  width: 0;
-  height: 0;
-  overflow: hidden;
-}
-.icon {
-  width: 1.8vh;
-  height: 1.8vh;
-  flex-shrink: 0;
-}
-.icon use,
-.icon path,
-.icon circle,
-.icon rect {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
 .hud-dock {
   position: fixed;
   right: max(1.4vh, env(safe-area-inset-right, 0px));
@@ -58,11 +31,6 @@
     border-color 0.15s ease;
 }
 
-.dock-btn .icon {
-  width: 2.1vh;
-  height: 2.1vh;
-}
-
 .dock-btn:hover {
   background: var(--surface-elevated, #262b35);
   border-color: var(--accent-2, #7db8ff);
@@ -70,18 +38,6 @@
 }
 .dock-btn:active {
   transform: scale(0.92);
-}
-
-.dock-btn--chat {
-  width: 5.2vh;
-  height: 5.2vh;
-  background: var(--accent-player, #2f6fed);
-  border-color: var(--accent-player, #2f6fed);
-  color: #fff;
-}
-.dock-btn--chat:hover {
-  background: #4a82f5;
-  border-color: #4a82f5;
 }
 
 /* ==========================================================================
@@ -148,10 +104,6 @@
   background: rgba(239, 68, 68, 0.2);
   border-color: rgba(239, 68, 68, 0.4);
   color: #fca5a5;
-}
-.sidebar-close .icon {
-  width: 1.6vh;
-  height: 1.6vh;
 }
 
 .unified-output {
@@ -236,10 +188,6 @@
 #send-btn:hover {
   background-color: #4a82f5;
 }
-#send-btn .icon {
-  width: 1.8vh;
-  height: 1.8vh;
-}
 
 /* --------------------------------------------------------------------
    Tab pills (inside the panel header)
@@ -278,10 +226,6 @@
   text-overflow: ellipsis;
   max-width: 100%;
 }
-.tab-btn .icon {
-  width: 1.7vh;
-  height: 1.7vh;
-}
 
 .tab-btn:hover {
   color: #fff;
@@ -309,7 +253,7 @@
 }
 
 /* --------------------------------------------------------------------
-   Action grid -- compact icon+label tiles instead of a stacked list
+   Action grid -- compact label tiles instead of a stacked list
    -------------------------------------------------------------------- */
 .action-section {
   display: flex;
@@ -358,11 +302,7 @@
     border-color 0.15s ease,
     transform 0.08s ease;
 }
-.action-btn .icon {
-  width: 1.8vh;
-  height: 1.8vh;
-  color: var(--accent-2, #7db8ff);
-}
+
 .action-btn:active {
   transform: scale(0.96);
 }
@@ -371,9 +311,6 @@
   border-color: rgba(255, 255, 255, 0.18);
 }
 
-.action-section.danger .action-btn .icon {
-  color: #f87171;
-}
 .section-label.danger {
   color: #ef4444;
   border-bottom-color: rgba(239, 68, 68, 0.25);
