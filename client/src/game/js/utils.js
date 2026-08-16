@@ -68,13 +68,6 @@ export function classifyType(type) {
   return 'pokemon';
 }
 
-export function isHidden(card, stateZoneId) {
-  if (card.isFaceDown) return true;
-  if (stateZoneId.endsWith('-deck') || stateZoneId.endsWith('-prizes'))
-    return true;
-  return false;
-}
-
 export function isPileZone(zone) {
   return PILE_ZONE_IDS.includes(zone);
 }

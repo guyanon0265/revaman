@@ -32,6 +32,7 @@ export const clientState = {
   selectedZone: null,
   selectedKind: null,
   selectedParentId: null,
+  showOpponentHand: false,
 };
 
 export function getSelectedCard() {

@@ -3,7 +3,6 @@ import {
   OWNED_ZONE_SUFFIXES,
   SHARED_ZONE_IDS,
   COUNT_BADGE_SUFFIXES,
-  isHidden,
 } from '../../utils.js';
 
 // DOM element id -> actual gameState.zones key it should render/target.
@@ -17,6 +16,18 @@ export function domIdToStateZone(domId) {
     return `${runtimeState.oppSlot}-${suffix}`;
   }
   return domId; // stadium / lost-zone / etc
+}
+
+function isHidden(card, stateZoneId) {
+  if (card.isFaceDown) return true;
+
+  if (stateZoneId === `${runtimeState.oppSlot}-hand`) {
+    return !clientState.showOpponentHand;
+  }
+
+  if (stateZoneId.endsWith('-deck') || stateZoneId.endsWith('-prizes'))
+    return true;
+  return false;
 }
 
 function buildAttachmentImg(attached, parentInstanceId, extraClass) {

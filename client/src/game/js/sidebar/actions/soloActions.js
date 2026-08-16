@@ -1,4 +1,5 @@
-import { runtimeState } from '../../gameboard/logic/state.js';
+import { clientState, runtimeState } from '../../gameboard/logic/state.js';
+import { renderEntireBoard } from '../../gameboard/ui/render.js';
 import { promptForCSVAndParse } from './deckActions.js';
 
 export function initSoloActions() {
@@ -14,11 +15,13 @@ export function initSoloActions() {
 
   if (btnShowOppHand) {
     btnShowOppHand.addEventListener('click', () => {
-      if (btnShowOppHand.textContent === 'Show Opponent Hand') {
-        btnShowOppHand.textContent = 'Hide Opponent Hand';
-      } else {
-        btnShowOppHand.textContent = 'Show Opponent Hand';
-      }
+      clientState.showOpponentHand = !clientState.showOpponentHand;
+
+      btnShowOppHand.textContent = clientState.showOpponentHand
+        ? 'Hide Opponent Hand'
+        : 'Show Opponent Hand';
+
+      renderEntireBoard();
     });
   }
 }
