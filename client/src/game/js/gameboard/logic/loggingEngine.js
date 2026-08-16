@@ -1,17 +1,26 @@
 // loggingEngine.js — thin wrapper around engine.js that adds GameLogger
-// calls and undo/redo snapshotting, without touching engine.js itself
-// (engine.js's own header says "pure, DOM-free ... no document/window
-// access, ever" — neither GameLogger nor snapshotting belongs there).
+// calls, undo/redo snapshotting, and multiplayer broadcast, without
+// touching engine.js itself (engine.js's own header says "pure,
+// DOM-free ... no document/window access, ever" — none of those three
+// belong there).
 //
 // Every exported function here has the exact same name and signature
 // as its engine.js counterpart. Callers only need to change their
 // import path from './engine.js' (or '../gameboard/engine.js') to
 // this file — no call-site logic changes required.
 //
-// pushSnapshot() fires immediately before each logical action's first
-// mutation, so undo granularity matches log-line granularity: a run of
-// damage clicks that batches into one log line also undoes as one step,
-// not one click at a time.
+// Three DIFFERENT granularities live in this file, and they're not the
+// same thing even though they look related:
+//   - pushSnapshot() fires once per logical action (a whole run of
+//     batched delta clicks = one snapshot), so undo matches log-line
+//     granularity.
+//   - logAction() also fires once per logical action, debounce-flushed
+//     for deltas.
+//   - emitStateChanged() (multiplayer broadcast) fires on EVERY
+//     successful mutation, including every individual delta click —
+//     broadcasting only once a batch finishes would mean the opponent
+//     watches damage numbers jump in a delayed lump instead of ticking
+//     up live as you click.
 
 import * as engine from './engine.js';
 import { gameState, runtimeState } from './state.js';
@@ -22,6 +31,7 @@ import {
 } from '../../utils.js';
 import { GameLogger } from '../../sidebar/chat/chatlog.js';
 import { pushSnapshot } from './undoManager.js';
+import { emitStateChanged } from './stateChangeBus.js';
 
 export { undo, redo, canUndo, canRedo } from './undoManager.js';
 
@@ -141,6 +151,7 @@ function applyDelta(statLabel, engineFn, instanceId, zone, delta) {
   }
 
   scheduleBatchFlush();
+  emitStateChanged(); // every click, not batched — see file header
   return card;
 }
 
@@ -170,10 +181,12 @@ export function moveCardToZone(instanceId, fromZone, toZone, position = 'top') {
   flushPendingBatch();
   pushSnapshot();
   const card = engine.moveCardToZone(instanceId, fromZone, toZone, position);
-  if (card)
+  if (card) {
     logAction(
       `moved ${card.name} from ${zoneLabel(fromZone)} to ${zoneLabel(toZone)}.`
     );
+    emitStateChanged();
+  }
   return card;
 }
 
@@ -182,10 +195,12 @@ export function moveToTopOfDeck(instanceId, fromZone, toZone) {
   flushPendingBatch();
   pushSnapshot();
   const card = engine.moveToTopOfDeck(instanceId, fromZone, toZone);
-  if (card)
+  if (card) {
     logAction(
       `put ${card.name} on top of the ${zoneLabel(toZone)} (from ${zoneLabel(fromZone)}).`
     );
+    emitStateChanged();
+  }
   return card;
 }
 
@@ -194,10 +209,12 @@ export function moveToBottomOfDeck(instanceId, fromZone, toZone) {
   flushPendingBatch();
   pushSnapshot();
   const card = engine.moveToBottomOfDeck(instanceId, fromZone, toZone);
-  if (card)
+  if (card) {
     logAction(
       `put ${card.name} on the bottom of the ${zoneLabel(toZone)} (from ${zoneLabel(fromZone)}).`
     );
+    emitStateChanged();
+  }
   return card;
 }
 
@@ -206,7 +223,10 @@ export function drawTopCard(fromZone, toZone) {
   flushPendingBatch();
   pushSnapshot();
   const card = engine.drawTopCard(fromZone, toZone);
-  if (card) logAction(`drew ${card.name}.`);
+  if (card) {
+    logAction(`drew ${card.name}.`);
+    emitStateChanged();
+  }
   return card;
 }
 
@@ -221,6 +241,7 @@ export function drawCards(fromZone, toZone, count) {
     logAction(
       `drew ${actualDrawn} card${actualDrawn === 1 ? '' : 's'} into ${zoneLabel(toZone)}.`
     );
+    emitStateChanged();
   }
 }
 
@@ -229,6 +250,7 @@ export function shuffleZone(zoneId) {
   pushSnapshot();
   engine.shuffleZone(zoneId);
   logAction(`shuffled ${zoneLabel(zoneId)}.`);
+  emitStateChanged();
 }
 
 export function shuffleDiscardIntoDeck(discardZone, deckZone) {
@@ -240,6 +262,7 @@ export function shuffleDiscardIntoDeck(discardZone, deckZone) {
     logAction(
       `shuffled ${count} card${count === 1 ? '' : 's'} from ${zoneLabel(discardZone)} into ${zoneLabel(deckZone)}.`
     );
+    emitStateChanged();
   }
 }
 
@@ -267,6 +290,7 @@ export function attachCardToTarget(selectedId, fromZone, targetId, targetZone) {
   } else {
     logAction(`evolved ${targetBefore.name} into ${result.name}.`);
   }
+  emitStateChanged();
   return result;
 }
 
@@ -294,6 +318,7 @@ export function detachCard(
     logAction(
       `detached ${card.name} from ${parent.name}, returning it to hand.`
     );
+    emitStateChanged();
   }
   return card;
 }
@@ -310,6 +335,7 @@ export function devolveCard(cardId, zone, targetInstanceId) {
     logAction(
       `devolved ${current.name} back into ${previous.name}, returning it to hand.`
     );
+    emitStateChanged();
   }
   return previous;
 }
@@ -323,8 +349,10 @@ export function toggleStatus(instanceId, zone, status) {
 
   const wasActive = before.statuses.includes(status);
   const card = engine.toggleStatus(instanceId, zone, status);
-  if (card)
+  if (card) {
     logAction(`${wasActive ? 'removed' : 'added'} ${status} on ${card.name}.`);
+    emitStateChanged();
+  }
   return card;
 }
 
@@ -335,10 +363,12 @@ export function toggleAbility(instanceId, zone) {
   pushSnapshot();
 
   const card = engine.toggleAbility(instanceId, zone);
-  if (card)
+  if (card) {
     logAction(
       `marked ${card.name}'s ability as ${card.abilityUsed ? 'used' : 'ready'}.`
     );
+    emitStateChanged();
+  }
   return card;
 }
 
@@ -349,8 +379,10 @@ export function toggleFlip(instanceId, zone) {
   pushSnapshot();
 
   const card = engine.toggleFlip(instanceId, zone);
-  if (card)
+  if (card) {
     logAction(`turned ${card.name} face ${card.isFaceDown ? 'down' : 'up'}.`);
+    emitStateChanged();
+  }
   return card;
 }
 
@@ -361,7 +393,10 @@ export function setRotation(instanceId, zone, degrees) {
   pushSnapshot();
 
   const card = engine.setRotation(instanceId, zone, degrees);
-  if (card) logAction(`rotated ${card.name} to ${degrees}°.`);
+  if (card) {
+    logAction(`rotated ${card.name} to ${degrees}°.`);
+    emitStateChanged();
+  }
   return card;
 }
 
@@ -372,7 +407,10 @@ export function setUpright(instanceId, zone) {
   pushSnapshot();
 
   const card = engine.setUpright(instanceId, zone);
-  if (card) logAction(`reset ${card.name} to upright.`);
+  if (card) {
+    logAction(`reset ${card.name} to upright.`);
+    emitStateChanged();
+  }
   return card;
 }
 
@@ -388,9 +426,11 @@ export function toggleBreak(instanceId, zone) {
   pushSnapshot();
 
   const card = engine.toggleBreak(instanceId, zone);
-  if (card)
+  if (card) {
     logAction(
       `${card.isBreakActive ? 'activated' : 'deactivated'} BREAK on ${card.name}.`
     );
+    emitStateChanged();
+  }
   return card;
 }

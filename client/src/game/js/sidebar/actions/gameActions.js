@@ -14,7 +14,7 @@ import { closeCardView } from '../../gameboard/ui/overlays/cardView.js';
 // fresh. Calling all three is deliberately redundant where they overlap
 // (closeActionMenu() already closes Card View itself, closePileBrowser()
 // does too) — each call is a cheap no-op if that overlay wasn't open.
-function closeAllOverlays() {
+export function closeAllOverlays() {
   closeActionMenu();
   closePileBrowser();
   closeCardView();
