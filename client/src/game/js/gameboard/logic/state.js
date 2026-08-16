@@ -32,7 +32,6 @@ export const clientState = {
   selectedZone: null,
   selectedKind: null,
   selectedParentId: null,
-  attachmentModeActive: false,
 };
 
 export function getSelectedCard() {
@@ -66,7 +65,6 @@ export function clearSelection() {
   clientState.selectedZone = null;
   clientState.selectedKind = null;
   clientState.selectedParentId = null;
-  clientState.attachmentModeActive = false;
 }
 
 export const runtimeState = {
