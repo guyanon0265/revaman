@@ -21,9 +21,16 @@
 
 import express from 'express';
 import http from 'http';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { Server } from 'socket.io';
 import { instrument } from '@socket.io/admin-ui';
 import bcrypt from 'bcryptjs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const CLIENT_DIR = path.join(__dirname, '../client/src/game');
 
 const PORT = process.env.PORT || 8080;
 const MAX_CLIENTS_PER_ROOM = 2; // this is a 2-player game; a 3rd join attempt is rejected, not queued as a spectator
@@ -44,6 +51,8 @@ const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN;
 
 const app = express();
 const server = http.createServer(app);
+
+app.use(express.static(CLIENT_DIR));
 
 const io = new Server(server, {
   cors: {
@@ -178,7 +187,7 @@ io.on('connection', (socket) => {
 });
 
 app.get('/', (_req, res) => {
-  res.send('RevaMan relay is running.');
+  res.sendFile(path.join(CLIENT_DIR, 'game.html'));
 });
 
 server.listen(PORT, () => {
