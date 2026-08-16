@@ -6,7 +6,7 @@
   "singleAttributePerLine": false,
   "overrides": [
     {
-      "files": ["*.html", "*.yaml"],
+      "files": ["*.html"],
       "options": {
         "printWidth": 10000
       }
