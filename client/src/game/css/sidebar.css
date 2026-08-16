@@ -32,7 +32,11 @@
   display: flex;
   flex-direction: column;
   gap: 1vh;
-  z-index: 500;
+  z-index: 600;
+}
+
+.hud-dock[button-side='left'] {
+  left: max(1.4vh, env(safe-area-inset-right, 0px));
 }
 
 .dock-btn {
@@ -109,7 +113,7 @@
   transition:
     transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
     opacity 0.2s ease;
-  z-index: 600;
+  z-index: 500;
   max-height: none;
 }
 
@@ -118,10 +122,6 @@
   opacity: 0;
   pointer-events: none;
 }
-
-#sidebar-toggle {
-  display: none;
-} /* it's a .dock-btn now, not an in-panel control */
 
 .sidebar-header {
   display: flex;
