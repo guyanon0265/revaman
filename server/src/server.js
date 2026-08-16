@@ -26,13 +26,13 @@ import { fileURLToPath } from 'url';
 import { Server } from 'socket.io';
 import { instrument } from '@socket.io/admin-ui';
 import bcrypt from 'bcryptjs';
+import { PORT } from './config.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const CLIENT_DIR = path.join(__dirname, '../../client/src/game');
 
-const PORT = process.env.PORT || 8080;
 const MAX_CLIENTS_PER_ROOM = 2; // this is a 2-player game; a 3rd join attempt is rejected, not queued as a spectator
 
 // ---------------------------------------------------------------------

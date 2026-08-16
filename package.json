@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "pnpm --filter server start",
+    "share": "pnpm --filter server share",
     "format": "pnpm prettier --write ."
   },
   "keywords": [],

@@ -4,7 +4,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "nodemon src/server.js"
+    "start": "nodemon src/server.js",
+    "tunnel": "nodemon src/tunnel.js",
+    "share": "nodemon src/broadcast.js"
   },
   "dependencies": {
     "@socket.io/admin-ui": "^0.5.1",
