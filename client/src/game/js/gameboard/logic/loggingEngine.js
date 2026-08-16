@@ -173,6 +173,7 @@ export function applyCounterDelta(instanceId, zone, delta) {
 // ---------------------------------------------------------------------
 
 export function moveCardToZone(instanceId, fromZone, toZone, position = 'top') {
+  if (!findCard(fromZone, instanceId)) return null; // nothing to move — don't waste an undo step
   flushPendingBatch();
   pushSnapshot();
   const card = engine.moveCardToZone(instanceId, fromZone, toZone, position);
@@ -184,6 +185,7 @@ export function moveCardToZone(instanceId, fromZone, toZone, position = 'top') {
 }
 
 export function moveToTopOfDeck(instanceId, fromZone, toZone) {
+  if (!findCard(fromZone, instanceId)) return null;
   flushPendingBatch();
   pushSnapshot();
   const card = engine.moveToTopOfDeck(instanceId, fromZone, toZone);
@@ -195,6 +197,7 @@ export function moveToTopOfDeck(instanceId, fromZone, toZone) {
 }
 
 export function moveToBottomOfDeck(instanceId, fromZone, toZone) {
+  if (!findCard(fromZone, instanceId)) return null;
   flushPendingBatch();
   pushSnapshot();
   const card = engine.moveToBottomOfDeck(instanceId, fromZone, toZone);
@@ -206,6 +209,7 @@ export function moveToBottomOfDeck(instanceId, fromZone, toZone) {
 }
 
 export function drawTopCard(fromZone, toZone) {
+  if (!gameState.zones[fromZone]?.length) return null; // deck empty — nothing to draw
   flushPendingBatch();
   pushSnapshot();
   const card = engine.drawTopCard(fromZone, toZone);
@@ -214,6 +218,7 @@ export function drawTopCard(fromZone, toZone) {
 }
 
 export function drawCards(fromZone, toZone, count) {
+  if (!gameState.zones[fromZone]?.length) return; // deck empty — nothing to draw
   flushPendingBatch();
   pushSnapshot();
   const before = gameState.zones[toZone]?.length ?? 0;
@@ -246,18 +251,21 @@ export function shuffleDiscardIntoDeck(discardZone, deckZone) {
 }
 
 export function attachCardToTarget(selectedId, fromZone, targetId, targetZone) {
-  flushPendingBatch();
-  pushSnapshot();
   const selectedBefore = findCard(fromZone, selectedId);
   const targetBefore = findCard(targetZone, targetId);
-  const kind = selectedBefore ? classifyType(selectedBefore.type) : null;
+  if (!selectedBefore || !targetBefore) return null; // one side missing — nothing to attach
+
+  flushPendingBatch();
+  pushSnapshot();
+
+  const kind = classifyType(selectedBefore.type);
   const result = engine.attachCardToTarget(
     selectedId,
     fromZone,
     targetId,
     targetZone
   );
-  if (!result || !targetBefore) return result;
+  if (!result) return result;
 
   if (kind === 'energy') {
     logAction(`attached ${result.name} to ${targetBefore.name} as energy.`);
@@ -276,9 +284,12 @@ export function detachCard(
   attachmentKind,
   toHandZone
 ) {
+  const parent = findCard(parentZone, parentId);
+  if (!parent) return null; // parent gone — nothing to detach from
+
   flushPendingBatch();
   pushSnapshot();
-  const parent = findCard(parentZone, parentId);
+
   const card = engine.detachCard(
     parentId,
     parentZone,
@@ -288,18 +299,21 @@ export function detachCard(
   );
   if (card) {
     logAction(
-      `detached ${card.name} from ${parent ? parent.name : 'a card'}, returning it to hand.`
+      `detached ${card.name} from ${parent.name}, returning it to hand.`
     );
   }
   return card;
 }
 
 export function devolveCard(cardId, zone, targetInstanceId) {
+  const current = findCard(zone, cardId);
+  if (!current) return null; // card gone — nothing to devolve
+
   flushPendingBatch();
   pushSnapshot();
-  const current = findCard(zone, cardId);
+
   const previous = engine.devolveCard(cardId, zone, targetInstanceId);
-  if (previous && current) {
+  if (previous) {
     logAction(
       `devolved ${current.name} back into ${previous.name}, returning it to hand.`
     );
@@ -308,10 +322,13 @@ export function devolveCard(cardId, zone, targetInstanceId) {
 }
 
 export function toggleStatus(instanceId, zone, status) {
+  const before = findCard(zone, instanceId);
+  if (!before) return null;
+
   flushPendingBatch();
   pushSnapshot();
-  const before = findCard(zone, instanceId);
-  const wasActive = before ? before.statuses.includes(status) : false;
+
+  const wasActive = before.statuses.includes(status);
   const card = engine.toggleStatus(instanceId, zone, status);
   if (card)
     logAction(`${wasActive ? 'removed' : 'added'} ${status} on ${card.name}.`);
@@ -319,8 +336,11 @@ export function toggleStatus(instanceId, zone, status) {
 }
 
 export function toggleAbility(instanceId, zone) {
+  if (!findCard(zone, instanceId)) return null;
+
   flushPendingBatch();
   pushSnapshot();
+
   const card = engine.toggleAbility(instanceId, zone);
   if (card)
     logAction(
@@ -330,8 +350,11 @@ export function toggleAbility(instanceId, zone) {
 }
 
 export function toggleFlip(instanceId, zone) {
+  if (!findCard(zone, instanceId)) return null;
+
   flushPendingBatch();
   pushSnapshot();
+
   const card = engine.toggleFlip(instanceId, zone);
   if (card)
     logAction(`turned ${card.name} face ${card.isFaceDown ? 'down' : 'up'}.`);
@@ -339,24 +362,38 @@ export function toggleFlip(instanceId, zone) {
 }
 
 export function setRotation(instanceId, zone, degrees) {
+  if (!findCard(zone, instanceId)) return null;
+
   flushPendingBatch();
   pushSnapshot();
+
   const card = engine.setRotation(instanceId, zone, degrees);
   if (card) logAction(`rotated ${card.name} to ${degrees}°.`);
   return card;
 }
 
 export function setUpright(instanceId, zone) {
+  if (!findCard(zone, instanceId)) return null;
+
   flushPendingBatch();
   pushSnapshot();
+
   const card = engine.setUpright(instanceId, zone);
   if (card) logAction(`reset ${card.name} to upright.`);
   return card;
 }
 
 export function toggleBreak(instanceId, zone) {
+  // Mirrors engine.js's own guard (card must exist AND have evolution
+  // history) so a click on a non-BREAK-eligible card doesn't waste an
+  // undo step either. This one's simple enough to safely mirror; keep
+  // it in sync if engine.js's own toggleBreak guard ever changes.
+  const before = findCard(zone, instanceId);
+  if (!before || !before.evolutionStack.length) return null;
+
   flushPendingBatch();
   pushSnapshot();
+
   const card = engine.toggleBreak(instanceId, zone);
   if (card)
     logAction(
