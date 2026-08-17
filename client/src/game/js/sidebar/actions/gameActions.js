@@ -3,6 +3,8 @@ import { renderEntireBoard } from '../../gameboard/ui/render.js';
 import { closeActionMenu } from '../../gameboard/ui/overlays/actionMenu.js';
 import { closePileBrowser } from '../../gameboard/ui/overlays/pileBrowser.js';
 import { closeCardView } from '../../gameboard/ui/overlays/cardView.js';
+import { shuffleZone } from '../../gameboard/logic/loggingEngine.js';
+import { clientState, runtimeState } from '../../gameboard/logic/state.js';
 
 // Undo/redo can jump gameState around far more drastically than any
 // single action we sync incrementally elsewhere (devolve, evolve) — a
@@ -21,10 +23,17 @@ export function closeAllOverlays() {
 }
 
 export function initGameActions() {
+  const btnShuffleDeck = document.getElementById('btn-shuffle-deck');
   const btnSetup = document.getElementById('btn-setup');
-  const btnShowHand = document.getElementById('btn-show-hand');
+  const btnShowOppHand = document.getElementById('btn-show-opp-hand');
   const btnUndo = document.getElementById('btn-undo');
   const btnRedo = document.getElementById('btn-redo');
+
+  if (btnShuffleDeck) {
+    btnShuffleDeck.addEventListener('click', () => {
+      shuffleZone(`${runtimeState.mySlot}-deck`);
+    });
+  }
 
   if (btnSetup) {
     btnSetup.addEventListener('click', () => {
@@ -32,13 +41,15 @@ export function initGameActions() {
     });
   }
 
-  if (btnShowHand) {
-    btnShowHand.addEventListener('click', () => {
-      if (btnShowHand.textContent === 'Show Hand') {
-        btnShowHand.textContent = 'Hide Hand';
-      } else {
-        btnShowHand.textContent = 'Show Hand';
-      }
+  if (btnShowOppHand) {
+    btnShowOppHand.addEventListener('click', () => {
+      clientState.showOpponentHand = !clientState.showOpponentHand;
+
+      btnShowOppHand.textContent = clientState.showOpponentHand
+        ? 'Hide Opponent Hand'
+        : 'Show Opponent Hand';
+
+      renderEntireBoard();
     });
   }
 
