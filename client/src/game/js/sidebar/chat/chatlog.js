@@ -1,4 +1,4 @@
-import { emitChatChanged } from '../../gameboard/logic/chatChangeBus.js';
+import { emitChatChanged } from '../../gameboard/logic/network/chatChangeBus.js';
 import { runtimeState } from '../../gameboard/logic/state.js';
 
 /* ==========================================================================

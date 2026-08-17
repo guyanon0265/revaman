@@ -32,11 +32,11 @@
 
 import { io } from 'socket.io-client';
 import { gameState, runtimeState } from './gameboard/logic/state.js';
-import { onStateChanged } from './gameboard/logic/stateChangeBus.js';
+import { onStateChanged } from './gameboard/logic/network/stateChangeBus.js';
 import { renderEntireBoard } from './gameboard/ui/render.js';
 import { closeAllOverlays } from './sidebar/actions/gameActions.js';
-import { onLogChanged } from './gameboard/logic/logChangeBus.js';
-import { onChatChanged } from './gameboard/logic/chatChangeBus.js';
+import { onLogChanged } from './gameboard/logic/network/logChangeBus.js';
+import { onChatChanged } from './gameboard/logic/network/chatChangeBus.js';
 import { GameLogger } from './sidebar/chat/chatlog.js';
 
 let lastAppliedSeq = 0;

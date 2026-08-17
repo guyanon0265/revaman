@@ -31,9 +31,9 @@ import {
 } from '../../utils.js';
 import { GameLogger } from '../../sidebar/chat/chatlog.js';
 import { pushSnapshot } from './undoManager.js';
-import { emitStateChanged } from './stateChangeBus.js';
+import { emitStateChanged } from './network/stateChangeBus.js';
+import { emitLogChanged } from './network/logChangeBus.js';
 import { parseDeckCSV } from './parser.js';
-import { emitLogChanged } from './logChangeBus.js'; // new — see chat/log section below
 
 export { undo, redo, canUndo, canRedo } from './undoManager.js';
 

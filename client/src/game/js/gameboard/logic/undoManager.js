@@ -1,5 +1,5 @@
 import { gameState, runtimeState } from './state.js';
-import { emitStateChanged } from './stateChangeBus.js';
+import { emitStateChanged } from './network/stateChangeBus.js';
 
 const undoStack = [];
 const redoStack = [];
