@@ -50,6 +50,6 @@ async function handleDemoDeckClick(demoDeck) {
   }
 }
 
-export function initDemoSelector() {
+export function initDemoDecks() {
   menuEl.addEventListener('click', handleDeckSelectorClick);
 }

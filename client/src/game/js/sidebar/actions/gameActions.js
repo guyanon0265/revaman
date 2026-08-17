@@ -1,17 +1,9 @@
 import { undo, redo } from '../../gameboard/logic/loggingEngine.js';
 import { renderEntireBoard } from '../../gameboard/ui/render.js';
-import { closeActionMenu } from '../../gameboard/ui/overlays/actionMenu.js';
-import { closePileBrowser } from '../../gameboard/ui/overlays/pileBrowser.js';
-import { closeCardView } from '../../gameboard/ui/overlays/cardView.js';
 import { shuffleZone } from '../../gameboard/logic/loggingEngine.js';
 import { clientState, runtimeState } from '../../gameboard/logic/state.js';
 import { requestRedo, requestUndo } from '../../networkSync.js';
-
-export function closeAllOverlays() {
-  closeActionMenu();
-  closePileBrowser();
-  closeCardView();
-}
+import { closeAllOverlays } from '../../gameboard/ui/overlays/overlays.js';
 
 export function initGameActions() {
   const btnShuffleDeck = document.getElementById('btn-shuffle-deck');
