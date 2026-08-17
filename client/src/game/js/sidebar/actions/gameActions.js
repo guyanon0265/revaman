@@ -5,17 +5,8 @@ import { closePileBrowser } from '../../gameboard/ui/overlays/pileBrowser.js';
 import { closeCardView } from '../../gameboard/ui/overlays/cardView.js';
 import { shuffleZone } from '../../gameboard/logic/loggingEngine.js';
 import { clientState, runtimeState } from '../../gameboard/logic/state.js';
+import { requestRedo, requestUndo } from '../../networkSync.js';
 
-// Undo/redo can jump gameState around far more drastically than any
-// single action we sync incrementally elsewhere (devolve, evolve) — a
-// snapshot restore isn't "one card changed," it can be an arbitrary
-// prior moment. Any open overlay may now be bound to a card, zone, or
-// board state that no longer exists or means something different.
-// Rather than trying to re-resolve every open panel against that
-// arbitrary prior state, close everything and let the board render
-// fresh. Calling all three is deliberately redundant where they overlap
-// (closeActionMenu() already closes Card View itself, closePileBrowser()
-// does too) — each call is a cheap no-op if that overlay wasn't open.
 export function closeAllOverlays() {
   closeActionMenu();
   closePileBrowser();
@@ -55,6 +46,10 @@ export function initGameActions() {
 
   if (btnUndo) {
     btnUndo.addEventListener('click', () => {
+      if (runtimeState.mode === 'multiplayer') {
+        requestUndo();
+        return;
+      }
       if (undo()) {
         closeAllOverlays();
         renderEntireBoard();
@@ -64,6 +59,10 @@ export function initGameActions() {
 
   if (btnRedo) {
     btnRedo.addEventListener('click', () => {
+      if (runtimeState.mode === 'multiplayer') {
+        requestRedo();
+        return;
+      }
       if (redo()) {
         closeAllOverlays();
         renderEntireBoard();

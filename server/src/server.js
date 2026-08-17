@@ -1,23 +1,37 @@
 // server.js — RevaMan multiplayer relay.
 //
-// Deliberately dumb about game rules: never imports or runs engine.js,
-// holds no gameState beyond a per-room sequence counter + membership
-// count. Stamps each incoming 'state' push with the next sequence
-// number for that room and relays it to every OTHER socket in the room.
-// Clients discard any incoming push whose seq isn't greater than the
+// Game-rule-agnostic: never imports or runs engine.js. Per-room state is
+// limited to what the RELAY itself needs — a sequence counter, undo/redo
+// history, and the current snapshot — never anything engine.js would
+// recognize as game logic. Clients always push full { zones, cardbacks }
+// snapshots; this server never diffs or validates them, just orders and
+// stores them.
+//
+// UNDO/REDO IS NOW SERVER-AUTHORITATIVE (previously client-local, which
+// caused each client to accumulate a different history and let a local
+// undo silently discard the other client's actions). The server holds
+// ONE undo/redo stack per room; clients request 'undo'/'redo' and wait
+// for the resulting 'state' broadcast rather than computing anything
+// locally. See undoManager.js on the client — pushSnapshot() is a no-op
+// whenever runtimeState.mode === 'multiplayer'.
+//
+// Clients discard any incoming 'state' whose seq isn't greater than the
 // last one they've applied. This guarantees every client applies
 // concurrent pushes in the same relative order as each other — it does
 // NOT prevent a slightly-stale remote push from overwriting a
 // not-yet-broadcast local mutation (an accepted tradeoff, not an
 // oversight; see the client-side networkSync module for the longer
-// explanation of why full server-authoritative state was deliberately
-// not chosen here).
+// explanation of why full server-authoritative GAME STATE, as opposed to
+// just history/sequence, was deliberately not chosen here).
 //
-// No reconnect/resume support and no room persistence: a room's state
-// lives only in whichever clients currently hold it. If a room empties
-// out, it's forgotten entirely — the next join to that same room id
-// starts fresh. Manual export/import is the accepted fallback for state
-// loss, not something this relay tries to solve.
+// No reconnect/resume support and no room persistence beyond the life of
+// the room: a room's state lives only as long as at least one client
+// holds the connection alive server-side. If a room empties out, it's
+// forgotten entirely — the next join to that same room id starts fresh.
+// Manual export/import is the accepted fallback for state loss, not
+// something this relay tries to solve. (Note: this could change now
+// that the server holds real state in memory — see the ongoing
+// discussion on room preservation before building anything here.)
 
 import express from 'express';
 import http from 'http';
@@ -32,6 +46,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const CLIENT_DIR = path.join(__dirname, '../../client/src/game');
+const ASSETS_DIR = path.join(__dirname, '../../client/src/assets');
 
 const MAX_CLIENTS_PER_ROOM = 2; // this is a 2-player game; a 3rd join attempt is rejected, not queued as a spectator
 
@@ -53,6 +68,7 @@ const app = express();
 const server = http.createServer(app);
 
 app.use(express.static(CLIENT_DIR));
+app.use('/assets', express.static(ASSETS_DIR));
 
 const io = new Server(server, {
   cors: {
@@ -102,17 +118,27 @@ instrument(io, {
 });
 
 // ---------------------------------------------------------------------
-// Room bookkeeping — roomId -> { seq, size }. This is the ONLY state
-// this relay holds, and neither field is gameState: seq is a counter
-// for ordering pushes, size just enforces the 2-client cap. Actual
-// message routing (who's in which room) is handled by Socket.io's own
-// room feature (socket.join / io.to), not tracked here separately.
+// Room bookkeeping — roomId -> { seq, size, currentState, undoStack,
+// redoStack }. Still not "gameState" in the engine.js sense — currentState
+// is just the last { zones, cardbacks } payload a client pushed, stored
+// opaquely; this server never looks inside it. undoStack/redoStack hold
+// the SAME kind of opaque payloads, one per prior state. seq orders
+// everything (pushes AND undo/redo results) on one shared per-room
+// counter. size enforces the 2-client cap. Actual message routing (who's
+// in which room) is handled by Socket.io's own room feature
+// (socket.join / io.to), not tracked here separately.
 // ---------------------------------------------------------------------
 const rooms = new Map();
 
 function getRoom(roomId) {
   if (!rooms.has(roomId)) {
-    rooms.set(roomId, { seq: 0, size: 0 });
+    rooms.set(roomId, {
+      seq: 0,
+      size: 0,
+      currentState: null,
+      undoStack: [],
+      redoStack: [],
+    });
   }
   return rooms.get(roomId);
 }
@@ -153,15 +179,67 @@ io.on('connection', (socket) => {
       }
     }
 
-    socket.emit('joined', { slot, peers });
+    // Also hand the newcomer the room's CURRENT state directly, plus the
+    // seq it's at — this replaces the old design where an existing
+    // client had to notice 'peer-joined' and manually re-broadcast its
+    // own state as a catch-up. That was only ever a workaround for the
+    // server holding nothing; now that it holds currentState, handing
+    // it over here is simpler and doesn't depend on the other client
+    // being responsive.
+    socket.emit('joined', {
+      slot,
+      peers,
+      seq: roomState.seq,
+      current: roomState.currentState,
+    });
     socket.to(room).emit('peer-joined', { username, slot });
   });
 
   socket.on('state', (payload) => {
     if (!joinedRoomId) return;
-    const roomState = getRoom(joinedRoomId);
-    roomState.seq += 1;
-    socket.to(joinedRoomId).emit('state', { seq: roomState.seq, ...payload });
+    const room = getRoom(joinedRoomId);
+
+    if (room.currentState) room.undoStack.push(room.currentState);
+    room.redoStack = []; // a real new action invalidates any pending redo
+    room.currentState = payload;
+    room.seq += 1;
+
+    socket.to(joinedRoomId).emit('state', { seq: room.seq, ...payload });
+  });
+
+  socket.on('undo', () => {
+    if (!joinedRoomId) return;
+    const room = getRoom(joinedRoomId);
+
+    if (room.undoStack.length === 0) {
+      socket.emit('undo-error', { message: 'Nothing to undo.' });
+      return;
+    }
+
+    room.redoStack.push(room.currentState);
+    room.currentState = room.undoStack.pop();
+    room.seq += 1;
+
+    // Unlike 'state', this goes to EVERYONE including the requester —
+    // the requester doesn't already know what the prior state was, the
+    // server had to compute that for them.
+    io.to(joinedRoomId).emit('state', { seq: room.seq, ...room.currentState });
+  });
+
+  socket.on('redo', () => {
+    if (!joinedRoomId) return;
+    const room = getRoom(joinedRoomId);
+
+    if (room.redoStack.length === 0) {
+      socket.emit('redo-error', { message: 'Nothing to redo.' });
+      return;
+    }
+
+    room.undoStack.push(room.currentState);
+    room.currentState = room.redoStack.pop();
+    room.seq += 1;
+
+    io.to(joinedRoomId).emit('state', { seq: room.seq, ...room.currentState });
   });
 
   socket.on('chat', (payload) => {

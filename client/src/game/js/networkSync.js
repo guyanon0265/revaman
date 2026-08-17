@@ -1,12 +1,21 @@
-// multiplayer/networkSync.js — client side of the state-push relay.
+// networkSync.js — client side of the state-push relay.
 //
 // This module's only job: turn local mutations into outgoing 'state'
 // pushes, and turn incoming 'state' pushes into local gameState
 // updates, matching server.js's event protocol exactly (join / joined /
-// join-error / peer-joined / peer-left / state). It has zero game-rule
+// join-error / peer-joined / peer-left / state / undo / redo /
+// undo-error / redo-error / chat / log). It has zero game-rule
 // knowledge — engine.js/loggingEngine.js are the only things that ever
 // construct or interpret game state; this module just moves
 // gameState.zones over the wire.
+//
+// UNDO/REDO ARE SERVER-AUTHORITATIVE while connected. requestUndo() /
+// requestRedo() just ask the server and wait for the resulting 'state'
+// (or 'undo-error' / 'redo-error') — nothing is computed or guessed
+// locally. See undoManager.js: pushSnapshot() is a no-op whenever
+// runtimeState.mode === 'multiplayer', so the client-local undo/redo
+// stacks stay empty for the duration of a multiplayer session and can't
+// drift out of sync with the server's.
 //
 // KNOWN LIMITATION, not fixed by the sequence numbers below: they
 // guarantee every client applies concurrent pushes in the SAME relative
@@ -17,8 +26,9 @@
 // failure mode than an ordering problem. Under normal two-person play
 // this window is a single round-trip. This was an accepted tradeoff
 // from the server-authoritative-vs-relay design discussion, not an
-// oversight — full server-authoritative state is the only way to close
-// it completely, and was deliberately not chosen here.
+// oversight — full server-authoritative GAME STATE (not just
+// history/sequence, which IS now server-authoritative) is the only way
+// to close it completely, and was deliberately not chosen here.
 
 import { io } from 'socket.io-client';
 import { gameState, runtimeState } from './gameboard/logic/state.js';
@@ -55,6 +65,16 @@ function applyIncomingState({ seq, zones, cardbacks }) {
   renderEntireBoard();
 }
 
+export function requestUndo() {
+  if (runtimeState.mode !== 'multiplayer' || !runtimeState.socket) return;
+  runtimeState.socket.emit('undo');
+}
+
+export function requestRedo() {
+  if (runtimeState.mode !== 'multiplayer' || !runtimeState.socket) return;
+  runtimeState.socket.emit('redo');
+}
+
 export function joinRoom(room, username) {
   if (runtimeState.socket) return; // already connected — one connection per session
 
@@ -66,7 +86,7 @@ export function joinRoom(room, username) {
     socket.emit('join', { room, username });
   });
 
-  socket.on('joined', ({ slot, peers }) => {
+  socket.on('joined', ({ slot, peers, seq, current }) => {
     runtimeState.mode = 'multiplayer';
     runtimeState.mySlot = slot;
     runtimeState.oppSlot = slot === 'p1' ? 'p2' : 'p1';
@@ -76,7 +96,25 @@ export function joinRoom(room, username) {
         runtimeState.usernames[p.slot] = p.username;
       });
     }
-    lastAppliedSeq = 0;
+
+    // Initialize to the room's ACTUAL current seq, not 0 — the server's
+    // history didn't reset just because a new client joined. Using 0
+    // here would be harmless in practice (any subsequent push still has
+    // a higher seq), but seq is meant to reflect "how caught up am I,"
+    // and this is what actually keeps that true from the moment of join.
+    lastAppliedSeq = seq;
+
+    // Apply whatever the server says the room's current state already
+    // is. This is what replaced the old peer-joined -> sendState()
+    // catch-up handshake below — the server can just hand it over
+    // directly now that it holds currentState itself.
+    if (current) {
+      gameState.zones = current.zones;
+      if (current.cardbacks) runtimeState.cardbacks = current.cardbacks;
+      closeAllOverlays();
+      renderEntireBoard();
+    }
+
     setStatus(
       `Connected as ${slot === 'p1' ? 'Player 1' : 'Player 2'} in room "${room}".`
     );
@@ -93,7 +131,9 @@ export function joinRoom(room, username) {
 
   socket.on('peer-joined', ({ username: peerUsername, slot: peerSlot }) => {
     runtimeState.usernames[peerSlot] = peerUsername;
-    sendState();
+    // No sendState() catch-up call here anymore — the server now hands
+    // the newcomer state directly via 'joined' (see above), so this
+    // client doesn't need to notice they arrived and react to it.
     setStatus('Opponent connected.');
     GameLogger.logSystem(`${peerUsername} joined the room.`);
   });
@@ -106,6 +146,10 @@ export function joinRoom(room, username) {
   });
 
   socket.on('state', applyIncomingState);
+
+  socket.on('undo-error', ({ message }) => GameLogger.logSystem(message));
+  socket.on('redo-error', ({ message }) => GameLogger.logSystem(message));
+
   socket.on('log', (text) => GameLogger.logAction(runtimeState.oppSlot, text));
   socket.on('chat', (text) => GameLogger.logChat(runtimeState.oppSlot, text));
 
@@ -132,10 +176,10 @@ export function leaveRoom() {
 }
 
 // Every successful gameState mutation (loggingEngine.js) and every
-// undo/redo restore (undoManager.js) emits through this same bus — see
-// stateChangeBus.js. This is the ONLY place those events turn into
-// network traffic; loggingEngine.js and undoManager.js have no idea
-// networking exists, and never need to.
+// undo/redo restore (undoManager.js, solo mode only now — see its own
+// header) emits through this same bus — see stateChangeBus.js. This is
+// the ONLY place those events turn into network traffic; loggingEngine.js
+// and undoManager.js have no idea networking exists, and never need to.
 onStateChanged(sendState);
 
 onLogChanged((text) => {
