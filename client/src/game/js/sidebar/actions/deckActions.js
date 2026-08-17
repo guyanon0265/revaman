@@ -1,8 +1,9 @@
 import { runtimeState } from '../../gameboard/logic/state.js';
 import { loadDeck } from '../../gameboard/logic/loggingEngine.js';
 import { renderEntireBoard } from '../../gameboard/ui/render.js';
+import { openDemoDecks } from '../../gameboard/ui/overlays/demoSelector.js';
 
-export function promptForCSVAndParse(slot) {
+export function promptForCSV(slot) {
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = '.csv,text/csv';
@@ -27,10 +28,17 @@ export function promptForCSVAndParse(slot) {
 
 export function initDeckActions() {
   const btnLoadDeck = document.getElementById('btn-load-deck');
+  const btnLoadDemoDeck = document.getElementById('btn-load-demo-deck');
 
   if (btnLoadDeck) {
     btnLoadDeck.addEventListener('click', () => {
-      promptForCSVAndParse(runtimeState.mySlot);
+      promptForCSV(runtimeState.mySlot);
+    });
+  }
+
+  if (btnLoadDemoDeck) {
+    btnLoadDemoDeck.addEventListener('click', () => {
+      openDemoDecks(runtimeState.mySlot);
     });
   }
 }

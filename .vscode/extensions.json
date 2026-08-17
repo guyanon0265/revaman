@@ -1,6 +1,7 @@
 {
   "recommendations": [
     "ritwickdey.LiveServer",
+    "mechatroner.rainbow-csv",
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
     "stylelint.vscode-stylelint"

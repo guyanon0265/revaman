@@ -188,6 +188,25 @@
   z-index: 2;
 }
 
+.demo-card {
+  width: calc(var(--card-w) * 2);
+  height: calc(var(--card-h) * 2);
+  border-radius: 1.6dvh;
+  position: relative;
+  cursor: pointer;
+  border: 0.2dvh solid var(--border-color);
+  background: #0f172a;
+  flex-shrink: 0;
+}
+
+.demo-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
 #card-view-overlay {
   display: none;
   position: fixed;
@@ -212,6 +231,11 @@
 }
 
 @media (max-width: 767px) {
+  .demo-card {
+    width: calc(var(--card-w-sm) * 1.2);
+    height: calc(var(--card-h-sm) * 1.2);
+  }
+
   #card-view-overlay {
     inset: 0 0 auto 0;
     height: 50dvh;
