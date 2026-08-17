@@ -1,17 +1,17 @@
 import { loadDeck } from '../../logic/loggingEngine.js';
 import { renderEntireBoard } from '../render.js';
 
-const overlayEl = document.getElementById('demo-deck-selector');
+const menuEl = document.getElementById('demo-deck-selector');
 
 let targetSlot = null;
 
 export function openDemoDecks(slot) {
   targetSlot = slot;
-  overlayEl.style.display = 'flex';
+  menuEl.style.display = 'flex';
 }
 
 export function closeDemoDecks() {
-  overlayEl.style.display = 'none';
+  menuEl.style.display = 'none';
   targetSlot = null;
 }
 
@@ -25,12 +25,7 @@ async function loadDemoDeck(deckId) {
   return response.text();
 }
 
-function handleOverlayClick(e) {
-  if (e.target === overlayEl) {
-    closeDemoDecks();
-    return;
-  }
-
+function handleDeckSelectorClick(e) {
   if (e.target.closest('#btn-demo-decks-close')) {
     closeDemoDecks();
     return;
@@ -56,5 +51,5 @@ async function handleDemoDeckClick(demoDeck) {
 }
 
 export function initDemoSelector() {
-  overlayEl.addEventListener('click', handleOverlayClick);
+  menuEl.addEventListener('click', handleDeckSelectorClick);
 }
