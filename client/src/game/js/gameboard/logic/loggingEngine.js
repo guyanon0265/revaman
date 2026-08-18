@@ -15,12 +15,16 @@ import {
   OWNED_ZONE_SUFFIX_LABELS,
 } from '../../utils.js';
 import { GameLogger } from '../../sidebar/chat/chatlog.js';
-import { pushSnapshot } from './undoManager.js';
+import {
+  pushSnapshot,
+  undo as _undo,
+  redo as _redo,
+  canUndo,
+  canRedo,
+} from './undoManager.js';
 import { emitStateChanged } from './network/stateChangeBus.js';
 import { emitLogChanged } from './network/logChangeBus.js';
 import { parseDeckCSV } from './parser.js';
-
-export { undo, redo, canUndo, canRedo } from './undoManager.js';
 
 // ---------------------------------------------------------------------
 // Logging helpers
@@ -39,7 +43,7 @@ function logAction(actionText) {
 }
 
 function zoneLabel(zoneId) {
-  if (zoneId.endsWith('table-half')) return `Board`;
+  if (zoneId.endsWith('table-half')) return 'Board';
   if (zoneId.startsWith('p1-') || zoneId.startsWith('p2-')) {
     const slot = zoneId.slice(0, 2);
     const suffix = zoneId.slice(3);
@@ -67,11 +71,17 @@ function findCard(zoneId, instanceId) {
 //   5. Log the successful mutation.
 //   6. Broadcast the resulting state.
 //
-// The individual wrappers only need to provide the operation-specific
-// validation, engine call, and log message.
+// `success` exists because some legitimate engine functions return
+// undefined or zero on success (for example shuffleZone/loadDeck),
+// while card mutations use null to indicate failure.
 // ---------------------------------------------------------------------
 
-function mutate({ validate = () => true, mutation, log }) {
+function mutate({
+  validate = () => true,
+  mutation,
+  log,
+  success = (result) => result !== null,
+}) {
   if (!validate()) return null;
 
   flushPendingBatch();
@@ -79,7 +89,7 @@ function mutate({ validate = () => true, mutation, log }) {
 
   const result = mutation();
 
-  if (result) {
+  if (success(result)) {
     log?.(result);
     emitStateChanged();
   }
@@ -177,11 +187,19 @@ function applyDelta(statLabel, engineFn, instanceId, zone, delta) {
   return card;
 }
 
-export function applyDamageDelta(instanceId, zone, delta) {
+// ---------------------------------------------------------------------
+// Actual mutation implementations
+//
+// These are intentionally NOT exported. The public exports at the
+// bottom of the file pass through guarded(), which prevents spectators
+// from reaching any mutation logic at all.
+// ---------------------------------------------------------------------
+
+function _applyDamageDelta(instanceId, zone, delta) {
   return applyDelta('damage', engine.applyDamageDelta, instanceId, zone, delta);
 }
 
-export function applyCounterDelta(instanceId, zone, delta) {
+function _applyCounterDelta(instanceId, zone, delta) {
   return applyDelta(
     'counter',
     engine.applyCounterDelta,
@@ -191,11 +209,7 @@ export function applyCounterDelta(instanceId, zone, delta) {
   );
 }
 
-// ---------------------------------------------------------------------
-// Normal mutations
-// ---------------------------------------------------------------------
-
-export function moveCardToZone(instanceId, fromZone, toZone, position = 'top') {
+function _moveCardToZone(instanceId, fromZone, toZone, position = 'top') {
   return mutate({
     validate: () => findCard(fromZone, instanceId),
     mutation: () =>
@@ -207,7 +221,7 @@ export function moveCardToZone(instanceId, fromZone, toZone, position = 'top') {
   });
 }
 
-export function moveToTopOfDeck(instanceId, fromZone, toZone) {
+function _moveToTopOfDeck(instanceId, fromZone, toZone) {
   return mutate({
     validate: () => findCard(fromZone, instanceId),
     mutation: () => engine.moveToTopOfDeck(instanceId, fromZone, toZone),
@@ -218,7 +232,7 @@ export function moveToTopOfDeck(instanceId, fromZone, toZone) {
   });
 }
 
-export function moveToBottomOfDeck(instanceId, fromZone, toZone) {
+function _moveToBottomOfDeck(instanceId, fromZone, toZone) {
   return mutate({
     validate: () => findCard(fromZone, instanceId),
     mutation: () => engine.moveToBottomOfDeck(instanceId, fromZone, toZone),
@@ -229,7 +243,7 @@ export function moveToBottomOfDeck(instanceId, fromZone, toZone) {
   });
 }
 
-export function drawTopCard(fromZone, toZone) {
+function _drawTopCard(fromZone, toZone) {
   return mutate({
     validate: () => !!gameState.zones[fromZone]?.length,
     mutation: () => engine.drawTopCard(fromZone, toZone),
@@ -237,36 +251,32 @@ export function drawTopCard(fromZone, toZone) {
   });
 }
 
-export function drawCards(fromZone, toZone, count) {
-  const before = gameState.zones[toZone]?.length ?? 0;
-
+function _drawCards(fromZone, toZone, count) {
   return mutate({
     validate: () => !!gameState.zones[fromZone]?.length,
     mutation: () => {
+      const before = gameState.zones[toZone]?.length ?? 0;
+
       engine.drawCards(fromZone, toZone, count);
 
-      const actualDrawn = (gameState.zones[toZone]?.length ?? 0) - before;
-
-      return actualDrawn;
+      return (gameState.zones[toZone]?.length ?? 0) - before;
     },
-    log: (actualDrawn) => {
-      if (actualDrawn <= 0) return;
-
+    success: (actualDrawn) => actualDrawn > 0,
+    log: (actualDrawn) =>
       logAction(
         `drew ${actualDrawn} card${actualDrawn === 1 ? '' : 's'} into ${zoneLabel(toZone)}.`
-      );
-    },
+      ),
   });
 }
 
-export function shuffleZone(zoneId) {
+function _shuffleZone(zoneId) {
   return mutate({
     mutation: () => engine.shuffleZone(zoneId),
     log: () => logAction(`shuffled ${zoneLabel(zoneId)}.`),
   });
 }
 
-export function shuffleDiscardIntoDeck(discardZone, deckZone) {
+function _shuffleDiscardIntoDeck(discardZone, deckZone) {
   const count = gameState.zones[discardZone]?.length ?? 0;
 
   return mutate({
@@ -281,10 +291,10 @@ export function shuffleDiscardIntoDeck(discardZone, deckZone) {
   });
 }
 
-export function loadDeck(csvText, slot) {
+function _loadDeck(csvText, slot) {
   const { cards, cardback } = parseDeckCSV(csvText, slot);
 
-  if (!cards.length && !cardback) return;
+  if (!cards.length && !cardback) return null;
 
   return mutate({
     mutation: () => {
@@ -299,7 +309,7 @@ export function loadDeck(csvText, slot) {
   });
 }
 
-export function attachCardToTarget(selectedId, fromZone, targetId, targetZone) {
+function _attachCardToTarget(selectedId, fromZone, targetId, targetZone) {
   const selectedBefore = findCard(fromZone, selectedId);
   const targetBefore = findCard(targetZone, targetId);
 
@@ -322,7 +332,7 @@ export function attachCardToTarget(selectedId, fromZone, targetId, targetZone) {
   });
 }
 
-export function detachCard(
+function _detachCard(
   parentId,
   parentZone,
   attachmentId,
@@ -348,7 +358,7 @@ export function detachCard(
   });
 }
 
-export function devolveCard(cardId, zone, targetInstanceId) {
+function _devolveCard(cardId, zone, targetInstanceId) {
   const current = findCard(zone, cardId);
   if (!current) return null;
 
@@ -361,7 +371,7 @@ export function devolveCard(cardId, zone, targetInstanceId) {
   });
 }
 
-export function toggleStatus(instanceId, zone, status) {
+function _toggleStatus(instanceId, zone, status) {
   const before = findCard(zone, instanceId);
   if (!before) return null;
 
@@ -376,7 +386,7 @@ export function toggleStatus(instanceId, zone, status) {
   });
 }
 
-export function toggleAbility(instanceId, zone) {
+function _toggleAbility(instanceId, zone) {
   return mutate({
     validate: () => findCard(zone, instanceId),
     mutation: () => engine.toggleAbility(instanceId, zone),
@@ -387,7 +397,7 @@ export function toggleAbility(instanceId, zone) {
   });
 }
 
-export function toggleFlip(instanceId, zone) {
+function _toggleFlip(instanceId, zone) {
   return mutate({
     validate: () => findCard(zone, instanceId),
     mutation: () => engine.toggleFlip(instanceId, zone),
@@ -396,7 +406,7 @@ export function toggleFlip(instanceId, zone) {
   });
 }
 
-export function setRotation(instanceId, zone, degrees) {
+function _setRotation(instanceId, zone, degrees) {
   return mutate({
     validate: () => findCard(zone, instanceId),
     mutation: () => engine.setRotation(instanceId, zone, degrees),
@@ -404,7 +414,7 @@ export function setRotation(instanceId, zone, degrees) {
   });
 }
 
-export function setUpright(instanceId, zone) {
+function _setUpright(instanceId, zone) {
   return mutate({
     validate: () => findCard(zone, instanceId),
     mutation: () => engine.setUpright(instanceId, zone),
@@ -412,7 +422,7 @@ export function setUpright(instanceId, zone) {
   });
 }
 
-export function toggleBreak(instanceId, zone) {
+function _toggleBreak(instanceId, zone) {
   const before = findCard(zone, instanceId);
 
   // Mirrors engine.js's guard: BREAK requires evolution history.
@@ -426,3 +436,58 @@ export function toggleBreak(instanceId, zone) {
       ),
   });
 }
+
+// ---------------------------------------------------------------------
+// Spectator guard
+//
+// This is deliberately applied at the public API boundary. A spectator
+// therefore cannot reach mutate(), applyDelta(), engine.js, snapshotting,
+// logging, or broadcasting.
+// ---------------------------------------------------------------------
+
+function guarded(fn) {
+  return (...args) => {
+    if (runtimeState.isSpectator) {
+      GameLogger.logSystem('Spectators cannot affect the game.');
+      return null;
+    }
+
+    return fn(...args);
+  };
+}
+
+// ---------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------
+
+export const applyDamageDelta = guarded(_applyDamageDelta);
+export const applyCounterDelta = guarded(_applyCounterDelta);
+
+export const moveCardToZone = guarded(_moveCardToZone);
+export const moveToTopOfDeck = guarded(_moveToTopOfDeck);
+export const moveToBottomOfDeck = guarded(_moveToBottomOfDeck);
+
+export const drawTopCard = guarded(_drawTopCard);
+export const drawCards = guarded(_drawCards);
+
+export const shuffleZone = guarded(_shuffleZone);
+export const shuffleDiscardIntoDeck = guarded(_shuffleDiscardIntoDeck);
+
+export const loadDeck = guarded(_loadDeck);
+
+export const attachCardToTarget = guarded(_attachCardToTarget);
+export const detachCard = guarded(_detachCard);
+export const devolveCard = guarded(_devolveCard);
+
+export const toggleStatus = guarded(_toggleStatus);
+export const toggleAbility = guarded(_toggleAbility);
+export const toggleFlip = guarded(_toggleFlip);
+
+export const setRotation = guarded(_setRotation);
+export const setUpright = guarded(_setUpright);
+export const toggleBreak = guarded(_toggleBreak);
+
+export const undo = guarded(_undo);
+export const redo = guarded(_redo);
+
+export { canUndo, canRedo };
