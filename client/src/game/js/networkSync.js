@@ -55,6 +55,7 @@ import { onLogChanged } from './gameboard/logic/network/logChangeBus.js';
 import { onChatChanged } from './gameboard/logic/network/chatChangeBus.js';
 import { GameLogger } from './sidebar/chat/chatlog.js';
 
+let initialized = false;
 let lastAppliedSeq = 0;
 
 function setStatus(text) {
@@ -262,22 +263,28 @@ export function leaveRoom() {
 // header) emits through this same bus — see stateChangeBus.js. This is
 // the ONLY place those events turn into network traffic; loggingEngine.js
 // and undoManager.js have no idea networking exists, and never need to.
-onStateChanged(sendState);
 
-onLogChanged((text) => {
-  if (
-    runtimeState.mode !== 'multiplayer' ||
-    !runtimeState.socket ||
-    runtimeState.isSpectator
-  )
-    return;
-  runtimeState.socket.emit('log', { text });
-});
+export function initNetworkSync() {
+  if (initialized) return;
+  initialized = true;
 
-onChatChanged((text) => {
-  // No isSpectator guard here — spectators are explicitly allowed to
-  // chat. Sender identity is added by the SERVER from socket.data, not
-  // sent by this client at all.
-  if (runtimeState.mode !== 'multiplayer' || !runtimeState.socket) return;
-  runtimeState.socket.emit('chat', { text });
-});
+  onStateChanged(sendState);
+
+  onLogChanged((text) => {
+    if (
+      runtimeState.mode !== 'multiplayer' ||
+      !runtimeState.socket ||
+      runtimeState.isSpectator
+    )
+      return;
+    runtimeState.socket.emit('log', { text });
+  });
+
+  onChatChanged((text) => {
+    // No isSpectator guard here — spectators are explicitly allowed to
+    // chat. Sender identity is added by the SERVER from socket.data, not
+    // sent by this client at all.
+    if (runtimeState.mode !== 'multiplayer' || !runtimeState.socket) return;
+    runtimeState.socket.emit('chat', { text });
+  });
+}
