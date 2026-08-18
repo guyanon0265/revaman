@@ -149,6 +149,9 @@
 .username.opp {
   color: var(--accent-opp, #ef4444);
 }
+.username.spectator {
+  color: var(--accent-spectator, #808080);
+}
 
 .chat-input-container {
   display: flex;
@@ -387,6 +390,16 @@
 }
 .mp-input:focus {
   border-color: var(--accent-player, #2f6fed);
+}
+
+.mp-generate {
+  background-color: var(--accent-player, #dc9110);
+  border-color: var(--accent-player, #dc9110);
+  flex-direction: row;
+  margin-top: 0.4dvh;
+}
+.mp-generate:hover {
+  background-color: #eca431;
 }
 
 .mp-join {

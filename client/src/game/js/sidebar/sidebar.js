@@ -1,15 +1,13 @@
+import { initSiderbarHud } from './sidebarHud.js';
 import { initSidebarTabs } from './sidebarTabs.js';
 import { initChatlog } from './chat/chatlog.js';
-import { initActions } from './actions/initActions.js';
-import { initSiderbarHud } from './sidebarHud.js';
-import { initMultiplayerPanel } from './multiplayer/multiplayerEntry.js';
-import { initSettingsZone } from './multiplayer/settingsZone.js';
+import { initActions } from './actions/actions.js';
+import { initSidebarMultiplayer } from './multiplayer/multiplayer.js';
 
 export function initSidebar() {
   initSiderbarHud();
   initSidebarTabs();
   initChatlog();
   initActions();
-  initMultiplayerPanel();
-  initSettingsZone();
+  initSidebarMultiplayer();
 }
