@@ -1,68 +1,25 @@
-import { undo, redo } from '../../logic/loggingEngine.js';
-import { renderEntireBoard } from '../render.js';
-import { shuffleZone } from '../../logic/loggingEngine.js';
-import { clientState, runtimeState } from '../../logic/state.js';
-import { requestRedo, requestUndo } from '../../networkSync.js';
-import { closeAllOverlays } from '../overlays/overlays.js';
+import {
+  undoAction,
+  redoAction,
+  shuffleDeck,
+  toggleOpponentHand,
+} from './actions.js';
+
+const buttons = {
+  'btn-shuffle-deck': shuffleDeck,
+  'btn-show-opp-hand': toggleOpponentHand,
+  'btn-undo': undoAction,
+  'btn-redo': redoAction,
+};
 
 export function initButtons() {
-  const btnShuffleDeck = document.getElementById('btn-shuffle-deck');
-  const btnShuffleDiscard = document.getElementById('btn-shuffle-discard');
-  const btnDeckMoveMode = document.getElementById('btn-deck-move-mode');
-  const btnFlipCoin = document.getElementById('btn-flip-coin');
-  const btnSetup = document.getElementById('btn-setup');
-  const btnMulligan = document.getElementById('btn-mulligan');
-  const btnShowOppHand = document.getElementById('btn-show-opp-hand');
-  const btnUndo = document.getElementById('btn-undo');
-  const btnRedo = document.getElementById('btn-redo');
+  for (const [buttonId, action] of Object.entries(buttons)) {
+    const button = document.getElementById(buttonId);
 
-  if (btnShuffleDeck) {
-    btnShuffleDeck.addEventListener('click', () => {
-      shuffleZone(`${runtimeState.mySlot}-deck`);
-    });
-  }
+    if (!button) {
+      continue;
+    }
 
-  if (btnSetup) {
-    btnSetup.addEventListener('click', () => {
-      console.log('Set Up clicked');
-    });
-  }
-
-  if (btnShowOppHand) {
-    btnShowOppHand.addEventListener('click', () => {
-      clientState.showOpponentHand = !clientState.showOpponentHand;
-
-      btnShowOppHand.textContent = clientState.showOpponentHand
-        ? 'Hide Opponent Hand'
-        : 'Show Opponent Hand';
-
-      renderEntireBoard();
-    });
-  }
-
-  if (btnUndo) {
-    btnUndo.addEventListener('click', () => {
-      if (runtimeState.mode === 'multiplayer') {
-        requestUndo();
-        return;
-      }
-      if (undo()) {
-        closeAllOverlays();
-        renderEntireBoard();
-      }
-    });
-  }
-
-  if (btnRedo) {
-    btnRedo.addEventListener('click', () => {
-      if (runtimeState.mode === 'multiplayer') {
-        requestRedo();
-        return;
-      }
-      if (redo()) {
-        closeAllOverlays();
-        renderEntireBoard();
-      }
-    });
+    button.addEventListener('click', action);
   }
 }

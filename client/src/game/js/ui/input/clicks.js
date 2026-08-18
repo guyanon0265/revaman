@@ -1,9 +1,5 @@
 import { clientState, clearSelection } from '../../logic/state.js';
-import {
-  moveCardToZone,
-  attachCardToTarget,
-  drawCards,
-} from '../../logic/loggingEngine.js';
+import { attachCardToTarget } from '../../logic/loggingEngine.js';
 import { isPileZone } from '../../utils.js';
 import { domIdToStateZone, renderEntireBoard } from '../render.js';
 import {
@@ -12,7 +8,7 @@ import {
 } from '../overlays/pileBrowser.js';
 import { openActionMenu, notifyCardReplaced } from '../overlays/actionMenu.js';
 import { refreshViewAttached } from '../overlays/viewAttached.js';
-import { drawCardFromZone } from './actions.js';
+import { drawCardFromZone, moveSelectedCardToZone } from './actions.js';
 
 let longPressTimer = null;
 let longPressTriggered = false;
@@ -54,11 +50,7 @@ function handleBoardClick(e) {
       targetZone.endsWith('-hand') ||
       isPileZone(targetZone)
     ) {
-      moveCardToZone(
-        clientState.selectedInstanceId,
-        clientState.selectedZone,
-        targetZone
-      );
+      moveSelectedCardToZone(targetZone);
       clearSelection();
       renderEntireBoard();
       refreshPileBrowser();
@@ -92,11 +84,7 @@ function handleBoardClick(e) {
     const targetZone = domIdToStateZone(zoneEl.id);
 
     if (targetZone !== clientState.selectedZone) {
-      moveCardToZone(
-        clientState.selectedInstanceId,
-        clientState.selectedZone,
-        targetZone
-      );
+      moveSelectedCardToZone(targetZone);
       clearSelection();
       renderEntireBoard();
       refreshPileBrowser();

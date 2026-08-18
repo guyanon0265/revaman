@@ -9,7 +9,7 @@ import { closeAllOverlays } from '../overlays/overlays.js';
 import { refreshPileBrowser } from '../overlays/pileBrowser.js';
 import { renderEntireBoard } from '../render.js';
 
-export function showOppHand() {
+export function toggleOpponentHand() {
   const btnShowOppHand = document.getElementById('btn-show-opp-hand');
   clientState.showOpponentHand = !clientState.showOpponentHand;
 
