@@ -68,15 +68,51 @@ function getAttachedCards() {
   };
 }
 
+function handleAttachedCardAction(card, section) {
+  if (!parentId || !parentZone) return;
+
+  if (section.kind === 'evolution') {
+    const promoted = devolveCard(parentId, parentZone, card.instanceId);
+
+    if (promoted) {
+      parentId = promoted.instanceId;
+      onRootChanged?.(promoted);
+    }
+  } else {
+    const handZone = parentZone.split('-')[0] + '-hand';
+
+    detachCard(parentId, parentZone, card.instanceId, section.kind, handZone);
+  }
+
+  overrideActive = false;
+  renderAttachedGrid();
+  renderEntireBoard();
+
+  const root = getParentCard();
+  if (root) openCardView(root);
+}
+
 function renderAttachedGrid() {
   const attachments = getAttachedCards();
 
   renderBrowserGrid(
     gridEl,
     [
-      { label: 'Evolutions', kind: 'evolution', cards: attachments.evolution },
-      { label: 'Trainers', kind: 'trainer', cards: attachments.trainers },
-      { label: 'Energy', kind: 'energy', cards: attachments.energy },
+      {
+        label: 'Evolutions',
+        kind: 'evolution',
+        cards: attachments.evolution,
+      },
+      {
+        label: 'Trainers',
+        kind: 'trainer',
+        cards: attachments.trainers,
+      },
+      {
+        label: 'Energy',
+        kind: 'energy',
+        cards: attachments.energy,
+      },
     ],
     {
       onSelect: (card) => {
@@ -88,34 +124,9 @@ function renderAttachedGrid() {
         const root = getParentCard();
         if (root) openCardView(root);
       },
-      onContextMenu: (card, section) => {
-        if (!parentId || !parentZone) return;
 
-        if (section.kind === 'evolution') {
-          const promoted = devolveCard(parentId, parentZone, card.instanceId);
-
-          if (promoted) {
-            parentId = promoted.instanceId;
-            onRootChanged?.(promoted);
-          }
-        } else {
-          const handZone = parentZone.split('-')[0] + '-hand';
-          detachCard(
-            parentId,
-            parentZone,
-            card.instanceId,
-            section.kind,
-            handZone
-          );
-        }
-
-        overrideActive = false;
-        renderAttachedGrid();
-        renderEntireBoard();
-
-        const root = getParentCard();
-        if (root) openCardView(root);
-      },
+      onContextMenu: handleAttachedCardAction,
+      onLongPress: handleAttachedCardAction,
     }
   );
 }

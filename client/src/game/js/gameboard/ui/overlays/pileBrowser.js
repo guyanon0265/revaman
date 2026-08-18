@@ -28,6 +28,12 @@ const gridEl = document.getElementById('pile-browser-grid');
 
 let currentZone = null;
 
+function handlePileCardAction(card) {
+  moveCardToZone(card.instanceId, currentZone, `${card.owner}-hand`);
+  renderPileGrid();
+  renderEntireBoard();
+}
+
 function renderPileGrid() {
   if (!currentZone) return;
   const cards = [...(gameState.zones[currentZone] || [])].reverse(); // top-first, LIFO
@@ -38,11 +44,8 @@ function renderPileGrid() {
   renderBrowserGrid(gridEl, [{ label: null, cards }], {
     onSelect: (card) => openCardView(card),
     onDeselect: () => closeCardView(),
-    onContextMenu: (card) => {
-      moveCardToZone(card.instanceId, currentZone, `${card.owner}-hand`);
-      renderPileGrid();
-      renderEntireBoard();
-    },
+    onContextMenu: (card) => handlePileCardAction(card),
+    onLongPress: (card) => handlePileCardAction(card),
   });
 }
 

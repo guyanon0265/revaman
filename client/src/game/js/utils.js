@@ -90,7 +90,7 @@ export function isPileZone(zone) {
 // and deselects any previously-selected thumbnail in this grid; clicking
 // the already-selected thumbnail deselects it.
 export function renderBrowserGrid(targetGridEl, sections, options = {}) {
-  const { onSelect, onDeselect, onContextMenu } = options;
+  const { onSelect, onDeselect, onContextMenu, onLongPress } = options;
 
   targetGridEl.innerHTML = '';
 
@@ -119,7 +119,15 @@ export function renderBrowserGrid(targetGridEl, sections, options = {}) {
       img.alt = card.name;
       img.draggable = false;
 
+      let longPressTimer = null;
+      let longPressTriggered = false;
+
       img.addEventListener('click', () => {
+        if (longPressTriggered) {
+          longPressTriggered = false;
+          return;
+        }
+
         if (selectedImg === img) {
           img.classList.remove('selected');
           selectedImg = null;
@@ -137,6 +145,43 @@ export function renderBrowserGrid(targetGridEl, sections, options = {}) {
       img.addEventListener('contextmenu', (e) => {
         e.preventDefault();
         onContextMenu?.(card, section);
+      });
+
+      img.addEventListener(
+        'touchstart',
+        (e) => {
+          if (e.touches.length !== 1) return;
+
+          clearTimeout(longPressTimer);
+          longPressTriggered = false;
+
+          longPressTimer = setTimeout(() => {
+            longPressTimer = null;
+            longPressTriggered = true;
+
+            onLongPress?.(card, section);
+          }, 500);
+        },
+        { passive: true }
+      );
+
+      img.addEventListener(
+        'touchmove',
+        () => {
+          clearTimeout(longPressTimer);
+          longPressTimer = null;
+        },
+        { passive: true }
+      );
+
+      img.addEventListener('touchend', () => {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+      });
+
+      img.addEventListener('touchcancel', () => {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
       });
 
       grid.appendChild(img);

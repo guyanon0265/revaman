@@ -10,8 +10,18 @@ import { openPileBrowser, refreshPileBrowser } from './overlays/pileBrowser.js';
 import { openActionMenu, notifyCardReplaced } from './overlays/actionMenu.js';
 import { refreshViewAttached } from './overlays/viewAttached.js';
 
+let longPressTimer = null;
+let longPressTriggered = false;
+
 function handleBoardClick(e) {
-  if (e.target.closest('.click-handling')) return; // menu clicks are a different domain entirely
+  // A long-press already opened the action menu. Ignore the synthetic
+  // click that mobile browsers may generate afterward.
+  if (longPressTriggered) {
+    longPressTriggered = false;
+    return;
+  }
+
+  if (e.target.closest('.click-handling')) return;
 
   const cardEl = e.target.closest('.card');
   const zoneEl = e.target.closest('.zone, .hand, .table-half');
@@ -36,7 +46,7 @@ function handleBoardClick(e) {
 
   // 0. Attachment mode active — the NEXT card clicked (that isn't the
   // card being attached) is the target, regardless of what it would
-  // normally mean to click a card. Checked first, before anything else.
+  // normally mean to click a card.
   if (clientState.selectedInstanceId && cardEl) {
     const targetInstanceId = cardEl.dataset.instanceId;
     const targetZone = cardEl.dataset.zone;
@@ -58,10 +68,6 @@ function handleBoardClick(e) {
     }
 
     if (targetInstanceId !== clientState.selectedInstanceId) {
-      // attachCardToTarget now returns whatever actually occupies
-      // targetZone post-mutation: the same card for energy/trainer
-      // attaches (occupant.instanceId === targetInstanceId, a no-op
-      // below), or the newly-evolved card for an evolution attach.
       const occupant = attachCardToTarget(
         clientState.selectedInstanceId,
         clientState.selectedZone,
@@ -72,13 +78,9 @@ function handleBoardClick(e) {
       clearSelection();
       renderEntireBoard();
 
-      // Must run BEFORE refreshViewAttached() below — this is what
-      // syncs viewAttached.js's parentId on an evolution attach. If the
-      // grid refreshes first, it's still looking up the old id, which
-      // no longer exists at the top level (it's nested inside the new
-      // card's evolutionStack now), and silently closes instead of
-      // showing the updated attachments.
-      if (occupant) notifyCardReplaced(targetInstanceId, targetZone, occupant);
+      if (occupant) {
+        notifyCardReplaced(targetInstanceId, targetZone, occupant);
+      }
 
       refreshViewAttached();
 
@@ -86,11 +88,11 @@ function handleBoardClick(e) {
     }
   }
 
-  // 1. If a card is already selected and we click a DIFFERENT zone (or a card inside a different zone)
+  // 1. If a card is already selected and we click a DIFFERENT zone
+  // (or a card inside a different zone)
   if (clientState.selectedInstanceId && zoneEl) {
     const targetZone = domIdToStateZone(zoneEl.id);
 
-    // Only move if it's a different zone than where the card currently is
     if (targetZone !== clientState.selectedZone) {
       moveCardToZone(
         clientState.selectedInstanceId,
@@ -114,7 +116,7 @@ function handleBoardClick(e) {
       return;
     }
 
-    clientState.selectedInstanceId = cardEl.dataset.instanceId;
+    clientState.selectedInstanceId = clickedInstanceId;
     clientState.selectedZone = cardEl.dataset.zone;
     clientState.selectedKind = 'card';
     renderEntireBoard();
@@ -128,8 +130,18 @@ function handleBoardClick(e) {
   }
 }
 
+function openContextMenuForCard(cardEl) {
+  clientState.selectedInstanceId = cardEl.dataset.instanceId;
+  clientState.selectedZone = cardEl.dataset.zone;
+  clientState.selectedKind = 'card';
+
+  renderEntireBoard();
+  openActionMenu(cardEl.dataset.instanceId, cardEl.dataset.zone);
+}
+
 function handleContextMenu(e) {
   e.preventDefault();
+
   const cardEl = e.target.closest('.card');
   const zoneEl = e.target.closest('.zone, .hand, .table-half');
 
@@ -143,16 +155,65 @@ function handleContextMenu(e) {
   }
 
   if (cardEl) {
-    clientState.selectedInstanceId = cardEl.dataset.instanceId;
-    clientState.selectedZone = cardEl.dataset.zone;
-    clientState.selectedKind = 'card';
-
-    renderEntireBoard();
-    openActionMenu(cardEl.dataset.instanceId, cardEl.dataset.zone);
+    openContextMenuForCard(cardEl);
   }
+}
+
+function cancelLongPress() {
+  if (longPressTimer !== null) {
+    clearTimeout(longPressTimer);
+    longPressTimer = null;
+  }
+}
+
+function handleTouchStart(e) {
+  if (e.touches.length !== 1) return;
+
+  const cardEl = e.target.closest('.card');
+  const zoneEl = e.target.closest('.zone, .hand, .table-half');
+
+  if (!cardEl && !zoneEl) return;
+
+  cancelLongPress();
+  longPressTriggered = false;
+
+  longPressTimer = setTimeout(() => {
+    longPressTimer = null;
+    longPressTriggered = true;
+
+    if (zoneEl) {
+      const zone = domIdToStateZone(zoneEl.id);
+
+      if (isPileZone(zone)) {
+        openPileBrowser(zone);
+        return;
+      }
+    }
+
+    if (cardEl) {
+      openContextMenuForCard(cardEl);
+    }
+  }, 500);
+}
+
+function handleTouchMove() {
+  cancelLongPress();
+}
+
+function handleTouchEnd() {
+  cancelLongPress();
 }
 
 export function initClick() {
   document.addEventListener('click', handleBoardClick);
   document.addEventListener('contextmenu', handleContextMenu);
+
+  document.addEventListener('touchstart', handleTouchStart, {
+    passive: true,
+  });
+  document.addEventListener('touchmove', handleTouchMove, {
+    passive: true,
+  });
+  document.addEventListener('touchend', handleTouchEnd);
+  document.addEventListener('touchcancel', handleTouchEnd);
 }
