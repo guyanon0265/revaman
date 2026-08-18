@@ -269,29 +269,33 @@ function _drawTopCard(fromZone, toZone) {
   });
 }
 
-function _setup() {
-  const deck = `${runtimeState.mySlot}-deck`;
-  const hand = `${runtimeState.mySlot}-hand`;
-  const prizes = `${runtimeState.mySlot}-prizes`;
-
+function _setup(deckZone, handZone, prizesZone) {
   return mutate({
-    validate: () => !!gameState.zones[deck]?.length,
+    validate: () => !!gameState.zones[deckZone]?.length,
     mutation: () => {
-      engine.shuffleZone(deck);
-      engine.moveCards(deck, hand, 7);
-      engine.moveCards(deck, prizes, 6);
+      engine.shuffleZone(deckZone);
+      engine.moveCards(deckZone, handZone, 7);
+      engine.moveCards(deckZone, prizesZone, 6);
     },
     log: () => logAction(`set up.`),
   });
 }
 
-function _discardHand() {
-  const hand = `${runtimeState.mySlot}-hand`;
-  const discard = `${runtimeState.mySlot}-discard`;
+function _mulligan(deckZone, handZone) {
   return mutate({
-    validate: () => !!gameState.zones[hand]?.length,
     mutation: () => {
-      engine.moveCards(hand, discard, hand.length);
+      engine.moveCards(handZone, deckZone, handZone.length);
+      engine.shuffleZone(deckZone);
+      engine.moveCards(deckZone, handZone, 7);
+    },
+  });
+}
+
+function _discardHand(handZone, discardZone) {
+  return mutate({
+    validate: () => !!gameState.zones[handZone]?.length,
+    mutation: () => {
+      engine.moveCards(handZone, discardZone, handZone.length);
     },
     log: () => logAction(`discarded their hand.`),
   });
@@ -505,6 +509,7 @@ export const moveToBottomOfDeck = guarded(_moveToBottomOfDeck);
 export const drawTopCard = guarded(_drawTopCard);
 export const moveCards = guarded(_moveCards);
 export const setup = guarded(_setup);
+export const mulligan = guarded(_mulligan);
 export const discardHand = guarded(_discardHand);
 
 export const shuffleZone = guarded(_shuffleZone);

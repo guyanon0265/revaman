@@ -151,6 +151,17 @@ export function openCardActions(instanceId, zone) {
 
 export function shuffleDeck() {
   lengine.shuffleZone(`${runtimeState.mySlot}-deck`);
+  renderEntireBoard();
+  refreshPileBrowser();
+}
+
+export function shuffleDiscardIntoDeck() {
+  lengine.shuffleDiscardIntoDeck(
+    `${runtimeState.mySlot}-discard`,
+    `${runtimeState.mySlot}-deck`
+  );
+  renderEntireBoard();
+  refreshPileBrowser();
 }
 
 export function moveSelectedCardToZone(zone) {
@@ -175,20 +186,35 @@ export function drawCardFromZone(zone) {
 }
 
 export function setupBoard() {
-  lengine.setup();
+  lengine.setup(
+    `${runtimeState.mySlot}-deck`,
+    `${runtimeState.mySlot}-hand`,
+    `${runtimeState.mySlot}-prizes`
+  );
+  clearSelection();
+  renderEntireBoard();
+  refreshPileBrowser();
+}
+
+export function mulligan() {
+  lengine.mulligan(
+    `${runtimeState.mySlot}-deck`,
+    `${runtimeState.mySlot}-hand`
+  );
   clearSelection();
   renderEntireBoard();
   refreshPileBrowser();
 }
 
 export function discardHand() {
-  lengine.discardHand();
+  lengine.discardHand(
+    `${runtimeState.mySlot}-hand`,
+    `${runtimeState.mySlot}-discard`
+  );
   clearSelection();
   renderEntireBoard();
   refreshPileBrowser();
 }
-
-export function mulligan() {}
 
 export function undoAction() {
   if (runtimeState.mode === 'multiplayer') {

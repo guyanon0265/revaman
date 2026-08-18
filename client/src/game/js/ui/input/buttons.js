@@ -10,16 +10,18 @@ import {
   flipCoin,
   setupBoard,
   discardHand,
+  mulligan,
+  shuffleDiscardIntoDeck,
 } from './actions.js';
 
 const buttons = {
   'btn-flip-coin': flipCoin,
   'btn-setup': setupBoard,
-  'btn-mulligan': null,
+  'btn-mulligan': mulligan,
   'btn-discard-hand': discardHand,
 
   'btn-shuffle-deck': shuffleDeck,
-  'btn-shuffle-discard': null,
+  'btn-shuffle-discard': shuffleDiscardIntoDeck,
   'btn-deck-move-mode': null,
 
   'btn-show-opp-hand': toggleOpponentHand,
