@@ -1,9 +1,9 @@
-import { undo, redo } from '../../../logic/loggingEngine.js';
-import { renderEntireBoard } from '../../../ui/render.js';
-import { shuffleZone } from '../../../logic/loggingEngine.js';
-import { clientState, runtimeState } from '../../../logic/state.js';
-import { requestRedo, requestUndo } from '../../../networkSync.js';
-import { closeAllOverlays } from '../../../ui/overlays/overlays.js';
+import { undo, redo } from '../../logic/loggingEngine.js';
+import { renderEntireBoard } from '../render.js';
+import { shuffleZone } from '../../logic/loggingEngine.js';
+import { clientState, runtimeState } from '../../logic/state.js';
+import { requestRedo, requestUndo } from '../../networkSync.js';
+import { closeAllOverlays } from '../overlays/overlays.js';
 
 export function initButtons() {
   const btnShuffleDeck = document.getElementById('btn-shuffle-deck');
