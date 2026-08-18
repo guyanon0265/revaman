@@ -8,6 +8,7 @@
 // differs.
 
 import { joinRoom, leaveRoom } from '../../networkSync.js';
+import { settings } from './settingsZone.js';
 
 export function initMultiplayerPanel() {
   const joinBtn = document.getElementById('mp-join-btn');
@@ -20,7 +21,7 @@ export function initMultiplayerPanel() {
       const room = roomInput?.value.trim();
       const username = usernameInput?.value.trim() || 'Player';
       if (!room) return; // nothing to join without a room id
-      joinRoom(room, username);
+      joinRoom(room, username, settings.allowSpectators);
     });
   }
 

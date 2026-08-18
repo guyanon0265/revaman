@@ -15,7 +15,8 @@ import { runtimeState } from '../../gameboard/logic/state.js';
 //   closed over — this function has no module-level state of its own.
 // usernameText: display text for the leading "[Name]:" / "Name:" tag, or
 //   null to omit it entirely (e.g. system messages with no per-player tag).
-// usernameClass: 'player' | 'opp' | 'system' — CSS modifier for the tag.
+// usernameClass: 'player' | 'opp' | 'system' | 'spectator' — CSS modifier
+//   for the tag.
 // messageText: the body of the entry.
 // typeClass: 'system' | 'action' | 'chat' — CSS modifier for the row.
 function appendLogEntry(
@@ -70,8 +71,19 @@ function sendPlayerMessage(chatInput) {
   // Block empty submissons
   if (messageText === '') return;
 
-  GameLogger.logChat(runtimeState.mySlot, messageText);
-  emitChatChanged(messageText); // new
+  // Spectators have no p1/p2 identity, so their own message can't go
+  // through the slot-based logChat/usernameForSlot/styleClassForSlot
+  // path below — logSpectatorChat displays a given name directly
+  // instead of resolving one.
+  if (runtimeState.isSpectator) {
+    GameLogger.logSpectatorChat(
+      runtimeState.myUsername || 'Spectator',
+      messageText
+    );
+  } else {
+    GameLogger.logChat(runtimeState.mySlot, messageText);
+  }
+  emitChatChanged(messageText);
 
   // Clear user input text box
   chatInput.value = '';
@@ -129,5 +141,19 @@ export const GameLogger = {
     const username = usernameForSlot(slot);
     const cls = styleClassForSlot(slot);
     appendLogEntry(this._element, `${username}:`, cls, text, 'chat');
+  },
+  // Chat message from a spectator (no p1/p2 identity to resolve through
+  // usernameForSlot/styleClassForSlot) — takes a display name directly.
+  // NOTE: '.username.spectator' has no styling rule yet as of this
+  // pass — will render with default/unstyled appearance until CSS for
+  // it is added.
+  logSpectatorChat: function (username, text) {
+    appendLogEntry(
+      this._element,
+      `${username} (Spectator):`,
+      'spectator',
+      text,
+      'chat'
+    );
   },
 };

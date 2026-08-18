@@ -73,6 +73,8 @@ export const runtimeState = {
   mySlot: 'p1',
   oppSlot: 'p2',
   socket: null,
+  isSpectator: false,
+  myUsername: null,
   usernames: { p1: 'Player 1', p2: 'Player 2' },
   cardbacks: { p1: DEFAULT_CARDBACK, p2: DEFAULT_CARDBACK },
 };

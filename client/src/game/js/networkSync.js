@@ -4,10 +4,26 @@
 // pushes, and turn incoming 'state' pushes into local gameState
 // updates, matching server.js's event protocol exactly (join / joined /
 // join-error / peer-joined / peer-left / state / undo / redo /
-// undo-error / redo-error / chat / log). It has zero game-rule
-// knowledge — engine.js/loggingEngine.js are the only things that ever
-// construct or interpret game state; this module just moves
+// undo-error / redo-error / spectator-error / chat / log). It has zero
+// game-rule knowledge — engine.js/loggingEngine.js are the only things
+// that ever construct or interpret game state; this module just moves
 // gameState.zones over the wire.
+//
+// SPECTATORS: joinRoom() now takes an allowSpectators flag (read from
+// the #spectators-switch checkbox by whoever calls this — see
+// initMultiplayer.js), sent only meaningfully by whoever creates a
+// room. On 'joined', a 'spectator' slot sets runtimeState.isSpectator
+// but ALSO gets a real mySlot/oppSlot pair (defaulting to p1's-eye-view)
+// — those two remain a pure rendering perspective, never a permission
+// check. isSpectator is the only thing anything should gate an action
+// on client-side; server.js enforces the same boundary authoritatively
+// regardless of what this client does, via 'spectator-error' below.
+//
+// PROTOCOL: chat/log/peer-left now arrive with sender identity STAMPED
+// BY THE SERVER (slot/username from socket.data), not sent by this
+// client at all except for the raw text. This replaced the old
+// "any incoming message is from runtimeState.oppSlot" assumption, which
+// only worked because exactly 2 participants were ever possible.
 //
 // UNDO/REDO ARE SERVER-AUTHORITATIVE while connected. requestUndo() /
 // requestRedo() just ask the server and wait for the resulting 'state'
@@ -47,7 +63,12 @@ function setStatus(text) {
 }
 
 function sendState() {
-  if (runtimeState.mode !== 'multiplayer' || !runtimeState.socket) return;
+  if (
+    runtimeState.mode !== 'multiplayer' ||
+    !runtimeState.socket ||
+    runtimeState.isSpectator // defensive — client-side interaction gating for spectators is separate/pending, this just makes sure a stray call here can never even try
+  )
+    return;
   runtimeState.socket.emit('state', {
     zones: gameState.zones,
     cardbacks: runtimeState.cardbacks,
@@ -66,16 +87,26 @@ function applyIncomingState({ seq, zones, cardbacks }) {
 }
 
 export function requestUndo() {
-  if (runtimeState.mode !== 'multiplayer' || !runtimeState.socket) return;
+  if (
+    runtimeState.mode !== 'multiplayer' ||
+    !runtimeState.socket ||
+    runtimeState.isSpectator
+  )
+    return;
   runtimeState.socket.emit('undo');
 }
 
 export function requestRedo() {
-  if (runtimeState.mode !== 'multiplayer' || !runtimeState.socket) return;
+  if (
+    runtimeState.mode !== 'multiplayer' ||
+    !runtimeState.socket ||
+    runtimeState.isSpectator
+  )
+    return;
   runtimeState.socket.emit('redo');
 }
 
-export function joinRoom(room, username) {
+export function joinRoom(room, username, allowSpectators = false) {
   if (runtimeState.socket) return; // already connected — one connection per session
 
   const socket = io();
@@ -83,31 +114,43 @@ export function joinRoom(room, username) {
   setStatus('Connecting…');
 
   socket.on('connect', () => {
-    socket.emit('join', { room, username });
+    socket.emit('join', { room, username, allowSpectators });
   });
 
   socket.on('joined', ({ slot, peers, seq, current }) => {
     runtimeState.mode = 'multiplayer';
-    runtimeState.mySlot = slot;
-    runtimeState.oppSlot = slot === 'p1' ? 'p2' : 'p1';
-    runtimeState.usernames[slot] = username;
+    runtimeState.isSpectator = slot === 'spectator';
+
+    // mySlot/oppSlot always resolve to a real 'p1'/'p2' pair, even for a
+    // spectator — these two fields are purely a RENDERING perspective
+    // (which board half is "bottom/mine" vs "top/opponent's"), never a
+    // permission. A spectator defaults to seeing exactly what P1 would.
+    runtimeState.mySlot = slot === 'p2' ? 'p2' : 'p1';
+    runtimeState.oppSlot = runtimeState.mySlot === 'p1' ? 'p2' : 'p1';
+
+    runtimeState.myUsername = username;
+    if (slot === 'p1' || slot === 'p2') {
+      runtimeState.usernames[slot] = username;
+    }
     if (peers && Array.isArray(peers)) {
       peers.forEach((p) => {
-        runtimeState.usernames[p.slot] = p.username;
+        if (p.slot === 'p1' || p.slot === 'p2') {
+          runtimeState.usernames[p.slot] = p.username;
+        }
+        // Spectator peers are deliberately not stored anywhere — chat
+        // carries a sender's username inline, so there's no lookup that
+        // would ever need it, and runtimeState.usernames only has room
+        // for two fixed keys (p1/p2) in the first place.
       });
     }
 
     // Initialize to the room's ACTUAL current seq, not 0 — the server's
-    // history didn't reset just because a new client joined. Using 0
-    // here would be harmless in practice (any subsequent push still has
-    // a higher seq), but seq is meant to reflect "how caught up am I,"
-    // and this is what actually keeps that true from the moment of join.
+    // history didn't reset just because a new client joined.
     lastAppliedSeq = seq;
 
     // Apply whatever the server says the room's current state already
-    // is. This is what replaced the old peer-joined -> sendState()
-    // catch-up handshake below — the server can just hand it over
-    // directly now that it holds currentState itself.
+    // is — this is what replaced the old peer-joined -> sendState()
+    // catch-up handshake.
     if (current) {
       gameState.zones = current.zones;
       if (current.cardbacks) runtimeState.cardbacks = current.cardbacks;
@@ -115,12 +158,17 @@ export function joinRoom(room, username) {
       renderEntireBoard();
     }
 
-    setStatus(
-      `Connected as ${slot === 'p1' ? 'Player 1' : 'Player 2'} in room "${room}".`
-    );
-    GameLogger.logSystem(
-      `You joined the room as ${slot === 'p1' ? 'Player 1' : 'Player 2'}.`
-    );
+    if (runtimeState.isSpectator) {
+      setStatus(`Spectating room "${room}".`);
+      GameLogger.logSystem('You are spectating this room.');
+    } else {
+      setStatus(
+        `Connected as ${slot === 'p1' ? 'Player 1' : 'Player 2'} in room "${room}".`
+      );
+      GameLogger.logSystem(
+        `You joined the room as ${slot === 'p1' ? 'Player 1' : 'Player 2'}.`
+      );
+    }
   });
 
   socket.on('join-error', ({ message }) => {
@@ -130,36 +178,56 @@ export function joinRoom(room, username) {
   });
 
   socket.on('peer-joined', ({ username: peerUsername, slot: peerSlot }) => {
-    runtimeState.usernames[peerSlot] = peerUsername;
-    // No sendState() catch-up call here anymore — the server now hands
-    // the newcomer state directly via 'joined' (see above), so this
-    // client doesn't need to notice they arrived and react to it.
-    setStatus('Opponent connected.');
-    GameLogger.logSystem(`${peerUsername} joined the room.`);
+    if (peerSlot === 'p1' || peerSlot === 'p2') {
+      runtimeState.usernames[peerSlot] = peerUsername;
+      setStatus('Opponent connected.');
+      GameLogger.logSystem(`${peerUsername} joined the room.`);
+    } else {
+      GameLogger.logSystem(`${peerUsername} started spectating.`);
+    }
+    // No sendState() catch-up call here anymore — the server hands the
+    // newcomer state directly via 'joined' (see above).
   });
 
-  socket.on('peer-left', () => {
-    setStatus('Opponent disconnected.');
-    GameLogger.logSystem(
-      `${runtimeState.usernames[runtimeState.oppSlot]} left the room.`
-    );
+  socket.on('peer-left', ({ slot, username }) => {
+    if (slot === 'p1' || slot === 'p2') {
+      setStatus(`${username} disconnected.`);
+      GameLogger.logSystem(`${username} left the room.`);
+    } else {
+      GameLogger.logSystem(`${username} stopped spectating.`);
+    }
   });
 
   socket.on('state', applyIncomingState);
 
   socket.on('undo-error', ({ message }) => GameLogger.logSystem(message));
   socket.on('redo-error', ({ message }) => GameLogger.logSystem(message));
+  socket.on('spectator-error', ({ message }) => GameLogger.logSystem(message));
 
-  socket.on('log', (text) => GameLogger.logAction(runtimeState.oppSlot, text));
-  socket.on('chat', (text) => GameLogger.logChat(runtimeState.oppSlot, text));
+  // Server now stamps the acting slot itself — this is the fix for the
+  // old "any incoming log must be from oppSlot" assumption, which broke
+  // the moment a spectator (with no single "opponent") could receive
+  // this event too.
+  socket.on('log', ({ slot, text }) => GameLogger.logAction(slot, text));
+
+  // Same fix, chat side — plus a spectator sender has no p1/p2 identity
+  // to resolve a username/style through, so it gets its own display
+  // path rather than being forced through the player-only one.
+  socket.on('chat', ({ slot, username, text }) => {
+    if (slot === 'p1' || slot === 'p2') {
+      GameLogger.logChat(slot, text);
+    } else {
+      GameLogger.logSpectatorChat(username, text);
+    }
+  });
 
   socket.on('disconnect', () => {
     runtimeState.socket = null;
     setStatus('Disconnected.');
-    // Deliberately NOT reverting runtimeState.mode/mySlot/oppSlot here —
-    // matches server.js's own no-persistence stance. Manual export/
-    // import is the accepted fallback for state loss, not automatic
-    // reconnect/resume.
+    // Deliberately NOT reverting runtimeState.mode/mySlot/oppSlot/
+    // isSpectator here — matches server.js's own no-persistence stance.
+    // Manual export/import is the accepted fallback for state loss, not
+    // automatic reconnect/resume.
   });
 }
 
@@ -172,6 +240,8 @@ export function leaveRoom() {
   runtimeState.mode = 'solo';
   runtimeState.mySlot = 'p1';
   runtimeState.oppSlot = 'p2';
+  runtimeState.isSpectator = false;
+  runtimeState.myUsername = null;
   setStatus('Not connected');
 }
 
@@ -183,11 +253,19 @@ export function leaveRoom() {
 onStateChanged(sendState);
 
 onLogChanged((text) => {
-  if (runtimeState.mode !== 'multiplayer' || !runtimeState.socket) return;
-  runtimeState.socket.emit('log', text);
+  if (
+    runtimeState.mode !== 'multiplayer' ||
+    !runtimeState.socket ||
+    runtimeState.isSpectator
+  )
+    return;
+  runtimeState.socket.emit('log', { text });
 });
 
 onChatChanged((text) => {
+  // No isSpectator guard here — spectators are explicitly allowed to
+  // chat. Sender identity is added by the SERVER from socket.data, not
+  // sent by this client at all.
   if (runtimeState.mode !== 'multiplayer' || !runtimeState.socket) return;
-  runtimeState.socket.emit('chat', text);
+  runtimeState.socket.emit('chat', { text });
 });
