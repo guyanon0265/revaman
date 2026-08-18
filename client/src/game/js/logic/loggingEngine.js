@@ -269,6 +269,22 @@ function _drawCards(fromZone, toZone, count) {
   });
 }
 
+function _setup() {
+  const deck = `${runtimeState.mySlot}-deck`;
+  const hand = `${runtimeState.mySlot}-hand`;
+  const prizes = `${runtimeState.mySlot}-prizes`;
+
+  return mutate({
+    validate: () => !!gameState.zones[deck]?.length,
+    mutation: () => {
+      engine.shuffleZone(deck);
+      engine.drawCards(deck, hand, 7);
+      engine.drawCards(deck, prizes, 6);
+    },
+    log: () => logAction(`set up.`),
+  });
+}
+
 function _shuffleZone(zoneId) {
   return mutate({
     mutation: () => engine.shuffleZone(zoneId),
@@ -437,6 +453,11 @@ function _toggleBreak(instanceId, zone) {
   });
 }
 
+function _flipCoin() {
+  const result = engine.flipCoin();
+  logAction(`flipped ${result}.`);
+}
+
 // ---------------------------------------------------------------------
 // Spectator guard
 //
@@ -460,6 +481,8 @@ function guarded(fn) {
 // Public API
 // ---------------------------------------------------------------------
 
+export const flipCoin = guarded(_flipCoin);
+
 export const applyDamageDelta = guarded(_applyDamageDelta);
 export const applyCounterDelta = guarded(_applyCounterDelta);
 
@@ -469,6 +492,7 @@ export const moveToBottomOfDeck = guarded(_moveToBottomOfDeck);
 
 export const drawTopCard = guarded(_drawTopCard);
 export const drawCards = guarded(_drawCards);
+export const setup = guarded(_setup);
 
 export const shuffleZone = guarded(_shuffleZone);
 export const shuffleDiscardIntoDeck = guarded(_shuffleDiscardIntoDeck);

@@ -7,11 +7,13 @@ import {
   loadPlayerDeck,
   loadOpponentDeck,
   switchSeatView,
+  flipCoin,
+  setupBoard,
 } from './actions.js';
 
 const buttons = {
-  'btn-flip-coin': null,
-  'btn-setup': null,
+  'btn-flip-coin': flipCoin,
+  'btn-setup': setupBoard,
   'btn-mulligan': null,
   'btn-discard-hand': null,
 

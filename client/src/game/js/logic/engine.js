@@ -66,6 +66,15 @@ export function drawTopCard(fromZone, toZone) {
   return card;
 }
 
+export function drawCards(fromZone, toZone, count) {
+  const from = gameState.zones[fromZone];
+  const to = gameState.zones[toZone];
+  if (!from || !to) return;
+  for (let i = 0; i < count && from.length > 0; i++) {
+    to.push(from.pop());
+  }
+}
+
 export function shuffleZone(zoneId) {
   const arr = gameState.zones[zoneId];
   if (!arr) return;
@@ -73,6 +82,16 @@ export function shuffleZone(zoneId) {
     const j = Math.floor(Math.random() * (i + 1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
+}
+
+export function shuffleDiscardIntoDeck(discardZone, deckZone) {
+  const discard = gameState.zones[discardZone];
+  const deck = gameState.zones[deckZone];
+  if (!discard || !deck) return;
+  while (discard.length > 0) {
+    deck.push(discard.pop());
+  }
+  shuffleZone(deckZone);
 }
 
 export function attachCardToTarget(selectedId, fromZone, targetId, targetZone) {
@@ -255,28 +274,13 @@ export function toggleBreak(instanceId, zone) {
   return card;
 }
 
-export function drawCards(fromZone, toZone, count) {
-  const from = gameState.zones[fromZone];
-  const to = gameState.zones[toZone];
-  if (!from || !to) return;
-  for (let i = 0; i < count && from.length > 0; i++) {
-    to.push(from.pop());
-  }
-}
-
-export function shuffleDiscardIntoDeck(discardZone, deckZone) {
-  const discard = gameState.zones[discardZone];
-  const deck = gameState.zones[deckZone];
-  if (!discard || !deck) return;
-  while (discard.length > 0) {
-    deck.push(discard.pop());
-  }
-  shuffleZone(deckZone);
-}
-
 export function loadDeckIntoZone(cards, zone) {
   const arr = gameState.zones[zone];
   if (!arr) return 0;
   cards.forEach((card) => arr.push(card));
   return cards.length;
+}
+
+export function flipCoin() {
+  return Math.random() < 0.5 ? 'heads' : 'tails';
 }

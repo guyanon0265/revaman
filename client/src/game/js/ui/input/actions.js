@@ -67,6 +67,10 @@ export function switchSeatView() {
   renderEntireBoard();
 }
 
+export function flipCoin() {
+  lengine.flipCoin();
+}
+
 function loadUserDeck(slot, mode) {
   if (mode === 'demo') {
     openDemoDecks(slot);
@@ -168,6 +172,11 @@ export function drawCardFromZone(zone) {
   clearSelection();
   renderEntireBoard();
   refreshPileBrowser();
+}
+
+export function setupBoard() {
+  lengine.setup();
+  renderEntireBoard();
 }
 
 export function undoAction() {
