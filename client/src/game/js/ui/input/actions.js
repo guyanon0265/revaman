@@ -37,6 +37,12 @@ export function toggleOpponentHand() {
   const btnShowOppHand = document.getElementById('btn-show-opp-hand');
   clientState.showOpponentHand = !clientState.showOpponentHand;
 
+  if (!runtimeState.isSpectator) {
+    lengine.logAction(
+      `${clientState.showOpponentHand ? 'is' : 'stopped'} viewing Opponent's Hand.`
+    );
+  }
+
   btnShowOppHand.textContent = clientState.showOpponentHand
     ? 'Hide Opponent Hand'
     : 'Show Opponent Hand';

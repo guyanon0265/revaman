@@ -37,7 +37,7 @@ import { parseDeckCSV } from './parser.js';
 // zone to flip-flop between Player/Opponent on successive moves of the
 // same card — this fixes that. Matches the client-authoritative model:
 // a client only ever logs its own actions.
-function logAction(actionText) {
+export function logAction(actionText) {
   GameLogger.logAction(runtimeState.mySlot, actionText);
   emitLogChanged(actionText);
 }
