@@ -71,21 +71,21 @@ console.log(`Waiting for port ${PORT}...`);
 await waitForPort(HOST, PORT);
 
 console.log(`Server is ready on port ${PORT}.`);
-console.log('Starting localtunnel...');
+console.log('Starting untun...');
 
 tunnel = spawn(node, [tunnelPath], {
   stdio: 'inherit',
 });
 
 tunnel.on('error', (err) => {
-  console.error('Failed to start localtunnel:', err);
+  console.error('Failed to start untun:', err);
   shutdown();
   process.exit(1);
 });
 
 tunnel.on('exit', (code, signal) => {
   if (code !== null && code !== 0) {
-    console.error(`Localtunnel exited with code ${code}.`);
+    console.error(`untun exited with code ${code}.`);
   }
 
   if (!signal) {

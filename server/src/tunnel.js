@@ -1,26 +1,19 @@
 import { spawn } from 'child_process';
-import { createRequire } from 'module';
 import { PORT } from './config.js';
 
-const require = createRequire(import.meta.url);
-const localtunnelBin = require.resolve('localtunnel/bin/lt.js');
-
-const tunnel = spawn(
-  process.execPath,
-  [localtunnelBin, '--port', String(PORT)],
-  {
-    stdio: 'inherit',
-  }
-);
+const tunnel = spawn('untun', ['--port', String(PORT)], {
+  stdio: 'inherit',
+  shell: true,
+});
 
 tunnel.on('error', (err) => {
-  console.error('Failed to start localtunnel:', err);
+  console.error('Failed to start untun:', err);
 });
 
 tunnel.on('exit', (code, signal) => {
   if (signal) {
-    console.log(`Localtunnel exited from signal ${signal}`);
+    console.log(`untun exited from signal ${signal}`);
   } else if (code !== 0) {
-    console.error(`Localtunnel exited with code ${code}`);
+    console.error(`untun exited with code ${code}`);
   }
 });
