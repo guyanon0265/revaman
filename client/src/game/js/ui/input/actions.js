@@ -67,6 +67,16 @@ export function switchSeatView() {
   renderEntireBoard();
 }
 
+export function hideLostZone() {
+  const lostZone = document.getElementById('lost-zone');
+  const btnHideLostZone = document.getElementById('btn-hide-lost-zone');
+
+  const isHidden = lostZone.style.display === 'none';
+
+  lostZone.style.display = isHidden ? 'flex' : 'none';
+  btnHideLostZone.textContent = isHidden ? 'Hide Lost Zone' : 'Show Lost Zone';
+}
+
 export function flipCoin() {
   lengine.flipCoin();
 }

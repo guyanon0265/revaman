@@ -12,6 +12,7 @@ import {
   discardHand,
   mulligan,
   shuffleDiscardIntoDeck,
+  hideLostZone,
 } from './actions.js';
 
 const buttons = {
@@ -26,7 +27,7 @@ const buttons = {
 
   'btn-show-opp-hand': toggleOpponentHand,
   'btn-switch-seat': switchSeatView,
-  'btn-hide-lost-zone': null,
+  'btn-hide-lost-zone': hideLostZone,
 
   'gx-btn': null,
   'vstar-btn': null,
