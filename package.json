@@ -6,7 +6,8 @@
   "scripts": {
     "start": "pnpm --filter server start",
     "share": "pnpm --filter server share",
-    "format": "pnpm prettier --write ."
+    "format": "pnpm prettier --write .",
+    "lint": "pnpm eslint ."
   },
   "keywords": [],
   "author": "",
