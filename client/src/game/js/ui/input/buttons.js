@@ -6,6 +6,7 @@ import {
   openDeckBuilder,
   loadPlayerDeck,
   loadOpponentDeck,
+  switchSeatView,
 } from './actions.js';
 
 const buttons = {
@@ -19,7 +20,7 @@ const buttons = {
   'btn-deck-move-mode': null,
 
   'btn-show-opp-hand': toggleOpponentHand,
-  'btn-switch-seat': null,
+  'btn-switch-seat': switchSeatView,
   'btn-hide-lost-zone': null,
 
   'gx-btn': null,

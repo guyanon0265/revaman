@@ -10,8 +10,8 @@ import { closeAllOverlays } from '../overlays/overlays.js';
 import { refreshPileBrowser } from '../overlays/pileBrowser.js';
 import { renderEntireBoard } from '../render.js';
 
-const mySlot = runtimeState.mySlot;
-const oppSlot = runtimeState.oppSlot;
+let mySlot = runtimeState.mySlot;
+let oppSlot = runtimeState.oppSlot;
 
 function promptForCSV(slot) {
   const input = document.createElement('input');
@@ -43,6 +43,17 @@ export function toggleOpponentHand() {
   btnShowOppHand.textContent = clientState.showOpponentHand
     ? 'Hide Opponent Hand'
     : 'Show Opponent Hand';
+
+  renderEntireBoard();
+}
+
+export function switchSeatView() {
+  if (runtimeState.mode !== 'solo' && !runtimeState.isSpectator) return;
+
+  const oldMySlot = mySlot;
+
+  mySlot = oppSlot;
+  oppSlot = oldMySlot;
 
   renderEntireBoard();
 }
