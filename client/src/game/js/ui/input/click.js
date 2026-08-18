@@ -12,6 +12,7 @@ import {
 } from '../overlays/pileBrowser.js';
 import { openActionMenu, notifyCardReplaced } from '../overlays/actionMenu.js';
 import { refreshViewAttached } from '../overlays/viewAttached.js';
+import { drawCardFromZone } from './actions.js';
 
 let longPressTimer = null;
 let longPressTriggered = false;
@@ -36,13 +37,7 @@ function handleBoardClick(e) {
       !clientState.selectedInstanceId &&
       (targetZone.endsWith('-deck') || targetZone.endsWith('-prizes'))
     ) {
-      const ownerSlot = targetZone.split('-')[0];
-
-      drawCards(targetZone, `${ownerSlot}-hand`, 1);
-
-      clearSelection();
-      renderEntireBoard();
-      refreshPileBrowser();
+      drawCardFromZone(targetZone);
       return;
     }
   }

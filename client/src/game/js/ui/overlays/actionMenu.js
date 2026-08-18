@@ -23,7 +23,7 @@
 // Both funnel through the same sync logic.
 
 import { gameState, clientState } from '../../logic/state.js';
-import * as engine from '../../logic/loggingEngine.js';
+import * as lengine from '../../logic/loggingEngine.js';
 import { renderEntireBoard } from '../render.js';
 import { openCardView, closeCardView } from './cardView.js';
 import {
@@ -222,37 +222,37 @@ function handleMenuClick(e) {
   // ------------------------------------------------------------------------
 
   if (target.id === 'btn-dmg-up') {
-    engine.applyDamageDelta(rootId, rootZone, 10);
+    lengine.applyDamageDelta(rootId, rootZone, 10);
     refreshControls();
     renderEntireBoard();
     return;
   }
   if (target.id === 'btn-dmg-down') {
-    engine.applyDamageDelta(rootId, rootZone, -10);
+    lengine.applyDamageDelta(rootId, rootZone, -10);
     refreshControls();
     renderEntireBoard();
     return;
   }
   if (target.id === 'btn-counter-up') {
-    engine.applyCounterDelta(rootId, rootZone, 1);
+    lengine.applyCounterDelta(rootId, rootZone, 1);
     refreshControls();
     renderEntireBoard();
     return;
   }
   if (target.id === 'btn-counter-down') {
-    engine.applyCounterDelta(rootId, rootZone, -1);
+    lengine.applyCounterDelta(rootId, rootZone, -1);
     refreshControls();
     renderEntireBoard();
     return;
   }
   if (target.classList.contains('status-chip')) {
-    engine.toggleStatus(rootId, rootZone, target.dataset.status);
+    lengine.toggleStatus(rootId, rootZone, target.dataset.status);
     refreshControls();
     renderEntireBoard();
     return;
   }
   if (target.id === 'btn-ability') {
-    engine.toggleAbility(rootId, rootZone);
+    lengine.toggleAbility(rootId, rootZone);
     refreshControls();
     renderEntireBoard();
     return;
@@ -267,32 +267,32 @@ function handleMenuClick(e) {
   // ------------------------------------------------------------------------
 
   if (target.id === 'btn-rotate-left') {
-    engine.setRotation(rootId, rootZone, -90);
+    lengine.setRotation(rootId, rootZone, -90);
     renderEntireBoard();
     return;
   }
   if (target.id === 'btn-rotate-right') {
-    engine.setRotation(rootId, rootZone, 90);
+    lengine.setRotation(rootId, rootZone, 90);
     renderEntireBoard();
     return;
   }
   if (target.id === 'btn-rotate-invert') {
-    engine.setRotation(rootId, rootZone, 180);
+    lengine.setRotation(rootId, rootZone, 180);
     renderEntireBoard();
     return;
   }
   if (target.id === 'btn-rotate-upright') {
-    engine.setRotation(rootId, rootZone, 0);
+    lengine.setRotation(rootId, rootZone, 0);
     renderEntireBoard();
     return;
   }
   if (target.id === 'btn-flip') {
-    engine.toggleFlip(rootId, rootZone);
+    lengine.toggleFlip(rootId, rootZone);
     renderEntireBoard();
     return;
   }
   if (target.id === 'btn-rotate-break') {
-    engine.toggleBreak(rootId, rootZone);
+    lengine.toggleBreak(rootId, rootZone);
     renderEntireBoard();
     openCardView(getRootCard()); // image/orientation changed — refresh the stale snapshot
     return;
