@@ -1,26 +1,11 @@
 // loggingEngine.js — thin wrapper around engine.js that adds GameLogger
 // calls, undo/redo snapshotting, and multiplayer broadcast, without
-// touching engine.js itself (engine.js's own header says "pure,
-// DOM-free ... no document/window access, ever" — none of those three
-// belong there).
+// touching engine.js itself.
 //
-// Every exported function here has the exact same name and signature
-// as its engine.js counterpart. Callers only need to change their
-// import path from './engine.js' (or '../gameboard/engine.js') to
-// this file — no call-site logic changes required.
-//
-// Three DIFFERENT granularities live in this file, and they're not the
-// same thing even though they look related:
-//   - pushSnapshot() fires once per logical action (a whole run of
-//     batched delta clicks = one snapshot), so undo matches log-line
-//     granularity.
-//   - logAction() also fires once per logical action, debounce-flushed
-//     for deltas.
-//   - emitStateChanged() (multiplayer broadcast) fires on EVERY
-//     successful mutation, including every individual delta click —
-//     broadcasting only once a batch finishes would mean the opponent
-//     watches damage numbers jump in a delayed lump instead of ticking
-//     up live as you click.
+// Every exported function here has the exact same name and signature as
+// its engine.js counterpart. Callers only need to change their import path
+// from './engine.js' (or '../gameboard/engine.js') to this file — no
+// call-site logic changes required.
 
 import * as engine from './engine.js';
 import { gameState, runtimeState, DEFAULT_CARDBACK } from './state.js';
@@ -36,6 +21,10 @@ import { emitLogChanged } from './network/logChangeBus.js';
 import { parseDeckCSV } from './parser.js';
 
 export { undo, redo, canUndo, canRedo } from './undoManager.js';
+
+// ---------------------------------------------------------------------
+// Logging helpers
+// ---------------------------------------------------------------------
 
 // Logs an action, always attributed to the local acting viewer
 // (runtimeState.mySlot) — NOT derived from the zone a card happens to be
@@ -67,21 +56,48 @@ function findCard(zoneId, instanceId) {
 }
 
 // ---------------------------------------------------------------------
-// Damage / overheal / counter deltas — batched. Consecutive clicks on
-// the SAME stat of the SAME card accumulate into one pending entry,
-// which is also one undo step: pushSnapshot() fires once, when the
-// batch STARTS (before that first mutation), not on every click that
-// extends it.
+// Common mutation lifecycle
+//
+// Normal mutations all follow the same sequence:
+//
+//   1. Validate that the mutation is applicable.
+//   2. Flush any pending delta batch.
+//   3. Snapshot the pre-mutation state.
+//   4. Execute the engine mutation.
+//   5. Log the successful mutation.
+//   6. Broadcast the resulting state.
+//
+// The individual wrappers only need to provide the operation-specific
+// validation, engine call, and log message.
+// ---------------------------------------------------------------------
+
+function mutate({ validate = () => true, mutation, log }) {
+  if (!validate()) return null;
+
+  flushPendingBatch();
+  pushSnapshot();
+
+  const result = mutation();
+
+  if (result) {
+    log?.(result);
+    emitStateChanged();
+  }
+
+  return result;
+}
+
+// ---------------------------------------------------------------------
+// Damage / overheal / counter deltas — batched.
+//
+// Consecutive clicks on the SAME stat of the SAME card accumulate into
+// one pending entry, which is also one undo step: pushSnapshot() fires
+// once, when the batch STARTS (before that first mutation), not on every
+// click that extends it.
 //
 // The batch flushes (logs + clears) via a short timer after the last
-// click, rather than waiting for some other action to trigger it. That
-// used to be lazy-flush-on-next-action, which meant a damage log line
-// could sit invisible for an arbitrarily long time and then appear
-// bundled together with an unrelated later action's log line the
-// moment ANYTHING else happened — or, if nothing else ever happened in
-// the session, never appear at all. The timer fixes both: the log
-// appears promptly on its own once clicking stops, independent of
-// whatever else does or doesn't happen afterward.
+// click. Broadcasting remains unbatched so the opponent sees every
+// individual delta live.
 // ---------------------------------------------------------------------
 
 const BATCH_FLUSH_DELAY_MS = 600;
@@ -154,7 +170,10 @@ function applyDelta(statLabel, engineFn, instanceId, zone, delta) {
   }
 
   scheduleBatchFlush();
-  emitStateChanged(); // every click, not batched — see file header
+
+  // Every individual delta is broadcast immediately.
+  emitStateChanged();
+
   return card;
 }
 
@@ -173,142 +192,134 @@ export function applyCounterDelta(instanceId, zone, delta) {
 }
 
 // ---------------------------------------------------------------------
-// Everything else — logs immediately, one line per call, and each is
-// its own undo step: pushSnapshot() fires before the mutation, right
-// after flushing whatever delta batch was pending (a non-delta action
-// always ends a batch — it can't be folded into one).
+// Normal mutations
 // ---------------------------------------------------------------------
 
 export function moveCardToZone(instanceId, fromZone, toZone, position = 'top') {
-  if (!findCard(fromZone, instanceId)) return null; // nothing to move — don't waste an undo step
-  flushPendingBatch();
-  pushSnapshot();
-  const card = engine.moveCardToZone(instanceId, fromZone, toZone, position);
-  if (card) {
-    logAction(
-      `moved ${card.name} from ${zoneLabel(fromZone)} to ${zoneLabel(toZone)}.`
-    );
-    emitStateChanged();
-  }
-  return card;
+  return mutate({
+    validate: () => findCard(fromZone, instanceId),
+    mutation: () =>
+      engine.moveCardToZone(instanceId, fromZone, toZone, position),
+    log: (card) =>
+      logAction(
+        `moved ${card.name} from ${zoneLabel(fromZone)} to ${zoneLabel(toZone)}.`
+      ),
+  });
 }
 
 export function moveToTopOfDeck(instanceId, fromZone, toZone) {
-  if (!findCard(fromZone, instanceId)) return null;
-  flushPendingBatch();
-  pushSnapshot();
-  const card = engine.moveToTopOfDeck(instanceId, fromZone, toZone);
-  if (card) {
-    logAction(
-      `put ${card.name} on top of the ${zoneLabel(toZone)} (from ${zoneLabel(fromZone)}).`
-    );
-    emitStateChanged();
-  }
-  return card;
+  return mutate({
+    validate: () => findCard(fromZone, instanceId),
+    mutation: () => engine.moveToTopOfDeck(instanceId, fromZone, toZone),
+    log: (card) =>
+      logAction(
+        `put ${card.name} on top of the ${zoneLabel(toZone)} (from ${zoneLabel(fromZone)}).`
+      ),
+  });
 }
 
 export function moveToBottomOfDeck(instanceId, fromZone, toZone) {
-  if (!findCard(fromZone, instanceId)) return null;
-  flushPendingBatch();
-  pushSnapshot();
-  const card = engine.moveToBottomOfDeck(instanceId, fromZone, toZone);
-  if (card) {
-    logAction(
-      `put ${card.name} on the bottom of the ${zoneLabel(toZone)} (from ${zoneLabel(fromZone)}).`
-    );
-    emitStateChanged();
-  }
-  return card;
+  return mutate({
+    validate: () => findCard(fromZone, instanceId),
+    mutation: () => engine.moveToBottomOfDeck(instanceId, fromZone, toZone),
+    log: (card) =>
+      logAction(
+        `put ${card.name} on the bottom of the ${zoneLabel(toZone)} (from ${zoneLabel(fromZone)}).`
+      ),
+  });
 }
 
 export function drawTopCard(fromZone, toZone) {
-  if (!gameState.zones[fromZone]?.length) return null; // deck empty — nothing to draw
-  flushPendingBatch();
-  pushSnapshot();
-  const card = engine.drawTopCard(fromZone, toZone);
-  if (card) {
-    logAction(`drew ${card.name}.`);
-    emitStateChanged();
-  }
-  return card;
+  return mutate({
+    validate: () => !!gameState.zones[fromZone]?.length,
+    mutation: () => engine.drawTopCard(fromZone, toZone),
+    log: (card) => logAction(`drew ${card.name}.`),
+  });
 }
 
 export function drawCards(fromZone, toZone, count) {
-  if (!gameState.zones[fromZone]?.length) return; // deck empty — nothing to draw
-  flushPendingBatch();
-  pushSnapshot();
   const before = gameState.zones[toZone]?.length ?? 0;
-  engine.drawCards(fromZone, toZone, count);
-  const actualDrawn = (gameState.zones[toZone]?.length ?? 0) - before;
-  if (actualDrawn > 0) {
-    logAction(
-      `drew ${actualDrawn} card${actualDrawn === 1 ? '' : 's'} into ${zoneLabel(toZone)}.`
-    );
-    emitStateChanged();
-  }
+
+  return mutate({
+    validate: () => !!gameState.zones[fromZone]?.length,
+    mutation: () => {
+      engine.drawCards(fromZone, toZone, count);
+
+      const actualDrawn = (gameState.zones[toZone]?.length ?? 0) - before;
+
+      return actualDrawn;
+    },
+    log: (actualDrawn) => {
+      if (actualDrawn <= 0) return;
+
+      logAction(
+        `drew ${actualDrawn} card${actualDrawn === 1 ? '' : 's'} into ${zoneLabel(toZone)}.`
+      );
+    },
+  });
 }
 
 export function shuffleZone(zoneId) {
-  flushPendingBatch();
-  pushSnapshot();
-  engine.shuffleZone(zoneId);
-  logAction(`shuffled ${zoneLabel(zoneId)}.`);
-  emitStateChanged();
+  return mutate({
+    mutation: () => engine.shuffleZone(zoneId),
+    log: () => logAction(`shuffled ${zoneLabel(zoneId)}.`),
+  });
 }
 
 export function shuffleDiscardIntoDeck(discardZone, deckZone) {
-  flushPendingBatch();
-  pushSnapshot();
   const count = gameState.zones[discardZone]?.length ?? 0;
-  engine.shuffleDiscardIntoDeck(discardZone, deckZone);
-  if (count > 0) {
-    logAction(
-      `shuffled ${count} card${count === 1 ? '' : 's'} from ${zoneLabel(discardZone)} into ${zoneLabel(deckZone)}.`
-    );
-    emitStateChanged();
-  }
+
+  return mutate({
+    mutation: () => engine.shuffleDiscardIntoDeck(discardZone, deckZone),
+    log: () => {
+      if (count <= 0) return;
+
+      logAction(
+        `shuffled ${count} card${count === 1 ? '' : 's'} from ${zoneLabel(discardZone)} into ${zoneLabel(deckZone)}.`
+      );
+    },
+  });
 }
 
 export function loadDeck(csvText, slot) {
   const { cards, cardback } = parseDeckCSV(csvText, slot);
-  if (!cards.length && !cardback) return; // nothing parsed — don't waste an undo step or a broadcast
 
-  flushPendingBatch();
-  pushSnapshot();
+  if (!cards.length && !cardback) return;
 
-  runtimeState.cardbacks[slot] = cardback || DEFAULT_CARDBACK; // reset-to-default-if-absent, matching the old scan-before-reset behavior
-  const count = engine.loadDeckIntoZone(cards, `${slot}-deck`);
+  return mutate({
+    mutation: () => {
+      runtimeState.cardbacks[slot] = cardback || DEFAULT_CARDBACK;
 
-  logAction(`loaded a ${count}-card deck into ${zoneLabel(`${slot}-deck`)}.`);
-  emitStateChanged();
+      return engine.loadDeckIntoZone(cards, `${slot}-deck`);
+    },
+    log: (count) =>
+      logAction(
+        `loaded a ${count}-card deck into ${zoneLabel(`${slot}-deck`)}.`
+      ),
+  });
 }
 
 export function attachCardToTarget(selectedId, fromZone, targetId, targetZone) {
   const selectedBefore = findCard(fromZone, selectedId);
   const targetBefore = findCard(targetZone, targetId);
-  if (!selectedBefore || !targetBefore) return null; // one side missing — nothing to attach
 
-  flushPendingBatch();
-  pushSnapshot();
+  if (!selectedBefore || !targetBefore) return null;
 
   const kind = classifyType(selectedBefore.type);
-  const result = engine.attachCardToTarget(
-    selectedId,
-    fromZone,
-    targetId,
-    targetZone
-  );
-  if (!result) return result;
 
-  if (kind === 'energy') {
-    logAction(`attached ${result.name} to ${targetBefore.name} as energy.`);
-  } else if (kind === 'trainer') {
-    logAction(`attached ${result.name} to ${targetBefore.name}.`);
-  } else {
-    logAction(`evolved ${targetBefore.name} into ${result.name}.`);
-  }
-  emitStateChanged();
-  return result;
+  return mutate({
+    mutation: () =>
+      engine.attachCardToTarget(selectedId, fromZone, targetId, targetZone),
+    log: (result) => {
+      if (kind === 'energy') {
+        logAction(`attached ${result.name} to ${targetBefore.name} as energy.`);
+      } else if (kind === 'trainer') {
+        logAction(`attached ${result.name} to ${targetBefore.name}.`);
+      } else {
+        logAction(`evolved ${targetBefore.name} into ${result.name}.`);
+      }
+    },
+  });
 }
 
 export function detachCard(
@@ -319,135 +330,99 @@ export function detachCard(
   toHandZone
 ) {
   const parent = findCard(parentZone, parentId);
-  if (!parent) return null; // parent gone — nothing to detach from
+  if (!parent) return null;
 
-  flushPendingBatch();
-  pushSnapshot();
-
-  const card = engine.detachCard(
-    parentId,
-    parentZone,
-    attachmentId,
-    attachmentKind,
-    toHandZone
-  );
-  if (card) {
-    logAction(
-      `detached ${card.name} from ${parent.name}, returning it to hand.`
-    );
-    emitStateChanged();
-  }
-  return card;
+  return mutate({
+    mutation: () =>
+      engine.detachCard(
+        parentId,
+        parentZone,
+        attachmentId,
+        attachmentKind,
+        toHandZone
+      ),
+    log: (card) =>
+      logAction(
+        `detached ${card.name} from ${parent.name}, returning it to hand.`
+      ),
+  });
 }
 
 export function devolveCard(cardId, zone, targetInstanceId) {
   const current = findCard(zone, cardId);
-  if (!current) return null; // card gone — nothing to devolve
+  if (!current) return null;
 
-  flushPendingBatch();
-  pushSnapshot();
-
-  const previous = engine.devolveCard(cardId, zone, targetInstanceId);
-  if (previous) {
-    logAction(
-      `devolved ${current.name} back into ${previous.name}, returning it to hand.`
-    );
-    emitStateChanged();
-  }
-  return previous;
+  return mutate({
+    mutation: () => engine.devolveCard(cardId, zone, targetInstanceId),
+    log: (previous) =>
+      logAction(
+        `devolved ${current.name} back into ${previous.name}, returning it to hand.`
+      ),
+  });
 }
 
 export function toggleStatus(instanceId, zone, status) {
   const before = findCard(zone, instanceId);
   if (!before) return null;
 
-  flushPendingBatch();
-  pushSnapshot();
-
   const wasActive = before.statuses.includes(status);
-  const card = engine.toggleStatus(instanceId, zone, status);
-  if (card) {
-    logAction(`${wasActive ? 'removed' : 'added'} ${status} on ${card.name}.`);
-    emitStateChanged();
-  }
-  return card;
+
+  return mutate({
+    mutation: () => engine.toggleStatus(instanceId, zone, status),
+    log: (card) =>
+      logAction(
+        `${wasActive ? 'removed' : 'added'} ${status} on ${card.name}.`
+      ),
+  });
 }
 
 export function toggleAbility(instanceId, zone) {
-  if (!findCard(zone, instanceId)) return null;
-
-  flushPendingBatch();
-  pushSnapshot();
-
-  const card = engine.toggleAbility(instanceId, zone);
-  if (card) {
-    logAction(
-      `marked ${card.name}'s ability as ${card.abilityUsed ? 'used' : 'ready'}.`
-    );
-    emitStateChanged();
-  }
-  return card;
+  return mutate({
+    validate: () => findCard(zone, instanceId),
+    mutation: () => engine.toggleAbility(instanceId, zone),
+    log: (card) =>
+      logAction(
+        `marked ${card.name}'s ability as ${card.abilityUsed ? 'used' : 'ready'}.`
+      ),
+  });
 }
 
 export function toggleFlip(instanceId, zone) {
-  if (!findCard(zone, instanceId)) return null;
-
-  flushPendingBatch();
-  pushSnapshot();
-
-  const card = engine.toggleFlip(instanceId, zone);
-  if (card) {
-    logAction(`turned ${card.name} face ${card.isFaceDown ? 'down' : 'up'}.`);
-    emitStateChanged();
-  }
-  return card;
+  return mutate({
+    validate: () => findCard(zone, instanceId),
+    mutation: () => engine.toggleFlip(instanceId, zone),
+    log: (card) =>
+      logAction(`turned ${card.name} face ${card.isFaceDown ? 'down' : 'up'}.`),
+  });
 }
 
 export function setRotation(instanceId, zone, degrees) {
-  if (!findCard(zone, instanceId)) return null;
-
-  flushPendingBatch();
-  pushSnapshot();
-
-  const card = engine.setRotation(instanceId, zone, degrees);
-  if (card) {
-    logAction(`rotated ${card.name} to ${degrees}°.`);
-    emitStateChanged();
-  }
-  return card;
+  return mutate({
+    validate: () => findCard(zone, instanceId),
+    mutation: () => engine.setRotation(instanceId, zone, degrees),
+    log: (card) => logAction(`rotated ${card.name} to ${degrees}°.`),
+  });
 }
 
 export function setUpright(instanceId, zone) {
-  if (!findCard(zone, instanceId)) return null;
-
-  flushPendingBatch();
-  pushSnapshot();
-
-  const card = engine.setUpright(instanceId, zone);
-  if (card) {
-    logAction(`reset ${card.name} to upright.`);
-    emitStateChanged();
-  }
-  return card;
+  return mutate({
+    validate: () => findCard(zone, instanceId),
+    mutation: () => engine.setUpright(instanceId, zone),
+    log: (card) => logAction(`reset ${card.name} to upright.`),
+  });
 }
 
 export function toggleBreak(instanceId, zone) {
-  // Mirrors engine.js's own guard (card must exist AND have evolution
-  // history) so a click on a non-BREAK-eligible card doesn't waste an
-  // undo step either. This one's simple enough to safely mirror; keep
-  // it in sync if engine.js's own toggleBreak guard ever changes.
   const before = findCard(zone, instanceId);
+
+  // Mirrors engine.js's guard: BREAK requires evolution history.
   if (!before || !before.evolutionStack.length) return null;
 
-  flushPendingBatch();
-  pushSnapshot();
-
-  const card = engine.toggleBreak(instanceId, zone);
-  if (card) {
-    logAction(
-      `${card.isBreakActive ? 'activated' : 'deactivated'} BREAK on ${card.name}.`
-    );
-    emitStateChanged();
-  }
-  return card;
+  return mutate({
+    mutation: () => engine.toggleBreak(instanceId, zone),
+    log: (card) =>
+      logAction(
+        `${card.isBreakActive ? 'activated' : 'deactivated'} BREAK on ${card.name}.`
+      ),
+  });
 }
