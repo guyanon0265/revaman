@@ -2,10 +2,7 @@ import { clientState, clearSelection } from '../../logic/state.js';
 import { attachCardToTarget } from '../../logic/loggingEngine.js';
 import { isPileZone } from '../../utils.js';
 import { domIdToStateZone, renderEntireBoard } from '../render.js';
-import {
-  openPileBrowser,
-  refreshPileBrowser,
-} from '../overlays/pileBrowser.js';
+import { openPileBrowser } from '../overlays/pileBrowser.js';
 import { openActionMenu, notifyCardReplaced } from '../overlays/actionMenu.js';
 import { refreshViewAttached } from '../overlays/viewAttached.js';
 import { drawCardFromZone, moveSelectedCardToZone } from './actions.js';
@@ -51,9 +48,6 @@ function handleBoardClick(e) {
       isPileZone(targetZone)
     ) {
       moveSelectedCardToZone(targetZone);
-      clearSelection();
-      renderEntireBoard();
-      refreshPileBrowser();
       return;
     }
 
@@ -85,9 +79,6 @@ function handleBoardClick(e) {
 
     if (targetZone !== clientState.selectedZone) {
       moveSelectedCardToZone(targetZone);
-      clearSelection();
-      renderEntireBoard();
-      refreshPileBrowser();
       return;
     }
   }
