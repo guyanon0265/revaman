@@ -243,21 +243,13 @@ function _moveToBottomOfDeck(instanceId, fromZone, toZone) {
   });
 }
 
-function _drawTopCard(fromZone, toZone) {
-  return mutate({
-    validate: () => !!gameState.zones[fromZone]?.length,
-    mutation: () => engine.drawTopCard(fromZone, toZone),
-    log: (card) => logAction(`drew ${card.name}.`),
-  });
-}
-
-function _drawCards(fromZone, toZone, count) {
+function _moveCards(fromZone, toZone, count) {
   return mutate({
     validate: () => !!gameState.zones[fromZone]?.length,
     mutation: () => {
       const before = gameState.zones[toZone]?.length ?? 0;
 
-      engine.drawCards(fromZone, toZone, count);
+      engine.moveCards(fromZone, toZone, count);
 
       return (gameState.zones[toZone]?.length ?? 0) - before;
     },
@@ -266,6 +258,14 @@ function _drawCards(fromZone, toZone, count) {
       logAction(
         `drew ${actualDrawn} card${actualDrawn === 1 ? '' : 's'} into ${zoneLabel(toZone)}.`
       ),
+  });
+}
+
+function _drawTopCard(fromZone, toZone) {
+  return mutate({
+    validate: () => !!gameState.zones[fromZone]?.length,
+    mutation: () => engine.drawTopCard(fromZone, toZone),
+    log: (card) => logAction(`drew ${card.name}.`),
   });
 }
 
@@ -278,10 +278,22 @@ function _setup() {
     validate: () => !!gameState.zones[deck]?.length,
     mutation: () => {
       engine.shuffleZone(deck);
-      engine.drawCards(deck, hand, 7);
-      engine.drawCards(deck, prizes, 6);
+      engine.moveCards(deck, hand, 7);
+      engine.moveCards(deck, prizes, 6);
     },
     log: () => logAction(`set up.`),
+  });
+}
+
+function _discardHand() {
+  const hand = `${runtimeState.mySlot}-hand`;
+  const discard = `${runtimeState.mySlot}-discard`;
+  return mutate({
+    validate: () => !!gameState.zones[hand]?.length,
+    mutation: () => {
+      engine.moveCards(hand, discard, hand.length);
+    },
+    log: () => logAction(`discarded their hand.`),
   });
 }
 
@@ -491,8 +503,9 @@ export const moveToTopOfDeck = guarded(_moveToTopOfDeck);
 export const moveToBottomOfDeck = guarded(_moveToBottomOfDeck);
 
 export const drawTopCard = guarded(_drawTopCard);
-export const drawCards = guarded(_drawCards);
+export const moveCards = guarded(_moveCards);
 export const setup = guarded(_setup);
+export const discardHand = guarded(_discardHand);
 
 export const shuffleZone = guarded(_shuffleZone);
 export const shuffleDiscardIntoDeck = guarded(_shuffleDiscardIntoDeck);

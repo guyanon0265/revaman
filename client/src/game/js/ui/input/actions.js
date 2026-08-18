@@ -167,7 +167,7 @@ export function moveSelectedCardToZone(zone) {
 export function drawCardFromZone(zone) {
   const ownerSlot = zone.split('-')[0];
 
-  lengine.drawCards(zone, `${ownerSlot}-hand`, 1);
+  lengine.moveCards(zone, `${ownerSlot}-hand`, 1);
 
   clearSelection();
   renderEntireBoard();
@@ -176,8 +176,19 @@ export function drawCardFromZone(zone) {
 
 export function setupBoard() {
   lengine.setup();
+  clearSelection();
   renderEntireBoard();
+  refreshPileBrowser();
 }
+
+export function discardHand() {
+  lengine.discardHand();
+  clearSelection();
+  renderEntireBoard();
+  refreshPileBrowser();
+}
+
+export function mulligan() {}
 
 export function undoAction() {
   if (runtimeState.mode === 'multiplayer') {

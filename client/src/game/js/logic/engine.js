@@ -58,21 +58,21 @@ export function moveToBottomOfDeck(instanceId, fromZone, toZone) {
   return moveCardToZone(instanceId, fromZone, toZone, 'bottom');
 }
 
-export function drawTopCard(fromZone, toZone) {
-  const arr = gameState.zones[fromZone];
-  if (!arr || !arr.length) return null;
-  const card = arr.pop();
-  gameState.zones[toZone].push(card);
-  return card;
-}
-
-export function drawCards(fromZone, toZone, count) {
+export function moveCards(fromZone, toZone, count) {
   const from = gameState.zones[fromZone];
   const to = gameState.zones[toZone];
   if (!from || !to) return;
   for (let i = 0; i < count && from.length > 0; i++) {
     to.push(from.pop());
   }
+}
+
+export function drawTopCard(fromZone, toZone) {
+  const arr = gameState.zones[fromZone];
+  if (!arr || !arr.length) return null;
+  const card = arr.pop();
+  gameState.zones[toZone].push(card);
+  return card;
 }
 
 export function shuffleZone(zoneId) {

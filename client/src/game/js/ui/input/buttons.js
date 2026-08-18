@@ -9,13 +9,14 @@ import {
   switchSeatView,
   flipCoin,
   setupBoard,
+  discardHand,
 } from './actions.js';
 
 const buttons = {
   'btn-flip-coin': flipCoin,
   'btn-setup': setupBoard,
   'btn-mulligan': null,
-  'btn-discard-hand': null,
+  'btn-discard-hand': discardHand,
 
   'btn-shuffle-deck': shuffleDeck,
   'btn-shuffle-discard': null,
