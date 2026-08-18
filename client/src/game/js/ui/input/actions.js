@@ -10,9 +10,6 @@ import { closeAllOverlays } from '../overlays/overlays.js';
 import { refreshPileBrowser } from '../overlays/pileBrowser.js';
 import { renderEntireBoard } from '../render.js';
 
-let mySlot = runtimeState.mySlot;
-let oppSlot = runtimeState.oppSlot;
-
 function promptForCSV(slot) {
   const input = document.createElement('input');
   input.type = 'file';
@@ -50,10 +47,10 @@ export function toggleOpponentHand() {
 export function switchSeatView() {
   if (runtimeState.mode !== 'solo' && !runtimeState.isSpectator) return;
 
-  const oldMySlot = mySlot;
+  const oldMySlot = runtimeState.mySlot;
 
-  mySlot = oppSlot;
-  oppSlot = oldMySlot;
+  runtimeState.mySlot = runtimeState.oppSlot;
+  runtimeState.oppSlot = oldMySlot;
 
   renderEntireBoard();
 }
@@ -67,11 +64,11 @@ function loadUserDeck(slot, mode) {
 }
 
 export function loadPlayerDeck(mode) {
-  loadUserDeck(mySlot, mode);
+  loadUserDeck(runtimeState.mySlot, mode);
 }
 
 export function loadOpponentDeck(mode) {
-  loadUserDeck(oppSlot, mode);
+  loadUserDeck(runtimeState.oppSlot, mode);
 }
 
 export function openDeckBuilder() {
@@ -97,7 +94,7 @@ export function openDeckBuilder() {
 }
 
 export function shuffleDeck() {
-  lengine.shuffleZone(`${mySlot}-deck`);
+  lengine.shuffleZone(`${runtimeState.mySlot}-deck`);
 }
 
 export function moveSelectedCardToZone(zone) {

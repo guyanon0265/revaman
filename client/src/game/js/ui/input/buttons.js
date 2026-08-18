@@ -28,8 +28,8 @@ const buttons = {
 
   'btn-load-deck': loadPlayerDeck,
   'btn-load-opp-deck': loadOpponentDeck,
-  'btn-load-demo-deck': loadPlayerDeck('demo'),
-  'btn-load-opp-demo-deck': loadOpponentDeck('demo'),
+  'btn-load-demo-deck': () => loadPlayerDeck('demo'),
+  'btn-load-opp-demo-deck': () => loadOpponentDeck('demo'),
   'btn-open-builder': openDeckBuilder,
 
   'btn-load-state': null,
