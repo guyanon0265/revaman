@@ -399,6 +399,8 @@
   border-radius: 1.8dvh;
   display: none;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
   flex: 1;
   padding: 1.4dvh;
   font-family:
