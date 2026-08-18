@@ -113,6 +113,14 @@ export function joinRoom(room, username, allowSpectators = false) {
   runtimeState.socket = socket;
   setStatus('Connecting…');
 
+  // True only for the brief window between join-error setting a
+  // specific status message and the disconnect() call it triggers —
+  // without this, the generic disconnect handler below unconditionally
+  // overwrites that message with 'Disconnected.' immediately after,
+  // since calling socket.disconnect() fires 'disconnect' regardless of
+  // why the disconnect happened.
+  let suppressDisconnectStatus = false;
+
   socket.on('connect', () => {
     socket.emit('join', { room, username, allowSpectators });
   });
@@ -173,6 +181,7 @@ export function joinRoom(room, username, allowSpectators = false) {
 
   socket.on('join-error', ({ message }) => {
     setStatus(`Couldn't join: ${message}`);
+    suppressDisconnectStatus = true;
     socket.disconnect();
     runtimeState.socket = null;
   });
@@ -223,7 +232,10 @@ export function joinRoom(room, username, allowSpectators = false) {
 
   socket.on('disconnect', () => {
     runtimeState.socket = null;
-    setStatus('Disconnected.');
+    if (!suppressDisconnectStatus) {
+      setStatus('Disconnected.');
+    }
+    suppressDisconnectStatus = false;
     // Deliberately NOT reverting runtimeState.mode/mySlot/oppSlot/
     // isSpectator here — matches server.js's own no-persistence stance.
     // Manual export/import is the accepted fallback for state loss, not
