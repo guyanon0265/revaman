@@ -1,11 +1,15 @@
-import { clientState, clearSelection } from '../../logic/state.js';
-import { attachCardToTarget } from '../../logic/loggingEngine.js';
+import { clientState } from '../../logic/state.js';
 import { isPileZone } from '../../utils.js';
-import { domIdToStateZone, renderEntireBoard } from '../render.js';
-import { openPileBrowser } from '../overlays/pileBrowser.js';
-import { openActionMenu, notifyCardReplaced } from '../overlays/actionMenu.js';
-import { refreshViewAttached } from '../overlays/viewAttached.js';
-import { drawCardFromZone, moveSelectedCardToZone } from './actions.js';
+import { domIdToStateZone } from '../render.js';
+import {
+  attachCard,
+  deselectCard,
+  drawCardFromZone,
+  moveSelectedCardToZone,
+  openCardActions,
+  openPile,
+  selectCard,
+} from './actions.js';
 
 let longPressTimer = null;
 let longPressTriggered = false;
@@ -52,23 +56,7 @@ function handleBoardClick(e) {
     }
 
     if (targetInstanceId !== clientState.selectedInstanceId) {
-      const occupant = attachCardToTarget(
-        clientState.selectedInstanceId,
-        clientState.selectedZone,
-        targetInstanceId,
-        cardEl.dataset.zone
-      );
-
-      clearSelection();
-      renderEntireBoard();
-
-      if (occupant) {
-        notifyCardReplaced(targetInstanceId, targetZone, occupant);
-      }
-
-      refreshViewAttached();
-
-      return;
+      attachCard(targetInstanceId, targetZone);
     }
   }
 
@@ -86,34 +74,37 @@ function handleBoardClick(e) {
   // 2. Otherwise, treat clicking a card as a selection action
   if (cardEl) {
     const clickedInstanceId = cardEl.dataset.instanceId;
+    const clickedCardZone = cardEl.dataset.zone;
 
     if (clickedInstanceId === clientState.selectedInstanceId) {
-      clearSelection();
-      renderEntireBoard();
+      deselectCard();
       return;
     }
 
-    clientState.selectedInstanceId = clickedInstanceId;
-    clientState.selectedZone = cardEl.dataset.zone;
-    clientState.selectedKind = 'card';
-    renderEntireBoard();
+    selectCard(clickedInstanceId, clickedCardZone);
     return;
   }
 
   // 3. Clicked empty space — clear selection
   if (clientState.selectedInstanceId) {
-    clearSelection();
-    renderEntireBoard();
+    deselectCard();
   }
 }
 
-function openContextMenuForCard(cardEl) {
-  clientState.selectedInstanceId = cardEl.dataset.instanceId;
-  clientState.selectedZone = cardEl.dataset.zone;
-  clientState.selectedKind = 'card';
+function handleAlternateClick(zoneEl, cardEl) {
+  if (zoneEl) {
+    const zone = domIdToStateZone(zoneEl.id);
 
-  renderEntireBoard();
-  openActionMenu(cardEl.dataset.instanceId, cardEl.dataset.zone);
+    openPile(zone);
+    return;
+  }
+
+  if (cardEl) {
+    const clickedInstanceId = cardEl.dataset.instanceId;
+    const clickedCardZone = cardEl.dataset.zone;
+
+    openCardActions(clickedInstanceId, clickedCardZone);
+  }
 }
 
 function handleContextMenu(e) {
@@ -122,18 +113,7 @@ function handleContextMenu(e) {
   const cardEl = e.target.closest('.card');
   const zoneEl = e.target.closest('.zone, .hand, .table-half');
 
-  if (zoneEl) {
-    const zone = domIdToStateZone(zoneEl.id);
-
-    if (isPileZone(zone)) {
-      openPileBrowser(zone);
-      return;
-    }
-  }
-
-  if (cardEl) {
-    openContextMenuForCard(cardEl);
-  }
+  handleAlternateClick(zoneEl, cardEl);
 }
 
 function cancelLongPress() {
@@ -158,18 +138,7 @@ function handleTouchStart(e) {
     longPressTimer = null;
     longPressTriggered = true;
 
-    if (zoneEl) {
-      const zone = domIdToStateZone(zoneEl.id);
-
-      if (isPileZone(zone)) {
-        openPileBrowser(zone);
-        return;
-      }
-    }
-
-    if (cardEl) {
-      openContextMenuForCard(cardEl);
-    }
+    handleAlternateClick(zoneEl, cardEl);
   }, 500);
 }
 

@@ -5,9 +5,15 @@ import {
   runtimeState,
 } from '../../logic/state.js';
 import { requestRedo, requestUndo } from '../../networkSync.js';
+import { isPileZone } from '../../utils.js';
+import { notifyCardReplaced, openActionMenu } from '../overlays/actionMenu.js';
 import { openDemoDecks } from '../overlays/demoSelector.js';
 import { closeAllOverlays } from '../overlays/overlays.js';
-import { refreshPileBrowser } from '../overlays/pileBrowser.js';
+import {
+  openPileBrowser,
+  refreshPileBrowser,
+} from '../overlays/pileBrowser.js';
+import { refreshViewAttached } from '../overlays/viewAttached.js';
 import { renderEntireBoard } from '../render.js';
 
 function promptForCSV(slot) {
@@ -97,6 +103,46 @@ export function openDeckBuilder() {
   }
 
   window.open(url, '_blank', 'width=800,height=600,noopener,noreferrer');
+}
+
+export function selectCard(instanceId, zone) {
+  clientState.selectedInstanceId = instanceId;
+  clientState.selectedZone = zone;
+  clientState.selectedKind = 'card';
+  renderEntireBoard();
+}
+
+export function deselectCard() {
+  clearSelection();
+  renderEntireBoard();
+}
+
+export function attachCard(instanceId, zone) {
+  const occupant = lengine.attachCardToTarget(
+    clientState.selectedInstanceId,
+    clientState.selectedZone,
+    instanceId,
+    zone
+  );
+
+  deselectCard();
+
+  if (occupant) {
+    notifyCardReplaced(instanceId, zone, occupant);
+  }
+
+  refreshViewAttached();
+  return;
+}
+
+export function openPile(zone) {
+  if (!isPileZone(zone)) return;
+  openPileBrowser(zone);
+}
+
+export function openCardActions(instanceId, zone) {
+  selectCard(instanceId, zone);
+  openActionMenu(instanceId, zone);
 }
 
 export function shuffleDeck() {
