@@ -64,6 +64,7 @@ const __dirname = path.dirname(__filename);
 
 const CLIENT_DIR = path.join(__dirname, '../../client/src/game');
 const ASSETS_DIR = path.join(__dirname, '../../client/src/assets');
+const BUILDER_DIR = path.join(__dirname, '../../client/src/deck');
 
 const MAX_PLAYERS_PER_ROOM = 2; // p1/p2 only — this cap never includes spectators, who are uncapped by default
 
@@ -86,6 +87,7 @@ const server = http.createServer(app);
 
 app.use(express.static(CLIENT_DIR));
 app.use('/assets', express.static(ASSETS_DIR));
+app.use('/deck', express.static(BUILDER_DIR));
 
 const io = new Server(server, {
   cors: {

@@ -3,11 +3,13 @@ import {
   redoAction,
   shuffleDeck,
   toggleOpponentHand,
+  openDeckBuilder,
 } from './actions.js';
 
 const buttons = {
   'btn-shuffle-deck': shuffleDeck,
   'btn-show-opp-hand': toggleOpponentHand,
+  'btn-open-builder': openDeckBuilder,
   'btn-undo': undoAction,
   'btn-redo': redoAction,
 };

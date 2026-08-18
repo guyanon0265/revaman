@@ -64,7 +64,7 @@ export function loadOpponentDeck(mode) {
 }
 
 export function openDeckBuilder() {
-  const url = '/deck/deck.html';
+  const url = '../deck/deck.html';
 
   const isPWA = window.matchMedia('(display-mode: standalone)').matches;
 

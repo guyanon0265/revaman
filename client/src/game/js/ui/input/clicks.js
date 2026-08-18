@@ -181,7 +181,7 @@ function handleTouchEnd() {
   cancelLongPress();
 }
 
-export function initClick() {
+export function initClicks() {
   document.addEventListener('click', handleBoardClick);
   document.addEventListener('contextmenu', handleContextMenu);
 
