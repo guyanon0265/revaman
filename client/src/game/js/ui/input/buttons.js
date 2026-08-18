@@ -4,14 +4,43 @@ import {
   shuffleDeck,
   toggleOpponentHand,
   openDeckBuilder,
+  loadPlayerDeck,
+  loadOpponentDeck,
 } from './actions.js';
 
 const buttons = {
+  'btn-flip-coin': null,
+  'btn-setup': null,
+  'btn-mulligan': null,
+  'btn-discard-hand': null,
+
   'btn-shuffle-deck': shuffleDeck,
+  'btn-shuffle-discard': null,
+  'btn-deck-move-mode': null,
+
   'btn-show-opp-hand': toggleOpponentHand,
+  'btn-switch-seat': null,
+  'btn-hide-lost-zone': null,
+
+  'gx-btn': null,
+  'vstar-btn': null,
+
+  'btn-load-deck': loadPlayerDeck,
+  'btn-load-opp-deck': loadOpponentDeck,
+  'btn-load-demo-deck': loadPlayerDeck('demo'),
+  'btn-load-opp-demo-deck': loadOpponentDeck('demo'),
   'btn-open-builder': openDeckBuilder,
+
+  'btn-load-state': null,
+  'btn-export-state': null,
+  'btn-export-log': null,
+
   'btn-undo': undoAction,
   'btn-redo': redoAction,
+  'btn-end-turn': null,
+
+  'btn-reset-board': null,
+  'btn-reset-game': null,
 };
 
 export function initButtons() {
