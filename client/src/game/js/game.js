@@ -1,6 +1,6 @@
-import { initUI } from './gameboard/ui/ui.js';
+import { initUI } from './ui/ui.js';
 import { initNetworkSync } from './networkSync.js';
-import { initSidebar } from './sidebar/sidebar.js';
+import { initSidebar } from './ui/sidebar/sidebar.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   initUI();

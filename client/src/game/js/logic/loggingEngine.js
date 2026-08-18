@@ -13,8 +13,8 @@ import {
   classifyType,
   SHARED_ZONE_LABELS,
   OWNED_ZONE_SUFFIX_LABELS,
-} from '../../utils.js';
-import { GameLogger } from '../../sidebar/chat/chatlog.js';
+} from '../utils.js';
+import { GameLogger } from '../ui/sidebar/chat/chatlog.js';
 import {
   pushSnapshot,
   undo as _undo,

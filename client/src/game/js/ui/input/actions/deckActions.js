@@ -1,7 +1,7 @@
-import { runtimeState } from '../../gameboard/logic/state.js';
-import { loadDeck } from '../../gameboard/logic/loggingEngine.js';
-import { renderEntireBoard } from '../../gameboard/ui/render.js';
-import { openDemoDecks } from '../../gameboard/ui/overlays/demoSelector.js';
+import { runtimeState } from '../../../logic/state.js';
+import { loadDeck } from '../../../logic/loggingEngine.js';
+import { renderEntireBoard } from '../../../ui/render.js';
+import { openDemoDecks } from '../../../ui/overlays/demoSelector.js';
 
 export function promptForCSV(slot) {
   const input = document.createElement('input');

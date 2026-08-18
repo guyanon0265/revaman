@@ -1,6 +1,6 @@
-import { runtimeState } from '../../gameboard/logic/state.js';
-import { openDemoDecks } from '../../gameboard/ui/overlays/demoSelector.js';
-import { renderEntireBoard } from '../../gameboard/ui/render.js';
+import { runtimeState } from '../../../logic/state.js';
+import { openDemoDecks } from '../../../ui/overlays/demoSelector.js';
+import { renderEntireBoard } from '../../../ui/render.js';
 import { promptForCSV } from './deckActions.js';
 
 export function initSoloActions() {

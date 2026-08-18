@@ -3,7 +3,7 @@ import {
   OWNED_ZONE_SUFFIXES,
   SHARED_ZONE_IDS,
   COUNT_BADGE_SUFFIXES,
-} from '../../utils.js';
+} from '../utils.js';
 
 // DOM element id -> actual gameState.zones key it should render/target.
 export function domIdToStateZone(domId) {

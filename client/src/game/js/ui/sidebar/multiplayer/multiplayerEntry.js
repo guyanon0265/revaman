@@ -7,7 +7,7 @@
 // import path to networkSync.js below if this file's real location
 // differs.
 
-import { joinRoom, leaveRoom } from '../../networkSync.js';
+import { joinRoom, leaveRoom } from '../../../networkSync.js';
 import { settings } from './settingsZone.js';
 
 export function initMultiplayerPanel() {

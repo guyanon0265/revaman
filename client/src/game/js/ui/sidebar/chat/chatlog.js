@@ -1,5 +1,5 @@
-import { emitChatChanged } from '../../gameboard/logic/network/chatChangeBus.js';
-import { runtimeState } from '../../gameboard/logic/state.js';
+import { emitChatChanged } from '../../../logic/network/chatChangeBus.js';
+import { runtimeState } from '../../../logic/state.js';
 
 /* ==========================================================================
     1. CHAT & LOG HANDLING FUNCTIONS

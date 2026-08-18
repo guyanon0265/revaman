@@ -47,13 +47,13 @@
 // to close it completely, and was deliberately not chosen here.
 
 import { io } from 'socket.io-client';
-import { gameState, runtimeState } from './gameboard/logic/state.js';
-import { onStateChanged } from './gameboard/logic/network/stateChangeBus.js';
-import { renderEntireBoard } from './gameboard/ui/render.js';
-import { closeAllOverlays } from './gameboard/ui/overlays/overlays.js';
-import { onLogChanged } from './gameboard/logic/network/logChangeBus.js';
-import { onChatChanged } from './gameboard/logic/network/chatChangeBus.js';
-import { GameLogger } from './sidebar/chat/chatlog.js';
+import { gameState, runtimeState } from './logic/state.js';
+import { onStateChanged } from './logic/network/stateChangeBus.js';
+import { renderEntireBoard } from './ui/render.js';
+import { closeAllOverlays } from './ui/overlays/overlays.js';
+import { onLogChanged } from './logic/network/logChangeBus.js';
+import { onChatChanged } from './logic/network/chatChangeBus.js';
+import { GameLogger } from './ui/sidebar/chat/chatlog.js';
 
 let initialized = false;
 let lastAppliedSeq = 0;
