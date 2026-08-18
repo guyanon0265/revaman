@@ -4,7 +4,7 @@ import {
   attachCardToTarget,
   drawCards,
 } from '../logic/loggingEngine.js';
-import { isPileZone } from '../../utils.js';
+import { isPileZone } from '../utils.js';
 import { domIdToStateZone, renderEntireBoard } from './render.js';
 import { openPileBrowser, refreshPileBrowser } from './overlays/pileBrowser.js';
 import { openActionMenu, notifyCardReplaced } from './overlays/actionMenu.js';

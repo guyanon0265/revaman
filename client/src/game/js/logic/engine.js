@@ -4,7 +4,7 @@
 // gameState.zones directly; nothing here renders anything.
 
 import { gameState } from './state.js';
-import { classifyType, isPileZone } from '../../utils.js';
+import { classifyType, isPileZone } from '../utils.js';
 
 // ---------------------------------------------------------------------
 // RULES — every function takes the zone(s) it needs

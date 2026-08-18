@@ -16,7 +16,7 @@
 // the board's selection state.
 
 import { gameState } from '../../logic/state.js';
-import { renderBrowserGrid, PILE_ZONE_LABELS } from '../../../utils.js';
+import { renderBrowserGrid, PILE_ZONE_LABELS } from '../../utils.js';
 import { openCardView, closeCardView } from './cardView.js';
 import { moveCardToZone } from '../../logic/loggingEngine.js';
 import { renderEntireBoard } from '../render.js';
