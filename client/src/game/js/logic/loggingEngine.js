@@ -288,6 +288,7 @@ function _mulligan(deckZone, handZone) {
       engine.shuffleZone(deckZone);
       engine.moveCards(deckZone, handZone, 7);
     },
+    log: () => logAction(`mulliganed.`),
   });
 }
 
