@@ -475,6 +475,32 @@ function _toggleBreak(instanceId, zone) {
   });
 }
 
+function _resetBoard() {
+  return mutate({
+    mutation: () => {
+      for (const zoneId of Object.keys(gameState.zones)) {
+        if (zoneId.endsWith('-deck')) {
+          continue;
+        }
+
+        const cards = [...gameState.zones[zoneId]];
+
+        for (const card of cards) {
+          _moveCardToZone(card.instanceId, zoneId, `${card.owner}-deck`);
+        }
+      }
+    },
+    log: () => logAction('reset the board.'),
+  });
+}
+
+function _resetGame() {
+  return mutate({
+    mutation: () => engine.resetGame(),
+    log: () => logAction(`reset the game.`),
+  });
+}
+
 function _flipCoin() {
   const result = engine.flipCoin();
   logAction(`flipped ${result}.`);
@@ -534,6 +560,9 @@ export const toggleFlip = guarded(_toggleFlip);
 export const setRotation = guarded(_setRotation);
 export const setUpright = guarded(_setUpright);
 export const toggleBreak = guarded(_toggleBreak);
+
+export const resetBoard = guarded(_resetBoard);
+export const resetGame = guarded(_resetGame);
 
 export const undo = guarded(_undo);
 export const redo = guarded(_redo);

@@ -235,6 +235,20 @@ export function endTurn() {
   refreshPileBrowser();
 }
 
+export function resetBoard() {
+  lengine.resetBoard();
+  clearSelection();
+  closeAllOverlays();
+  renderEntireBoard();
+}
+
+export function resetGame() {
+  lengine.resetGame();
+  clearSelection();
+  closeAllOverlays();
+  renderEntireBoard();
+}
+
 export function undoAction() {
   if (runtimeState.mode === 'multiplayer') {
     requestUndo();

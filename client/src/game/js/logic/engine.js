@@ -4,7 +4,12 @@
 // gameState.zones directly; nothing here renders anything.
 
 import { gameState } from './state.js';
-import { classifyType, isPileZone } from '../utils.js';
+import {
+  classifyType,
+  isPileZone,
+  OWNED_ZONE_SUFFIXES,
+  SHARED_ZONE_IDS,
+} from '../utils.js';
 
 // ---------------------------------------------------------------------
 // RULES — every function takes the zone(s) it needs
@@ -279,6 +284,18 @@ export function loadDeckIntoZone(cards, zone) {
   if (!arr) return 0;
   cards.forEach((card) => arr.push(card));
   return cards.length;
+}
+
+export function resetGame() {
+  for (const slot of ['p1', 'p2']) {
+    for (const suffix of OWNED_ZONE_SUFFIXES) {
+      gameState.zones[`${slot}-${suffix}`].length = 0;
+    }
+  }
+
+  for (const zoneId of SHARED_ZONE_IDS) {
+    gameState.zones[zoneId].length = 0;
+  }
 }
 
 export function flipCoin() {
