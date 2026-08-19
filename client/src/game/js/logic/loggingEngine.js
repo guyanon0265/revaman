@@ -272,7 +272,7 @@ function _drawCards(fromZone, toZone, count) {
     success: (actualDrawn) => actualDrawn > 0,
     log: (actualDrawn) =>
       logAction(
-        `drew ${actualDrawn} card${actualDrawn === 1 ? '' : 's'} into ${zoneLabel(toZone)}.`
+        `drew ${actualDrawn} card${actualDrawn === 1 ? '' : 's'} from ${zoneLabel(fromZone)} into ${zoneLabel(toZone)}.`
       ),
   });
 }

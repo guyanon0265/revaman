@@ -1,7 +1,19 @@
-import { undoAction, redoAction, shuffleDeck } from './actions.js';
+import {
+  undoAction,
+  redoAction,
+  shuffleDeck,
+  loadPlayerDeck,
+  flipCoin,
+  drawCardFromPile,
+} from './actions.js';
 
 const keybinds = {
   'Mod+S': shuffleDeck,
+  'Mod+D': () => drawCardFromPile('deck'),
+  'Mod+P': () => drawCardFromPile('prizes'),
+  'Mod+L': loadPlayerDeck,
+  'Alt+L': () => loadPlayerDeck('demo'),
+  'Mod+F': flipCoin,
   'Mod+Z': undoAction,
   'Mod+Y': redoAction,
 };

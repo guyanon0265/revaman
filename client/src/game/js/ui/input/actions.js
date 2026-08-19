@@ -291,6 +291,10 @@ export function drawCardFromZone(zone) {
   refreshPileBrowser();
 }
 
+export function drawCardFromPile(pile) {
+  drawCardFromZone(`${runtimeState.mySlot}-${pile}`);
+}
+
 export function setupBoard() {
   lengine.setup(
     `${runtimeState.mySlot}-deck`,
