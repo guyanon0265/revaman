@@ -243,7 +243,7 @@ function _moveToBottomOfDeck(instanceId, fromZone, toZone) {
     mutation: () => engine.moveToBottomOfDeck(instanceId, fromZone, toZone),
     log: (card) =>
       logAction(
-        `put ${card.name} on the bottom of the ${zoneLabel(toZone)} (from ${zoneLabel(fromZone)}).`
+        `moved ${card.name} to the bottom of the ${zoneLabel(toZone)} (from ${zoneLabel(fromZone)}).`
       ),
   });
 }

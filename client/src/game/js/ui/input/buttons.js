@@ -8,7 +8,7 @@ const buttons = {
 
   'btn-shuffle-deck': actions.shuffleDeck,
   'btn-shuffle-discard': actions.shuffleDiscardIntoDeck,
-  'btn-deck-move-mode': null,
+  'btn-move-deck-bottom': actions.moveToDeckBottom,
 
   'btn-show-opp-hand': actions.toggleOpponentHand,
   'btn-switch-seat': actions.switchSeatView,

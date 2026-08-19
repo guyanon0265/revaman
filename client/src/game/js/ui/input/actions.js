@@ -197,6 +197,19 @@ export function moveSelectedCardToZone(zone) {
   refreshPileBrowser();
 }
 
+export function moveToDeckBottom() {
+  const instanceId = clientState.selectedInstanceId;
+  const zone = clientState.selectedZone;
+
+  if (!instanceId || !zone) return;
+
+  lengine.moveToBottomOfDeck(instanceId, zone, `${runtimeState.mySlot}-deck`);
+
+  clearSelection();
+  renderEntireBoard();
+  refreshPileBrowser();
+}
+
 export function drawCardFromZone(zone) {
   const ownerSlot = zone.split('-')[0];
 
