@@ -22,8 +22,8 @@
 
   --browser-border: #333333;
   --browser-hover-border: #555555;
-  --browser-selected-border: #7db8ff;
-  --browser-selected-glow: rgba(47, 111, 237, 0.45);
+  --browser-selected-border: #15b5fa;
+  --browser-selected-glow: rgba(21, 174, 250, 0.5);
 
   --control-chip-bg: #222222;
   --control-btn-bg: #252525;
@@ -322,8 +322,8 @@
 }
 
 .browser-thumbnail.selected {
-  border-color: var(--browser-selected-border);
-  box-shadow: 0 0 0 2px var(--browser-selected-glow);
+  border: 0.3dvh solid var(--browser-selected-border);
+  box-shadow: 0 0 0 0.2dvh var(--browser-selected-glow);
 }
 
 /* ==========================================================================
