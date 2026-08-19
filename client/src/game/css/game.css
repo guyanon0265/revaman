@@ -257,13 +257,18 @@ body {
   width: 100vw;
   max-width: 100%;
   z-index: 100;
-  display: flex;
-  justify-content: safe center;
   background: none;
   min-height: var(--card-h);
+  pointer-events: none;
+}
+
+.hand-cards {
+  display: flex;
+  justify-content: safe center;
+  width: 100%;
+  height: 100%;
   overflow-x: auto;
   padding-top: 2dvh;
-  pointer-events: none;
 }
 
 #opp-hand {

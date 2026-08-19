@@ -188,6 +188,13 @@ function buildCardEl(card, stateZoneId) {
   return el;
 }
 
+function getCardHost(container, suffix) {
+  if (suffix === 'hand') {
+    return container.querySelector(':scope > .hand-cards') || container;
+  }
+  return container;
+}
+
 export function renderEntireBoard() {
   // Owned zones (deck/hand/active/bench/discard/prizes), both sides
   for (const suffix of OWNED_ZONE_SUFFIXES) {
@@ -196,7 +203,7 @@ export function renderEntireBoard() {
 
     if (playerContainer) {
       const zoneId = domIdToStateZone(`player-${suffix}`);
-      const cardHost = playerContainer;
+      const cardHost = getCardHost(playerContainer, suffix);
       cardHost.innerHTML = '';
       (gameState.zones[zoneId] || []).forEach((card) => {
         cardHost.appendChild(buildCardEl(card, zoneId));
@@ -210,7 +217,7 @@ export function renderEntireBoard() {
     }
     if (oppContainer) {
       const zoneId = domIdToStateZone(`opp-${suffix}`);
-      const cardHost = oppContainer;
+      const cardHost = getCardHost(oppContainer, suffix);
       cardHost.innerHTML = '';
       (gameState.zones[zoneId] || []).forEach((card) => {
         cardHost.appendChild(buildCardEl(card, zoneId));
