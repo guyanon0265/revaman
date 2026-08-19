@@ -49,26 +49,26 @@
 }
 
 :root[local-theme='dark'] {
-  --surface: #1b1e26;
-  --bg-recessed: #121419;
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --surface-subtle: rgba(255, 255, 255, 0.06);
+  --surface: #1c1c1c;
+  --bg-recessed: #101010;
+  --border-subtle: #3d3d3d;
+  --surface-subtle: rgba(255, 255, 255, 0.05);
 
   --text-strong: #ffffff;
-  --text-default: #cfd6e2;
-  --text-muted: #888888;
+  --text-default: #e4e7eb;
+  --text-muted: #7c828d;
 
-  --shadow-deep: rgba(0, 0, 0, 0.55);
-  --scrollbar-thumb: #3a3f4a;
+  --shadow-deep: rgba(0, 0, 0, 0.65);
+  --scrollbar-thumb: #333333;
 
-  --browser-border: #333333;
-  --browser-hover-border: #555555;
+  --browser-border: #2e2e2e;
+  --browser-hover-border: #4a4a4a;
 
-  --control-chip-bg: #222222;
-  --control-btn-bg: #252525;
-  --control-btn-border: #333333;
-  --control-btn-hover-bg: rgba(255, 255, 255, 0.08);
-  --control-btn-hover-border: rgba(255, 255, 255, 0.16);
+  --control-chip-bg: #1c1c1c;
+  --control-btn-bg: #1c1c1c;
+  --control-btn-border: #2e2e2e;
+  --control-btn-hover-bg: rgba(255, 255, 255, 0.06);
+  --control-btn-hover-border: rgba(255, 255, 255, 0.15);
 }
 
 :root[local-theme='light'] {
