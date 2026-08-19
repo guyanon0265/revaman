@@ -23,9 +23,9 @@ const buttons = {
   'btn-load-opp-demo-deck': () => actions.loadOpponentDeck('demo'),
   'btn-open-builder': actions.openDeckBuilder,
 
-  'btn-load-state': null,
-  'btn-export-state': null,
-  'btn-export-log': null,
+  'btn-load-state': actions.loadState,
+  'btn-export-state': actions.exportState,
+  'btn-export-log': actions.exportLog,
 
   'btn-undo': actions.undoAction,
   'btn-redo': actions.redoAction,

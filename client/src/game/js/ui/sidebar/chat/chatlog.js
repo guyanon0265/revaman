@@ -19,6 +19,8 @@ import { runtimeState } from '../../../logic/state.js';
 //   for the tag.
 // messageText: the body of the entry.
 // typeClass: 'system' | 'action' | 'chat' — CSS modifier for the row.
+const logEntries = [];
+
 function appendLogEntry(
   logDisplay,
   usernameText,
@@ -26,6 +28,12 @@ function appendLogEntry(
   messageText,
   typeClass
 ) {
+  logEntries.push({
+    username: usernameText,
+    text: messageText,
+    type: typeClass,
+  });
+
   if (!logDisplay) return;
 
   const entry = document.createElement('div');
@@ -123,6 +131,10 @@ export function initChatlog() {
 
 export const GameLogger = {
   _element: null, // Populated by initChatlog()
+
+  getEntries: function () {
+    return logEntries.slice(); // copy — callers shouldn't mutate the live log
+  },
 
   // System messages — no per-player attribution.
   logSystem: function (text) {

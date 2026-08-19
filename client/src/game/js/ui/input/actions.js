@@ -2,6 +2,7 @@ import * as lengine from '../../logic/loggingEngine.js';
 import {
   clearSelection,
   clientState,
+  gameState,
   runtimeState,
 } from '../../logic/state.js';
 import { requestRedo, requestUndo } from '../../networkSync.js';
@@ -15,6 +16,7 @@ import {
 } from '../overlays/pileBrowser.js';
 import { refreshViewAttached } from '../overlays/viewAttached.js';
 import { renderEntireBoard } from '../render.js';
+import { GameLogger } from '../sidebar/chat/chatlog.js';
 
 function promptForCSV(slot) {
   const input = document.createElement('input');
@@ -96,6 +98,75 @@ export function loadPlayerDeck(mode) {
 export function loadOpponentDeck(mode) {
   if (runtimeState.mode !== 'solo') return;
   loadUserDeck(runtimeState.oppSlot, mode);
+}
+
+function downloadFile(filename, content, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+export function exportState() {
+  const payload = {
+    zones: gameState.zones,
+    cardbacks: runtimeState.cardbacks,
+  };
+  downloadFile(
+    `revaman-state-${Date.now()}.json`,
+    JSON.stringify(payload, null, 2),
+    'application/json'
+  );
+}
+
+export function exportLog() {
+  const lines = GameLogger.getEntries().map((entry) =>
+    entry.username ? `${entry.username} ${entry.text}` : entry.text
+  );
+  downloadFile(`revaman-log-${Date.now()}.txt`, lines.join('\n'), 'text/plain');
+}
+
+export function loadState() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+  input.style.display = 'none';
+
+  input.addEventListener('change', () => {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      let parsed;
+      try {
+        parsed = JSON.parse(reader.result);
+      } catch {
+        lengine.logSystem('Import failed: not valid JSON.');
+        return;
+      }
+
+      if (!lengine.importState(parsed)) {
+        lengine.logSystem('Import failed: file has no zone data.');
+        return;
+      }
+
+      clearSelection();
+      closeAllOverlays();
+      renderEntireBoard();
+      refreshPileBrowser();
+    };
+    reader.readAsText(file);
+  });
+
+  document.body.appendChild(input);
+  input.click();
+  input.remove();
 }
 
 export function openDeckBuilder() {

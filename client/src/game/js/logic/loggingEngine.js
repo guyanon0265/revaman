@@ -347,6 +347,20 @@ function _loadDeck(csvText, slot) {
   });
 }
 
+function _importState(payload) {
+  return mutate({
+    validate: () => payload && typeof payload === 'object' && payload.zones,
+    mutation: () => {
+      gameState.zones = payload.zones;
+      if (payload.cardbacks) {
+        runtimeState.cardbacks = payload.cardbacks;
+      }
+      return true;
+    },
+    log: () => logAction('imported a game state.'),
+  });
+}
+
 function _attachCardToTarget(selectedId, fromZone, targetId, targetZone) {
   const selectedBefore = findCard(fromZone, selectedId);
   const targetBefore = findCard(targetZone, targetId);
@@ -548,6 +562,7 @@ export const shuffleZone = guarded(_shuffleZone);
 export const shuffleDiscardIntoDeck = guarded(_shuffleDiscardIntoDeck);
 
 export const loadDeck = guarded(_loadDeck);
+export const importState = guarded(_importState);
 
 export const attachCardToTarget = guarded(_attachCardToTarget);
 export const detachCard = guarded(_detachCard);
