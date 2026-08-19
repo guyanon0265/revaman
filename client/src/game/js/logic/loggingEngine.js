@@ -42,6 +42,11 @@ export function logAction(actionText) {
   emitLogChanged(actionText);
 }
 
+export function logSystem(systemText) {
+  GameLogger.logSystem(systemText);
+  emitLogChanged(systemText);
+}
+
 function zoneLabel(zoneId) {
   if (zoneId.endsWith('table-half')) return 'Board';
   if (zoneId.startsWith('p1-') || zoneId.startsWith('p2-')) {
@@ -243,7 +248,7 @@ function _moveToBottomOfDeck(instanceId, fromZone, toZone) {
   });
 }
 
-function _moveCards(fromZone, toZone, count) {
+function _drawCards(fromZone, toZone, count) {
   return mutate({
     validate: () => !!gameState.zones[fromZone]?.length,
     mutation: () => {
@@ -508,7 +513,7 @@ export const moveToTopOfDeck = guarded(_moveToTopOfDeck);
 export const moveToBottomOfDeck = guarded(_moveToBottomOfDeck);
 
 export const drawTopCard = guarded(_drawTopCard);
-export const moveCards = guarded(_moveCards);
+export const drawCards = guarded(_drawCards);
 export const setup = guarded(_setup);
 export const mulligan = guarded(_mulligan);
 export const discardHand = guarded(_discardHand);

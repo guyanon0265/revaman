@@ -188,7 +188,7 @@ export function moveSelectedCardToZone(zone) {
 export function drawCardFromZone(zone) {
   const ownerSlot = zone.split('-')[0];
 
-  lengine.moveCards(zone, `${ownerSlot}-hand`, 1);
+  lengine.drawCards(zone, `${ownerSlot}-hand`, 1);
 
   clearSelection();
   renderEntireBoard();
@@ -221,6 +221,15 @@ export function discardHand() {
     `${runtimeState.mySlot}-hand`,
     `${runtimeState.mySlot}-discard`
   );
+  clearSelection();
+  renderEntireBoard();
+  refreshPileBrowser();
+}
+
+export function endTurn() {
+  if (!runtimeState.isSpectator) {
+    lengine.logSystem(`Turn - ${runtimeState.usernames[runtimeState.oppSlot]}`);
+  }
   clearSelection();
   renderEntireBoard();
   refreshPileBrowser();

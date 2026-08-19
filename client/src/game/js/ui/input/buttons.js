@@ -13,6 +13,7 @@ import {
   mulligan,
   shuffleDiscardIntoDeck,
   hideLostZone,
+  endTurn,
 } from './actions.js';
 
 const buttons = {
@@ -44,7 +45,7 @@ const buttons = {
 
   'btn-undo': undoAction,
   'btn-redo': redoAction,
-  'btn-end-turn': null,
+  'btn-end-turn': endTurn,
 
   'btn-reset-board': null,
   'btn-reset-game': null,
