@@ -64,6 +64,17 @@ function findCard(zoneId, instanceId) {
   );
 }
 
+const EXPECTED_ZONE_KEYS = Object.keys(gameState.zones);
+
+function sanitizeZones(rawZones) {
+  const clean = {};
+  for (const key of EXPECTED_ZONE_KEYS) {
+    const value = rawZones[key];
+    clean[key] = Array.isArray(value) ? value : [];
+  }
+  return clean;
+}
+
 // ---------------------------------------------------------------------
 // Common mutation lifecycle
 //
@@ -349,11 +360,18 @@ function _loadDeck(csvText, slot) {
 
 function _importState(payload) {
   return mutate({
-    validate: () => payload && typeof payload === 'object' && payload.zones,
+    validate: () =>
+      payload &&
+      typeof payload === 'object' &&
+      payload.zones &&
+      typeof payload.zones === 'object',
     mutation: () => {
-      gameState.zones = payload.zones;
-      if (payload.cardbacks) {
-        runtimeState.cardbacks = payload.cardbacks;
+      gameState.zones = sanitizeZones(payload.zones);
+      if (payload.cardbacks && typeof payload.cardbacks === 'object') {
+        runtimeState.cardbacks = {
+          p1: payload.cardbacks.p1 || DEFAULT_CARDBACK,
+          p2: payload.cardbacks.p2 || DEFAULT_CARDBACK,
+        };
       }
       return true;
     },
