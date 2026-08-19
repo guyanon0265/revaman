@@ -1,21 +1,15 @@
-import {
-  undoAction,
-  redoAction,
-  shuffleDeck,
-  loadPlayerDeck,
-  flipCoin,
-  drawCardFromPile,
-} from './actions.js';
+import * as actions from './actions.js';
 
 const keybinds = {
-  'Mod+S': shuffleDeck,
-  'Mod+D': () => drawCardFromPile('deck'),
-  'Mod+P': () => drawCardFromPile('prizes'),
-  'Mod+L': loadPlayerDeck,
-  'Alt+L': () => loadPlayerDeck('demo'),
-  'Mod+F': flipCoin,
-  'Mod+Z': undoAction,
-  'Mod+Y': redoAction,
+  'Mod+S': actions.shuffleDeck,
+  'Mod+D': () => actions.drawCardFromPile('deck'),
+  'Mod+P': () => actions.drawCardFromPile('prizes'),
+  'Mod+L': actions.loadPlayerDeck,
+  'Alt+L': () => actions.loadPlayerDeck('demo'),
+  'Mod+M': actions.mulligan,
+  'Mod+F': actions.flipCoin,
+  'Mod+Z': actions.undoAction,
+  'Mod+Y': actions.redoAction,
 };
 
 function getKeybind(event) {
