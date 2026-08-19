@@ -336,6 +336,10 @@
   border-color: #ef4444;
   color: #fff;
 }
+.action-btn.unavailable {
+  opacity: 0.4;
+  filter: grayscale(1);
+}
 
 .btn-row {
   display: flex;

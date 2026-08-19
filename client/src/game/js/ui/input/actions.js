@@ -119,6 +119,17 @@ export function openDeckBuilder() {
   window.open(url, '_blank', 'width=800,height=600,noopener,noreferrer');
 }
 
+export function tokenButton(event) {
+  const button = event.currentTarget;
+
+  if (!button.classList.contains('token-btn')) return;
+
+  const name = button.innerHTML;
+  const unavailable = button.classList.toggle('unavailable');
+
+  lengine.logAction(`${unavailable ? 'used' : 'reset'} their ${name}.`);
+}
+
 export function selectCard(instanceId, zone) {
   clientState.selectedInstanceId = instanceId;
   clientState.selectedZone = zone;

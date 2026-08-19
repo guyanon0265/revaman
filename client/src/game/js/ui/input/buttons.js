@@ -14,8 +14,8 @@ const buttons = {
   'btn-switch-seat': actions.switchSeatView,
   'btn-hide-lost-zone': actions.hideLostZone,
 
-  'gx-btn': null,
-  'vstar-btn': null,
+  'gx-btn': actions.tokenButton,
+  'vstar-btn': actions.tokenButton,
 
   'btn-load-deck': actions.loadPlayerDeck,
   'btn-load-opp-deck': actions.loadOpponentDeck,
