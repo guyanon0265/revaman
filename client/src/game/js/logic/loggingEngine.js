@@ -227,9 +227,7 @@ function _applyCounterDelta(instanceId, zone, delta) {
 
 function _moveCardToZone(instanceId, fromZone, toZone, position = 'top') {
   return mutate({
-    validate: () => {
-      fromZone !== toZone && findCard(fromZone, instanceId);
-    },
+    validate: () => fromZone !== toZone && findCard(fromZone, instanceId),
     mutation: () =>
       engine.moveCardToZone(instanceId, fromZone, toZone, position),
     log: (card) =>
