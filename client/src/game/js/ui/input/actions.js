@@ -6,7 +6,6 @@ import {
   runtimeState,
 } from '../../logic/state.js';
 import { requestRedo, requestUndo } from '../../networkSync.js';
-import { isPileZone } from '../../utils.js';
 import { notifyCardReplaced, openActionMenu } from '../overlays/actionMenu.js';
 import { openDemoDecks } from '../overlays/demoSelector.js';
 import { closeAllOverlays } from '../overlays/overlays.js';

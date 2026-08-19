@@ -6,6 +6,7 @@ const keybinds = {
   'Mod+P': () => actions.drawCardFromPile('prizes'),
   'Mod+L': actions.loadPlayerDeck,
   'Alt+L': () => actions.loadPlayerDeck('demo'),
+  'Mod+X': actions.setupBoard,
   'Mod+M': actions.mulligan,
   'Mod+F': actions.flipCoin,
   'Mod+Z': actions.undoAction,
