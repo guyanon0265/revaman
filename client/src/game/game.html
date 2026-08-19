@@ -176,10 +176,14 @@
           <div class="settings-zone">
             <div class="action-section">
               <div class="section-label">Local Settings</div>
-              <label class="settings-option" for="light-mode-switch">
-                <span class="settings-label">Light Mode</span>
-                <input id="light-mode-switch" type="checkbox" class="settings-checkbox" />
-              </label>
+              <div class="settings-option settings-option--select">
+                <span class="settings-label">Theme</span>
+                <select id="theme-select" class="settings-select">
+                  <option value="default">Default</option>
+                  <option value="dark">Dark</option>
+                  <option value="light">Light</option>
+                </select>
+              </div>
               <label class="settings-option" for="sidebar-side-switch">
                 <span class="settings-label">Left-Sided Sidebar</span>
                 <input id="sidebar-side-switch" type="checkbox" class="settings-checkbox" />

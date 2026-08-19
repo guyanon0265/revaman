@@ -45,6 +45,14 @@
   pointer-events: none;
 }
 
+.side-panel[button-side='left'] {
+  left: auto;
+  right: max(1.4dvh, env(safe-area-inset-right, 0px));
+}
+.side-panel.collapsed[button-side='left'] {
+  transform: translateX(calc(100% + 3dvh));
+}
+
 @media (max-width: 767px) {
   .side-panel {
     top: auto;

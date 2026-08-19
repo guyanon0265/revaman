@@ -9,7 +9,8 @@
 }
 
 .hud-dock[button-side='left'] {
-  left: max(1.4dvh, env(safe-area-inset-right, 0px));
+  left: max(1.4dvh, env(safe-area-inset-left, 0px));
+  right: auto;
 }
 
 .dock-btn {
@@ -77,6 +78,14 @@
   transform: translateX(calc(100% + 3dvh));
   opacity: 0;
   pointer-events: none;
+}
+
+#sidebar[button-side='left'] {
+  right: auto;
+  left: max(1.4dvh, env(safe-area-inset-left, 0px));
+}
+#sidebar.collapsed[button-side='left'] {
+  transform: translateX(calc(-100% - 3dvh));
 }
 
 .sidebar-header {
@@ -468,6 +477,22 @@ input[type='checkbox'].settings-checkbox:checked {
 }
 input[type='checkbox'].settings-checkbox:checked::before {
   transform: translateX(calc(3.6dvh - 2.1dvh));
+}
+
+.settings-select {
+  background-color: var(--bg-recessed, #121419);
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  border-radius: 1dvh;
+  color: #fff;
+  padding: 0.6dvh 1.2dvh;
+  font-size: 1.25dvh;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.settings-select:focus {
+  border-color: var(--accent-player, #2f6fed);
 }
 
 /* ==========================================================================
