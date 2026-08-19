@@ -1,10 +1,98 @@
 /* ==========================================================================
-   menu.css
-   Shared side-panel shell (.side-panel) + generic panel components
-   (.panel-header, .panel-tabs, .panel-grid, .browser-*) used by both
-   #action-menu and #pile-browser, followed by content specific to the
-   Action Menu's Controls tab and the Card View overlay.
+   menu.css — theme tokens
+   Shares token NAMES with sidebar.css (--surface, --border-subtle, etc.)
+   by design, so both files read as visually consistent — but each file
+   defines its own values, per-file, per the project's theme convention.
    ========================================================================== */
+:root {
+  --surface: #1b1e26;
+  --bg-recessed: #121419;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --surface-subtle: rgba(255, 255, 255, 0.06);
+
+  --text-strong: #ffffff;
+  --text-default: #cfd6e2;
+  --text-muted: #888888;
+
+  --shadow-deep: rgba(0, 0, 0, 0.55);
+  --scrollbar-thumb: #3a3f4a;
+
+  --accent-tint-bg: rgba(47, 111, 237, 0.18);
+  --accent-tint-text: #7db8ff;
+
+  --browser-border: #333333;
+  --browser-hover-border: #555555;
+  --browser-selected-border: #7db8ff;
+  --browser-selected-glow: rgba(47, 111, 237, 0.45);
+
+  --control-chip-bg: #222222;
+  --control-btn-bg: #252525;
+  --control-btn-border: #333333;
+  --control-btn-hover-bg: rgba(255, 255, 255, 0.08);
+  --control-btn-hover-border: rgba(255, 255, 255, 0.16);
+
+  /* Same statuses/values as card.css — kept in sync deliberately since
+     these appear in both the on-card badge and this action-menu chip
+     for the same status. */
+  --status-par-bg: #e6b800;
+  --status-par-text: #000;
+  --status-brn: #ff6600;
+  --status-psn: #9900cc;
+  --status-slp: #6c6c6d;
+  --status-frz: #33ccff;
+  --status-con-bg: #ddd;
+  --status-con-text: #000;
+
+  --danger-bg: rgba(239, 68, 68, 0.2);
+  --danger-border: rgba(239, 68, 68, 0.4);
+  --danger-text: #fca5a5;
+}
+
+:root[local-theme='dark'] {
+  --surface: #1b1e26;
+  --bg-recessed: #121419;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --surface-subtle: rgba(255, 255, 255, 0.06);
+
+  --text-strong: #ffffff;
+  --text-default: #cfd6e2;
+  --text-muted: #888888;
+
+  --shadow-deep: rgba(0, 0, 0, 0.55);
+  --scrollbar-thumb: #3a3f4a;
+
+  --browser-border: #333333;
+  --browser-hover-border: #555555;
+
+  --control-chip-bg: #222222;
+  --control-btn-bg: #252525;
+  --control-btn-border: #333333;
+  --control-btn-hover-bg: rgba(255, 255, 255, 0.08);
+  --control-btn-hover-border: rgba(255, 255, 255, 0.16);
+}
+
+:root[local-theme='light'] {
+  --surface: #ffffff;
+  --bg-recessed: #eef1f5;
+  --border-subtle: rgba(0, 0, 0, 0.1);
+  --surface-subtle: rgba(0, 0, 0, 0.04);
+
+  --text-strong: #12141a;
+  --text-default: #23262d;
+  --text-muted: #767e8a;
+
+  --shadow-deep: rgba(0, 0, 0, 0.18);
+  --scrollbar-thumb: #c2c8d1;
+
+  --browser-border: #d2d7df;
+  --browser-hover-border: #aab1bd;
+
+  --control-chip-bg: #eef1f5;
+  --control-btn-bg: #eef1f5;
+  --control-btn-border: #d2d7df;
+  --control-btn-hover-bg: rgba(0, 0, 0, 0.05);
+  --control-btn-hover-border: rgba(0, 0, 0, 0.15);
+}
 
 /* ==========================================================================
    Side Panel shell — generic sliding panel container
@@ -16,8 +104,8 @@
   left: max(1.4dvh, env(safe-area-inset-left, 0px));
   bottom: max(1.4dvh, env(safe-area-inset-bottom, 0px));
   width: min(520px, 92vw);
-  background: var(--surface, #1b1e26);
-  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
   border-radius: 1.8dvh;
   display: flex;
   flex-direction: column;
@@ -29,7 +117,7 @@
     'Segoe UI',
     Roboto,
     sans-serif;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 20px 60px var(--shadow-deep);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   transition:
@@ -70,10 +158,7 @@
 }
 
 /* ==========================================================================
-   Panel Header — shared by #action-menu and #pile-browser
-   Structure: .panel-header > (.panel-header-text, .btn-side-panel-close)
-   .panel-header-text holds the title plus either a .panel-subtext line
-   (pile browser) or a .panel-tabs tab-group (action menu).
+   Panel Header
    ========================================================================== */
 
 .panel-header {
@@ -94,7 +179,7 @@
 }
 
 .side-panel-title {
-  color: #cfd6e2;
+  color: var(--text-default);
   font-size: 1.6dvh;
   font-weight: 700;
   white-space: nowrap;
@@ -103,7 +188,7 @@
 }
 
 .panel-subtext {
-  color: #888;
+  color: var(--text-muted);
   font-size: 1.3dvh;
   font-weight: 600;
 }
@@ -112,9 +197,9 @@
   width: 3.4dvh;
   height: 3.4dvh;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
-  color: #cfd6e2;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-default);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -123,13 +208,13 @@
 }
 
 .btn-side-panel-close:hover {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: rgba(239, 68, 68, 0.4);
-  color: #fca5a5;
+  background: var(--danger-bg);
+  border-color: var(--danger-border);
+  color: var(--danger-text);
 }
 
 /* ==========================================================================
-   Panel Tabs — tab-group living inside .panel-header-text (Action Menu)
+   Panel Tabs
    ========================================================================== */
 
 .panel-tabs {
@@ -148,7 +233,7 @@
   gap: 0.3dvh;
   background-color: transparent;
   border: 1px solid transparent;
-  color: #7d8494;
+  color: var(--text-muted);
   padding: 0.8dvh 0.2dvh;
   font-size: 1.5dvh;
   font-weight: 700;
@@ -162,25 +247,24 @@
 }
 
 .panel-tab-btn:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-strong);
+  background: var(--surface-subtle);
 }
 
 .panel-tab-btn.active {
-  background-color: rgba(47, 111, 237, 0.18);
-  color: #7db8ff;
+  background-color: var(--accent-tint-bg);
+  color: var(--accent-tint-text);
 }
 
 /* ==========================================================================
-   Panel Grid — scrollable content area shared by #pile-browser-grid and
-   #view-attached-grid
+   Panel Grid
    ========================================================================== */
 
 .panel-grid {
   flex: 1;
   min-height: 0;
-  background-color: var(--bg-recessed, #121419);
-  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  background-color: var(--bg-recessed);
+  border: 1px solid var(--border-subtle);
   border-radius: 1.2dvh;
   padding: 1.4dvh;
   overflow-y: auto;
@@ -195,16 +279,16 @@
 }
 
 .panel-grid::-webkit-scrollbar-thumb {
-  background-color: #3a3f4a;
+  background-color: var(--scrollbar-thumb);
   border-radius: 3px;
 }
 
 /* ==========================================================================
-   Browser Sections & Thumbnails — shared by pile browser and view-attached
+   Browser Sections & Thumbnails
    ========================================================================== */
 
 .browser-section-label {
-  color: #888;
+  color: var(--text-muted);
   font-size: 1.5dvh;
   font-weight: bold;
   text-transform: uppercase;
@@ -224,7 +308,7 @@
   aspect-ratio: 5 / 7;
   object-fit: cover;
   border-radius: 6px;
-  border: 1px solid #333;
+  border: 1px solid var(--browser-border);
   cursor: pointer;
   transition:
     transform 0.1s ease,
@@ -234,12 +318,12 @@
 
 .browser-thumbnail:hover {
   transform: translateY(-2px);
-  border-color: #555;
+  border-color: var(--browser-hover-border);
 }
 
 .browser-thumbnail.selected {
-  border-color: #7db8ff;
-  box-shadow: 0 0 0 2px rgba(47, 111, 237, 0.45);
+  border-color: var(--browser-selected-border);
+  box-shadow: 0 0 0 2px var(--browser-selected-glow);
 }
 
 /* ==========================================================================
@@ -282,18 +366,18 @@
 .counter-control {
   display: flex;
   align-items: center;
-  background: #222;
+  background: var(--control-chip-bg);
   border-radius: 20px;
   padding: 4px 10px;
-  color: #fff;
+  color: var(--text-strong);
   font-size: 1.5dvh;
   gap: 8px;
 }
 
 .controls-tab button {
-  background: #252525;
-  border: 1px solid #333;
-  color: #fff;
+  background: var(--control-btn-bg);
+  border: 1px solid var(--control-btn-border);
+  color: var(--text-strong);
   min-height: 4.2dvh;
   padding: 0.8dvh 1.1dvh;
   font-size: 1.5dvh;
@@ -309,8 +393,8 @@
 }
 
 .controls-tab button:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.16);
+  background: var(--control-btn-hover-bg);
+  border-color: var(--control-btn-hover-border);
 }
 
 .controls-tab button:active {
@@ -318,24 +402,24 @@
 }
 
 .status-chip.active[data-status='PAR'] {
-  background: #e6b800;
-  color: #000;
+  background: var(--status-par-bg);
+  color: var(--status-par-text);
 }
 .status-chip.active[data-status='BRN'] {
-  background: #ff6600;
+  background: var(--status-brn);
 }
 .status-chip.active[data-status='PSN'] {
-  background: #9900cc;
+  background: var(--status-psn);
 }
 .status-chip.active[data-status='SLP'] {
-  background: #0066ff;
+  background: var(--status-slp);
 }
 .status-chip.active[data-status='FRZ'] {
-  background: #33ccff;
+  background: var(--status-frz);
 }
 .status-chip.active[data-status='CON'] {
-  background: #ddd;
-  color: #000;
+  background: var(--status-con-bg);
+  color: var(--status-con-text);
 }
 
 /* --------------------------------------------------------------------------
@@ -402,8 +486,8 @@
   left: 50%;
   transform: translate(-50%, -50%);
   max-width: 90%;
-  background: var(--surface, #1b1e26);
-  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
   border-radius: 1.8dvh;
   display: none;
   flex-direction: column;
@@ -418,7 +502,7 @@
     'Segoe UI',
     Roboto,
     sans-serif;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 20px 60px var(--shadow-deep);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   transition:
@@ -431,8 +515,8 @@
   flex: 1;
   min-height: 0;
   width: max-content;
-  background-color: var(--bg-recessed, #121419);
-  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  background-color: var(--bg-recessed);
+  border: 1px solid var(--border-subtle);
   border-radius: 1.2dvh;
   padding: 1.4dvh;
   display: flex;
@@ -451,9 +535,9 @@
   width: 3.4dvh;
   height: 3.4dvh;
   border-radius: 50%;
-  background: rgba(239, 68, 68, 0.2);
-  border: 1px solid var(--border-subtle, rgba(239, 68, 68, 0.4));
-  color: #cfd6e2;
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  color: var(--text-default);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -462,5 +546,5 @@
 }
 
 .close-btn:hover {
-  color: #fca5a5;
+  color: var(--danger-text);
 }

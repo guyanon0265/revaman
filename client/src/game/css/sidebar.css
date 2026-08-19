@@ -1,3 +1,94 @@
+/* ==========================================================================
+   sidebar.css — theme tokens
+   ========================================================================== */
+:root {
+  --surface: #1b1e26;
+  --surface-elevated: #262b35;
+  --surface-subtle: rgba(255, 255, 255, 0.06);
+  --surface-subtle-hover: rgba(255, 255, 255, 0.07);
+  --bg-recessed: #121419;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.18);
+  --toggle-track-bg: rgba(255, 255, 255, 0.12);
+
+  --text-strong: #ffffff;
+  --text-default: #e7ebf3;
+  --text-muted: #8b93a3;
+  --text-faint: #6b7280;
+
+  --shadow-soft: rgba(0, 0, 0, 0.4);
+  --shadow-deep: rgba(0, 0, 0, 0.55);
+  --scrollbar-thumb: #3a3f4a;
+
+  /* Brand/role accents — held constant across themes on purpose;
+     see note in the light-theme block below. */
+  --accent-player: #2f6fed;
+  --accent-hover: #4a82f5;
+  --accent-2: #7db8ff;
+  --accent-opp: #ef4444;
+  --accent-spectator: #808080;
+  --accent-tint-bg: rgba(47, 111, 237, 0.18);
+  --accent-tint-text: #7db8ff;
+
+  --accent-generate: #dc9110;
+  --accent-generate-hover: #eca431;
+
+  --accent-success: #4ade80;
+  --accent-success-border: rgba(74, 222, 128, 0.35);
+
+  --danger-bg: rgba(239, 68, 68, 0.2);
+  --danger-bg-strong: rgba(239, 68, 68, 0.15);
+  --danger-border: rgba(239, 68, 68, 0.4);
+  --danger-border-strong: #ef4444;
+  --danger-text: #fca5a5;
+  --danger-section-border: rgba(239, 68, 68, 0.25);
+}
+
+:root[local-theme='dark'] {
+  --surface: #1b1e26;
+  --surface-elevated: #262b35;
+  --surface-subtle: rgba(255, 255, 255, 0.06);
+  --surface-subtle-hover: rgba(255, 255, 255, 0.07);
+  --bg-recessed: #121419;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.18);
+  --toggle-track-bg: rgba(255, 255, 255, 0.12);
+
+  --text-strong: #ffffff;
+  --text-default: #e7ebf3;
+  --text-muted: #8b93a3;
+  --text-faint: #6b7280;
+
+  --shadow-soft: rgba(0, 0, 0, 0.4);
+  --shadow-deep: rgba(0, 0, 0, 0.55);
+  --scrollbar-thumb: #3a3f4a;
+}
+
+:root[local-theme='light'] {
+  --surface: #ffffff;
+  --surface-elevated: #eef1f5;
+  --surface-subtle: rgba(0, 0, 0, 0.04);
+  --surface-subtle-hover: rgba(0, 0, 0, 0.06);
+  --bg-recessed: #eef1f5;
+  --border-subtle: rgba(0, 0, 0, 0.1);
+  --border-hover: rgba(0, 0, 0, 0.2);
+  --toggle-track-bg: rgba(0, 0, 0, 0.12);
+
+  --text-strong: #12141a;
+  --text-default: #23262d;
+  --text-muted: #656d78;
+  --text-faint: #8b93a3;
+
+  --shadow-soft: rgba(0, 0, 0, 0.12);
+  --shadow-deep: rgba(0, 0, 0, 0.18);
+  --scrollbar-thumb: #c2c8d1;
+
+  /* NOTE: --accent-player/--accent-opp/etc. are NOT overridden here —
+     they stay the same brand/role colors in both themes (kept in the
+     base :root block above). If you want e.g. a softer blue on light
+     backgrounds, add overrides for those specific vars here. */
+}
+
 .hud-dock {
   position: fixed;
   right: max(1.4dvh, env(safe-area-inset-right, 0px));
@@ -17,14 +108,14 @@
   width: 4.6dvh;
   height: 4.6dvh;
   border-radius: 50%;
-  background: var(--surface, #1b1e26);
-  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.1));
-  color: #cfd6e2;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-default);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 6px 18px var(--shadow-soft);
   transition:
     transform 0.12s ease,
     background 0.15s ease,
@@ -33,17 +124,16 @@
 }
 
 .dock-btn:hover {
-  background: var(--surface-elevated, #262b35);
-  border-color: var(--accent-2, #7db8ff);
-  color: #fff;
+  background: var(--surface-elevated);
+  border-color: var(--accent-2);
+  color: var(--text-strong);
 }
 .dock-btn:active {
   transform: scale(0.92);
 }
 
 /* ==========================================================================
-   SIDEBAR -- off-canvas floating card, summoned by the dock. No longer
-   occupies real layout space; the board is always full-bleed underneath.
+   SIDEBAR -- off-canvas floating card, summoned by the dock.
    ========================================================================== */
 #sidebar {
   position: fixed;
@@ -51,8 +141,8 @@
   right: max(1.4dvh, env(safe-area-inset-right, 0px));
   bottom: max(1.4dvh, env(safe-area-inset-bottom, 0px));
   width: min(340px, 92vw);
-  background: var(--surface, #1b1e26);
-  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
   border-radius: 1.8dvh;
   display: flex;
   flex-direction: column;
@@ -64,7 +154,7 @@
     'Segoe UI',
     Roboto,
     sans-serif;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 20px 60px var(--shadow-deep);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   transition:
@@ -100,9 +190,9 @@
   width: 3.4dvh;
   height: 3.4dvh;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
-  color: #cfd6e2;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-default);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -110,15 +200,15 @@
   flex-shrink: 0;
 }
 .sidebar-close:hover {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: rgba(239, 68, 68, 0.4);
-  color: #fca5a5;
+  background: var(--danger-bg);
+  border-color: var(--danger-border);
+  color: var(--danger-text);
 }
 
 .unified-output {
   flex: 1;
-  background-color: var(--bg-recessed, #121419);
-  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  background-color: var(--bg-recessed);
+  border: 1px solid var(--border-subtle);
   border-radius: 1.2dvh;
   padding: 1.4dvh;
   overflow-y: auto;
@@ -130,7 +220,7 @@
   width: 6px;
 }
 .unified-output::-webkit-scrollbar-thumb {
-  background-color: #3a3f4a;
+  background-color: var(--scrollbar-thumb);
   border-radius: 3px;
 }
 
@@ -139,27 +229,27 @@
   word-wrap: break-word;
 }
 .log-entry.system {
-  color: #f1c40f;
+  color: #f1c40f; /* system/warning yellow — intentionally constant across themes */
   font-style: italic;
 }
 .log-entry.action {
-  color: #a8b0bf;
+  color: var(--text-muted);
 }
 .log-entry.chat {
-  color: #f2f4f8;
+  color: var(--text-strong);
 }
 
 .username {
   font-weight: 800;
 }
 .username.player {
-  color: var(--accent-player, #38bdf8);
+  color: var(--accent-player);
 }
 .username.opp {
-  color: var(--accent-opp, #ef4444);
+  color: var(--accent-opp);
 }
 .username.spectator {
-  color: var(--accent-spectator, #808080);
+  color: var(--accent-spectator);
 }
 
 .chat-input-container {
@@ -171,22 +261,22 @@
 
 #chat-input {
   flex: 1;
-  background-color: var(--bg-recessed, #121419);
-  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  background-color: var(--bg-recessed);
+  border: 1px solid var(--border-subtle);
   border-radius: 1.2dvh;
-  color: #fff;
+  color: var(--text-strong);
   padding: 1.1dvh 1.3dvh;
   font-size: 1.5dvh;
   outline: none;
   transition: border-color 0.15s ease;
 }
 #chat-input:focus {
-  border-color: var(--accent-player, #2f6fed);
+  border-color: var(--accent-player);
 }
 
 #send-btn {
-  background-color: var(--accent-player, #2f6fed);
-  color: #fff;
+  background-color: var(--accent-player);
+  color: var(--text-strong);
   border: none;
   border-radius: 1.2dvh;
   width: 4.4dvh;
@@ -198,11 +288,11 @@
   flex-shrink: 0;
 }
 #send-btn:hover {
-  background-color: #4a82f5;
+  background-color: var(--accent-hover);
 }
 
 /* --------------------------------------------------------------------
-   Tab pills (inside the panel header)
+   Tab pills
    -------------------------------------------------------------------- */
 .sidebar-tabs {
   display: flex;
@@ -220,7 +310,7 @@
   gap: 0.3dvh;
   background-color: transparent;
   border: 1px solid transparent;
-  color: #7d8494;
+  color: var(--text-muted);
   padding: 0.8dvh 0.2dvh;
   font-size: 1.5dvh;
   font-weight: 700;
@@ -240,13 +330,13 @@
 }
 
 .tab-btn:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-strong);
+  background: var(--surface-subtle);
 }
 
 .tab-btn.active {
-  background-color: rgba(47, 111, 237, 0.18);
-  color: #7db8ff;
+  background-color: var(--accent-tint-bg);
+  color: var(--accent-tint-text);
 }
 
 .tab-panel {
@@ -273,7 +363,7 @@
 }
 
 /* --------------------------------------------------------------------
-   Action grid -- compact label tiles instead of a stacked list
+   Action grid
    -------------------------------------------------------------------- */
 .action-section {
   display: flex;
@@ -290,9 +380,9 @@
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #6b7280;
+  color: var(--text-faint);
   padding-bottom: 0.4dvh;
-  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  border-bottom: 1px solid var(--border-subtle);
   margin-bottom: 0.2dvh;
 }
 
@@ -303,9 +393,9 @@
 }
 
 .action-btn {
-  background-color: var(--surface-elevated, #23272f);
-  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
-  color: #e7ebf3;
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-default);
   padding: 1dvh 0.6dvh;
   font-size: 1.25dvh;
   font-weight: 700;
@@ -327,23 +417,23 @@
   transform: scale(0.96);
 }
 .action-btn:hover {
-  background-color: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.18);
+  background-color: var(--surface-subtle-hover);
+  border-color: var(--border-hover);
 }
 
 .section-label.danger {
-  color: #ef4444;
-  border-bottom-color: rgba(239, 68, 68, 0.25);
+  color: var(--accent-opp);
+  border-bottom-color: var(--danger-section-border);
 }
 .action-btn.danger {
-  background-color: var(--surface-elevated, rgb(35, 28, 28));
-  border-color: rgba(239, 68, 68, 0.3);
-  color: #fca5a5;
+  background-color: var(--surface-elevated);
+  border-color: var(--danger-section-border);
+  color: var(--danger-text);
 }
 .action-btn.danger:hover {
-  background-color: rgba(239, 68, 68, 0.15);
-  border-color: #ef4444;
-  color: #fff;
+  background-color: var(--danger-bg-strong);
+  border-color: var(--danger-border-strong);
+  color: var(--text-strong);
 }
 .action-btn.token-used {
   opacity: 0.4;
@@ -371,16 +461,16 @@
 .mp-status {
   font-size: 1.25dvh;
   font-weight: 700;
-  color: #8b93a3;
+  color: var(--text-muted);
   padding: 1dvh 1.2dvh;
-  background-color: var(--bg-recessed, #121419);
-  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  background-color: var(--bg-recessed);
+  border: 1px solid var(--border-subtle);
   border-radius: 1dvh;
   margin-bottom: 0.4dvh;
 }
 .mp-status.connected {
-  color: #4ade80;
-  border-color: rgba(74, 222, 128, 0.35);
+  color: var(--accent-success);
+  border-color: var(--accent-success-border);
 }
 
 .mp-label {
@@ -388,41 +478,41 @@
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #6b7280;
+  color: var(--text-faint);
 }
 
 .mp-input {
-  background-color: var(--bg-recessed, #121419);
-  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  background-color: var(--bg-recessed);
+  border: 1px solid var(--border-subtle);
   border-radius: 1.25dvh;
-  color: #fff;
+  color: var(--text-strong);
   padding: 1dvh 1.2dvh;
   font-size: 1.25dvh;
   outline: none;
   transition: border-color 0.15s ease;
 }
 .mp-input:focus {
-  border-color: var(--accent-player, #2f6fed);
+  border-color: var(--accent-player);
 }
 
 .mp-generate {
-  background-color: var(--accent-player, #dc9110);
-  border-color: var(--accent-player, #dc9110);
+  background-color: var(--accent-generate);
+  border-color: var(--accent-generate);
   flex-direction: row;
   margin-top: 0.4dvh;
 }
 .mp-generate:hover {
-  background-color: #eca431;
+  background-color: var(--accent-generate-hover);
 }
 
 .mp-join {
-  background-color: var(--accent-player, #2f6fed);
-  border-color: var(--accent-player, #2f6fed);
+  background-color: var(--accent-player);
+  border-color: var(--accent-player);
   flex-direction: row;
   margin-top: 0.4dvh;
 }
 .mp-join:hover {
-  background-color: #4a82f5;
+  background-color: var(--accent-hover);
 }
 
 .settings-zone {
@@ -436,7 +526,7 @@
   justify-content: space-between;
   padding: 0.9dvh 0.2dvh;
   cursor: pointer;
-  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.05));
+  border-bottom: 1px solid var(--surface-subtle);
 }
 .settings-option:last-child {
   border-bottom: none;
@@ -445,7 +535,7 @@
 .settings-label {
   font-size: 1.25dvh;
   font-weight: 600;
-  color: #cfd6e2;
+  color: var(--text-default);
 }
 
 input[type='checkbox'].settings-checkbox {
@@ -454,8 +544,8 @@ input[type='checkbox'].settings-checkbox {
   width: 3.6dvh;
   height: 2.1dvh;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.1));
+  background: var(--toggle-track-bg);
+  border: 1px solid var(--border-subtle);
   position: relative;
   cursor: pointer;
   flex-shrink: 0;
@@ -473,17 +563,17 @@ input[type='checkbox'].settings-checkbox::before {
   transition: transform 0.15s ease;
 }
 input[type='checkbox'].settings-checkbox:checked {
-  background: var(--accent-player, #2f6fed);
+  background: var(--accent-player);
 }
 input[type='checkbox'].settings-checkbox:checked::before {
   transform: translateX(calc(3.6dvh - 2.1dvh));
 }
 
 .settings-select {
-  background-color: var(--bg-recessed, #121419);
-  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  background-color: var(--bg-recessed);
+  border: 1px solid var(--border-subtle);
   border-radius: 1dvh;
-  color: #fff;
+  color: var(--text-strong);
   padding: 0.6dvh 1.2dvh;
   font-size: 1.25dvh;
   font-weight: 600;
@@ -492,7 +582,7 @@ input[type='checkbox'].settings-checkbox:checked::before {
   transition: border-color 0.15s ease;
 }
 .settings-select:focus {
-  border-color: var(--accent-player, #2f6fed);
+  border-color: var(--accent-player);
 }
 
 /* ==========================================================================

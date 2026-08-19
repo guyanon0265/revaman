@@ -95,8 +95,10 @@ function handleAlternateClick(zoneEl, cardEl) {
   if (zoneEl) {
     const zone = domIdToStateZone(zoneEl.id);
 
-    openPile(zone);
-    return;
+    if (isPileZone(zone)) {
+      openPile(zone);
+      return;
+    }
   }
 
   if (cardEl) {

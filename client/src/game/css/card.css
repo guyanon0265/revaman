@@ -1,11 +1,53 @@
+/* ==========================================================================
+   card.css — theme tokens
+   Badge/status colors are semantic (damage=red, poison=purple, etc.) and
+   intentionally NOT overridden per-theme — they mean the same thing in
+   light or dark mode. Only surface/border/text tokens vary by theme.
+   ========================================================================== */
+:root {
+  --card-bg: #0f172a;
+  --card-border: #383c46;
+  --card-selected: #15b5fa;
+  --card-selected-glow: rgba(21, 174, 250, 0.5);
+
+  --overlay-backdrop: rgba(0, 0, 0, 0.4);
+  --overlay-shadow: rgba(0, 0, 0, 0.6);
+
+  --badge-text: #fff;
+  --badge-dmg: rgba(220, 0, 0, 0.95);
+  --badge-ohl: rgba(0, 180, 60, 0.95);
+  --badge-counter-bg: #fff;
+  --badge-counter-text: #b00d0d;
+  --badge-ability-bg: #cc0000;
+
+  --status-par-bg: #e6b800;
+  --status-par-text: #000;
+  --status-brn: #ff6600;
+  --status-psn: #9900cc;
+  --status-slp: #6c6c6d;
+  --status-frz: #33ccff;
+  --status-con-bg: #222;
+  --status-con-text: #fff;
+}
+
+:root[local-theme='dark'] {
+  --card-bg: #0f172a;
+  --card-border: #383c46;
+}
+
+:root[local-theme='light'] {
+  --card-bg: #e2e8f0;
+  --card-border: #d2d7df;
+}
+
 .card {
   width: var(--card-w-sm);
   height: var(--card-h-sm);
   border-radius: 0.8dvh;
   position: relative;
   cursor: pointer;
-  border: 0.2dvh solid var(--border-color);
-  background: #0f172a;
+  border: 0.2dvh solid var(--card-border);
+  background: var(--card-bg);
   flex-shrink: 0;
   transform: rotate(var(--card-rotate, 0deg));
   transition:
@@ -43,8 +85,8 @@
 }
 
 .card.selected {
-  border: 0.3dvh solid #15b5fa;
-  box-shadow: 0 0 0 0.2dvh rgba(21, 174, 250, 0.5);
+  border: 0.3dvh solid var(--card-selected);
+  box-shadow: 0 0 0 0.2dvh var(--card-selected-glow);
 }
 
 .card-face {
@@ -71,7 +113,7 @@
 }
 
 .stat-badge {
-  color: #fff;
+  color: var(--badge-text);
   font-size: 1dvh;
   font-weight: 700;
   padding: 0.1dvh 0.35dvh;
@@ -81,40 +123,42 @@
 }
 
 .stat-badge.badge-dmg {
-  background: rgba(220, 0, 0, 0.95);
+  background: var(--badge-dmg);
 }
 .stat-badge.badge-ohl {
-  background: rgba(0, 180, 60, 0.95);
+  background: var(--badge-ohl);
 }
 .stat-badge.badge-counter {
-  background: #fff;
-  color: #b00d0d;
+  background: var(--badge-counter-bg);
+  color: var(--badge-counter-text);
   text-shadow: none;
 }
 .stat-badge.badge-ability {
-  background: #cc0000;
-  border: 2px solid #fff;
+  background: var(--badge-ability-bg);
+  border: 2px solid var(--badge-text);
 }
 
 .stat-badge.status-par {
-  background: #e6b800;
-  color: #000;
+  background: var(--status-par-bg);
+  color: var(--status-par-text);
   text-shadow: none;
 }
 .stat-badge.status-brn {
-  background: #ff6600;
+  background: var(--status-brn);
 }
 .stat-badge.status-psn {
-  background: #9900cc;
+  background: var(--status-psn);
 }
 .stat-badge.status-slp {
-  background: #6c6c6d;
+  background: var(--status-slp);
 }
 .stat-badge.status-frz {
-  background: #33ccff;
+  background: var(--status-frz);
 }
 .stat-badge.status-con {
-  background: #222;
+  background: var(--status-con-bg);
+  color: var(--status-con-text);
+  text-shadow: none;
 }
 
 .trainer-attachments {
@@ -182,7 +226,7 @@
   height: 100%;
   object-fit: cover;
   border-radius: 0.8dvh;
-  border: 0.2dvh solid var(--border-color);
+  border: 0.2dvh solid var(--card-border);
   transform: translateX(-50%) rotate(90deg);
   pointer-events: none;
   z-index: 2;
@@ -194,8 +238,8 @@
   border-radius: 1.6dvh;
   position: relative;
   cursor: pointer;
-  border: 0.2dvh solid var(--border-color);
-  background: #0f172a;
+  border: 0.2dvh solid var(--card-border);
+  background: var(--card-bg);
   flex-shrink: 0;
 }
 
@@ -211,7 +255,7 @@
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--overlay-backdrop);
   z-index: 100;
   align-items: center;
   justify-content: center;
@@ -223,7 +267,7 @@
   max-width: 80vw;
   max-height: 70dvh;
   border-radius: 1.5dvh;
-  box-shadow: 0 0 4dvh rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 4dvh var(--overlay-shadow);
 }
 
 #card-view-img.break-rotated {

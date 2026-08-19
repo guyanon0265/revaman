@@ -233,7 +233,6 @@ export function attachCard(instanceId, zone) {
 }
 
 export function openPile(zone) {
-  if (!isPileZone(zone)) return;
   openPileBrowser(zone);
 }
 
