@@ -336,7 +336,7 @@
   border-color: #ef4444;
   color: #fff;
 }
-.action-btn.unavailable {
+.action-btn.token-used {
   opacity: 0.4;
   filter: grayscale(1);
 }

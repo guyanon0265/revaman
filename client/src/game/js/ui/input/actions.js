@@ -94,6 +94,7 @@ export function loadPlayerDeck(mode) {
 }
 
 export function loadOpponentDeck(mode) {
+  if (runtimeState.mode !== 'solo') return;
   loadUserDeck(runtimeState.oppSlot, mode);
 }
 
@@ -125,7 +126,7 @@ export function tokenButton(event) {
   if (!button.classList.contains('token-btn')) return;
 
   const name = button.innerHTML;
-  const unavailable = button.classList.toggle('unavailable');
+  const unavailable = button.classList.toggle('token-used');
 
   lengine.logAction(`${unavailable ? 'used' : 'reset'} their ${name}.`);
 }
