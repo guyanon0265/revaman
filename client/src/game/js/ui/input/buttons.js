@@ -1,4 +1,8 @@
-import { applyCounter, applyDamage } from '../overlays/overlayActions.js';
+import {
+  applyCounter,
+  applyDamage,
+  applyStatus,
+} from '../overlays/overlayActions.js';
 import * as actions from './actions.js';
 
 const buttons = {
@@ -53,7 +57,16 @@ function bindButtons(buttonMap) {
   }
 }
 
+function bindStatusChips() {
+  document.querySelectorAll('#markers-section .status-chip').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      applyStatus(chip.dataset.status, 'menu');
+    });
+  });
+}
+
 export function initButtons() {
   bindButtons(buttons);
   bindButtons(actionMenuButtons);
+  bindStatusChips();
 }

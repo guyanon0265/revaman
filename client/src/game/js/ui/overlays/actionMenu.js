@@ -225,12 +225,6 @@ function handleMenuClick(e) {
   // Markers
   // ------------------------------------------------------------------------
 
-  if (target.classList.contains('status-chip')) {
-    lengine.toggleStatus(rootId, rootZone, target.dataset.status);
-    refreshControls();
-    renderEntireBoard();
-    return;
-  }
   if (target.id === 'btn-ability') {
     lengine.toggleAbility(rootId, rootZone);
     refreshControls();

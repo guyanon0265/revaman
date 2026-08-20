@@ -1,4 +1,8 @@
-import { applyCounter, applyDamage } from '../overlays/overlayActions.js';
+import {
+  applyCounter,
+  applyDamage,
+  applyStatus,
+} from '../overlays/overlayActions.js';
 import * as actions from './actions.js';
 
 const keybinds = {
@@ -19,6 +23,12 @@ const actionMenuKeybinds = {
   'Mod+ARROWDOWN': () => applyDamage(-10),
   'Mod+ARROWRIGHT': () => applyCounter(1),
   'Mod+ARROWLEFT': () => applyCounter(-1),
+  'Mod+1': () => applyStatus('BRN'),
+  'Mod+2': () => applyStatus('PAR'),
+  'Mod+3': () => applyStatus('PSN'),
+  'Mod+4': () => applyStatus('FRZ'),
+  'Mod+5': () => applyStatus('SLP'),
+  'Mod+6': () => applyStatus('CON'),
 };
 
 function getKeybind(event) {
