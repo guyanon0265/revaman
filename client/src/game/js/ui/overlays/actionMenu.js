@@ -46,6 +46,10 @@ function getRootCard() {
   );
 }
 
+export function getActionMenuTarget() {
+  return { instanceId: rootId, zone: rootZone };
+}
+
 // ============================================================================
 // Page Navigation
 // ============================================================================
@@ -167,7 +171,7 @@ export function notifyCardReplaced(oldInstanceId, zone, newCard) {
 // Controls
 // ============================================================================
 
-function refreshControls() {
+export function refreshControls() {
   const card = getRootCard();
 
   if (!card) return;
@@ -221,30 +225,6 @@ function handleMenuClick(e) {
   // Markers
   // ------------------------------------------------------------------------
 
-  if (target.id === 'btn-dmg-up') {
-    lengine.applyDamageDelta(rootId, rootZone, 10);
-    refreshControls();
-    renderEntireBoard();
-    return;
-  }
-  if (target.id === 'btn-dmg-down') {
-    lengine.applyDamageDelta(rootId, rootZone, -10);
-    refreshControls();
-    renderEntireBoard();
-    return;
-  }
-  if (target.id === 'btn-counter-up') {
-    lengine.applyCounterDelta(rootId, rootZone, 1);
-    refreshControls();
-    renderEntireBoard();
-    return;
-  }
-  if (target.id === 'btn-counter-down') {
-    lengine.applyCounterDelta(rootId, rootZone, -1);
-    refreshControls();
-    renderEntireBoard();
-    return;
-  }
   if (target.classList.contains('status-chip')) {
     lengine.toggleStatus(rootId, rootZone, target.dataset.status);
     refreshControls();

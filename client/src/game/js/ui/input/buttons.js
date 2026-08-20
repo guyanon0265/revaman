@@ -1,3 +1,4 @@
+import { applyCounter, applyDamage } from '../overlays/overlayActions.js';
 import * as actions from './actions.js';
 
 const buttons = {
@@ -35,14 +36,24 @@ const buttons = {
   'btn-reset-game': actions.resetGame,
 };
 
-export function initButtons() {
-  for (const [buttonId, action] of Object.entries(buttons)) {
+const actionMenuButtons = {
+  'btn-dmg-up': () => applyDamage(10, 'menu'),
+  'btn-dmg-down': () => applyDamage(-10, 'menu'),
+  'btn-counter-up': () => applyCounter(1, 'menu'),
+  'btn-counter-down': () => applyCounter(-1, 'menu'),
+};
+
+function bindButtons(buttonMap) {
+  for (const [buttonId, action] of Object.entries(buttonMap)) {
     const button = document.getElementById(buttonId);
 
-    if (!button) {
-      continue;
-    }
+    if (!button) continue;
 
     button.addEventListener('click', action);
   }
+}
+
+export function initButtons() {
+  bindButtons(buttons);
+  bindButtons(actionMenuButtons);
 }

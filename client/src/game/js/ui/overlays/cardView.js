@@ -33,6 +33,16 @@ export function closeCardView() {
   overlayEl.style.display = 'none';
 }
 
+export function toggleCardView(card) {
+  const isOpen = overlayEl.style.display === 'flex';
+
+  if (isOpen) {
+    closeCardView;
+  } else {
+    openCardView(card);
+  }
+}
+
 function handleOverlayClick(e) {
   if (e.target === overlayEl || e.target.id === 'btn-close-card-view') {
     closeCardView();

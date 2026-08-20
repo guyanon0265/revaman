@@ -1,3 +1,4 @@
+import { applyCounter, applyDamage } from '../overlays/overlayActions.js';
 import * as actions from './actions.js';
 
 const keybinds = {
@@ -11,6 +12,13 @@ const keybinds = {
   'Mod+F': actions.flipCoin,
   'Mod+Z': actions.undoAction,
   'Mod+Y': actions.redoAction,
+};
+
+const actionMenuKeybinds = {
+  'Mod+ARROWUP': () => applyDamage(10),
+  'Mod+ARROWDOWN': () => applyDamage(-10),
+  'Mod+ARROWRIGHT': () => applyCounter(1),
+  'Mod+ARROWLEFT': () => applyCounter(-1),
 };
 
 function getKeybind(event) {
@@ -36,20 +44,21 @@ function isTypingTarget(target) {
   );
 }
 
-export function initKeybinds() {
+function bindKeybinds(bindMap) {
   document.addEventListener('keydown', (event) => {
-    if (isTypingTarget(event.target)) {
-      return;
-    }
+    if (isTypingTarget(event.target)) return;
 
     const key = getKeybind(event);
-    const action = keybinds[key];
+    const action = bindMap[key];
 
-    if (!action) {
-      return;
-    }
+    if (!action) return;
 
     event.preventDefault();
     action();
   });
+}
+
+export function initKeybinds() {
+  bindKeybinds(keybinds);
+  bindKeybinds(actionMenuKeybinds);
 }
