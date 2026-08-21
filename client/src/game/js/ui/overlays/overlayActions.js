@@ -38,3 +38,15 @@ export function applyStatus(status, target = null) {
   refreshControls();
   renderEntireBoard();
 }
+
+export function applyAbilityUsed(target = null) {
+  if (target === 'menu') {
+    target = getActionMenuTarget();
+  }
+  const instanceId = target?.instanceId ?? clientState.selectedInstanceId;
+  const zone = target?.zone ?? clientState.selectedZone;
+  if (!instanceId || !zone) return;
+  lengine.toggleAbility(instanceId, zone);
+  refreshControls();
+  renderEntireBoard();
+}

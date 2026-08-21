@@ -1,8 +1,4 @@
-import {
-  applyCounter,
-  applyDamage,
-  applyStatus,
-} from '../overlays/overlayActions.js';
+import * as ovactions from '../overlays/overlayActions.js';
 import * as actions from './actions.js';
 
 const buttons = {
@@ -41,10 +37,11 @@ const buttons = {
 };
 
 const actionMenuButtons = {
-  'btn-dmg-up': () => applyDamage(10, 'menu'),
-  'btn-dmg-down': () => applyDamage(-10, 'menu'),
-  'btn-counter-up': () => applyCounter(1, 'menu'),
-  'btn-counter-down': () => applyCounter(-1, 'menu'),
+  'btn-dmg-up': () => ovactions.applyDamage(10, 'menu'),
+  'btn-dmg-down': () => ovactions.applyDamage(-10, 'menu'),
+  'btn-counter-up': () => ovactions.applyCounter(1, 'menu'),
+  'btn-counter-down': () => ovactions.applyCounter(-1, 'menu'),
+  'btn-ability': ovactions.applyAbilityUsed('menu'),
 };
 
 function bindButtons(buttonMap) {
@@ -60,7 +57,7 @@ function bindButtons(buttonMap) {
 function bindStatusChips() {
   document.querySelectorAll('#markers-section .status-chip').forEach((chip) => {
     chip.addEventListener('click', () => {
-      applyStatus(chip.dataset.status, 'menu');
+      ovactions.applyStatus(chip.dataset.status, 'menu');
     });
   });
 }

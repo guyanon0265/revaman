@@ -222,17 +222,6 @@ function handleMenuClick(e) {
   }
 
   // ------------------------------------------------------------------------
-  // Markers
-  // ------------------------------------------------------------------------
-
-  if (target.id === 'btn-ability') {
-    lengine.toggleAbility(rootId, rootZone);
-    refreshControls();
-    renderEntireBoard();
-    return;
-  }
-
-  // ------------------------------------------------------------------------
   // Rotation / Flip
   //
   // These leave the menu (and Card View) open — see prior discussion:

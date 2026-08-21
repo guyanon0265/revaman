@@ -1,8 +1,4 @@
-import {
-  applyCounter,
-  applyDamage,
-  applyStatus,
-} from '../overlays/overlayActions.js';
+import * as ovactions from '../overlays/overlayActions.js';
 import * as actions from './actions.js';
 
 const keybinds = {
@@ -19,16 +15,17 @@ const keybinds = {
 };
 
 const actionMenuKeybinds = {
-  'Mod+ARROWUP': () => applyDamage(10),
-  'Mod+ARROWDOWN': () => applyDamage(-10),
-  'Mod+ARROWRIGHT': () => applyCounter(1),
-  'Mod+ARROWLEFT': () => applyCounter(-1),
-  'Mod+1': () => applyStatus('BRN'),
-  'Mod+2': () => applyStatus('PAR'),
-  'Mod+3': () => applyStatus('PSN'),
-  'Mod+4': () => applyStatus('FRZ'),
-  'Mod+5': () => applyStatus('SLP'),
-  'Mod+6': () => applyStatus('CON'),
+  'Mod+ARROWUP': () => ovactions.applyDamage(10),
+  'Mod+ARROWDOWN': () => ovactions.applyDamage(-10),
+  'Mod+ARROWRIGHT': () => ovactions.applyCounter(1),
+  'Mod+ARROWLEFT': () => ovactions.applyCounter(-1),
+  'Mod+1': () => ovactions.applyStatus('BRN'),
+  'Mod+2': () => ovactions.applyStatus('PAR'),
+  'Mod+3': () => ovactions.applyStatus('PSN'),
+  'Mod+4': () => ovactions.applyStatus('FRZ'),
+  'Mod+5': () => ovactions.applyStatus('SLP'),
+  'Mod+6': () => ovactions.applyStatus('CON'),
+  'Mod+0': ovactions.applyAbilityUsed,
 };
 
 function getKeybind(event) {
