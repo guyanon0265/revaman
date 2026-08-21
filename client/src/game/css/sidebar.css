@@ -23,13 +23,14 @@
   /* Brand/role accents — held constant across themes on purpose;
      see note in the light-theme block below. */
   --accent-player: #38bdf8;
-  --accent-hover: #4a82f5;
   --accent-2: #7db8ff;
   --accent-opp: #ef4444;
   --accent-spectator: #808080;
   --accent-tint-bg: rgba(47, 111, 237, 0.18);
   --accent-tint-text: #7db8ff;
 
+  --accent-button: #2f6fed;
+  --accent-hover: #4a82f5;
   --accent-generate: #dc9110;
   --accent-generate-hover: #eca431;
 
@@ -271,11 +272,11 @@
   transition: border-color 0.15s ease;
 }
 #chat-input:focus {
-  border-color: var(--accent-player);
+  border-color: var(--accent-button);
 }
 
 #send-btn {
-  background-color: var(--accent-player);
+  background-color: var(--accent-button);
   color: var(--text-strong);
   border: none;
   border-radius: 1.2dvh;
@@ -492,7 +493,7 @@
   transition: border-color 0.15s ease;
 }
 .mp-input:focus {
-  border-color: var(--accent-player);
+  border-color: var(--accent-button);
 }
 
 .mp-generate {
@@ -506,8 +507,8 @@
 }
 
 .mp-join {
-  background-color: var(--accent-player);
-  border-color: var(--accent-player);
+  background-color: var(--accent-button);
+  border-color: var(--accent-button);
   flex-direction: row;
   margin-top: 0.4dvh;
 }
@@ -563,7 +564,7 @@ input[type='checkbox'].settings-checkbox::before {
   transition: transform 0.15s ease;
 }
 input[type='checkbox'].settings-checkbox:checked {
-  background: var(--accent-player);
+  background: var(--accent-button);
 }
 input[type='checkbox'].settings-checkbox:checked::before {
   transform: translateX(calc(3.6dvh - 2.1dvh));
@@ -582,7 +583,7 @@ input[type='checkbox'].settings-checkbox:checked::before {
   transition: border-color 0.15s ease;
 }
 .settings-select:focus {
-  border-color: var(--accent-player);
+  border-color: var(--accent-button);
 }
 
 /* ==========================================================================
