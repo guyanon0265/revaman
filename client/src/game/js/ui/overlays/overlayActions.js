@@ -1,5 +1,5 @@
 import * as lengine from '../../logic/loggingEngine.js';
-import { clientState } from '../../logic/state.js';
+import { clientState, gameState } from '../../logic/state.js';
 import { renderEntireBoard } from '../render.js';
 import { getActionMenuTarget, refreshControls } from './actionMenu.js';
 
@@ -48,5 +48,32 @@ export function applyAbilityUsed(target = null) {
   if (!instanceId || !zone) return;
   lengine.toggleAbility(instanceId, zone);
   refreshControls();
+  renderEntireBoard();
+}
+
+export function applyRotation(rotation) {
+  const target = getActionMenuTarget();
+  if (!target) return;
+  const instanceId = target.instanceId;
+  const zone = target.zone;
+  lengine.setRotation(instanceId, zone, rotation);
+  renderEntireBoard();
+}
+
+export function cycleRotation() {
+  const instanceId = clientState.selectedInstanceId;
+  const zone = clientState.selectedZone;
+  if (!instanceId || !zone) return;
+  const card = gameState.zones[zone]?.find(
+    (card) => card.instanceId === instanceId
+  );
+  if (!card) return;
+  const nextRotation = {
+    0: 90,
+    90: 180,
+    180: 270,
+    270: 0,
+  }[card.rotation ?? 0];
+  lengine.setRotation(instanceId, zone, nextRotation);
   renderEntireBoard();
 }

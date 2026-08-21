@@ -26,6 +26,7 @@ const actionMenuKeybinds = {
   'Mod+5': () => ovactions.applyStatus('SLP'),
   'Mod+6': () => ovactions.applyStatus('CON'),
   'Mod+0': ovactions.applyAbilityUsed,
+  'Mod+R': ovactions.cycleRotation,
 };
 
 function getKeybind(event) {

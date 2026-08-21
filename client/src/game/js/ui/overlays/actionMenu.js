@@ -229,26 +229,6 @@ function handleMenuClick(e) {
   // unwanted side effect now that the two are coupled.
   // ------------------------------------------------------------------------
 
-  if (target.id === 'btn-rotate-left') {
-    lengine.setRotation(rootId, rootZone, -90);
-    renderEntireBoard();
-    return;
-  }
-  if (target.id === 'btn-rotate-right') {
-    lengine.setRotation(rootId, rootZone, 90);
-    renderEntireBoard();
-    return;
-  }
-  if (target.id === 'btn-rotate-invert') {
-    lengine.setRotation(rootId, rootZone, 180);
-    renderEntireBoard();
-    return;
-  }
-  if (target.id === 'btn-rotate-upright') {
-    lengine.setRotation(rootId, rootZone, 0);
-    renderEntireBoard();
-    return;
-  }
   if (target.id === 'btn-flip') {
     lengine.toggleFlip(rootId, rootZone);
     renderEntireBoard();

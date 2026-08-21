@@ -42,6 +42,12 @@ const actionMenuButtons = {
   'btn-counter-up': () => ovactions.applyCounter(1, 'menu'),
   'btn-counter-down': () => ovactions.applyCounter(-1, 'menu'),
   'btn-ability': ovactions.applyAbilityUsed('menu'),
+  'btn-rotate-left': () => ovactions.applyRotation(-90),
+  'btn-rotate-right': () => ovactions.applyRotation(90),
+  'btn-rotate-invert': () => ovactions.applyRotation(180),
+  'btn-rotate-upright': () => ovactions.applyRotation(0),
+  'btn-rotate-break': null,
+  'btn-flip': null,
 };
 
 function bindButtons(buttonMap) {
