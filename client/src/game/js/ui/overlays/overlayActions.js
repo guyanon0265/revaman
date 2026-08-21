@@ -77,3 +77,14 @@ export function cycleRotation() {
   lengine.setRotation(instanceId, zone, nextRotation);
   renderEntireBoard();
 }
+
+export function applyFlip(target = null) {
+  if (target === 'menu') {
+    target = getActionMenuTarget();
+  }
+  const instanceId = target?.instanceId ?? clientState.selectedInstanceId;
+  const zone = target?.zone ?? clientState.selectedZone;
+  if (!instanceId || !zone) return;
+  lengine.toggleFlip(instanceId, zone);
+  renderEntireBoard();
+}

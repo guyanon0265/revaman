@@ -9,7 +9,7 @@ const keybinds = {
   'Alt+L': () => actions.loadPlayerDeck('demo'),
   'Mod+X': actions.setupBoard,
   'Mod+M': actions.mulligan,
-  'Mod+F': actions.flipCoin,
+  'Mod+C': actions.flipCoin,
   'Mod+Z': actions.undoAction,
   'Mod+Y': actions.redoAction,
 };
@@ -27,6 +27,8 @@ const actionMenuKeybinds = {
   'Mod+6': () => ovactions.applyStatus('CON'),
   'Mod+0': ovactions.applyAbilityUsed,
   'Mod+R': ovactions.cycleRotation,
+  'Mod+B': null,
+  'Mod+F': ovactions.applyFlip,
 };
 
 function getKeybind(event) {

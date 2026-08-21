@@ -47,7 +47,7 @@ const actionMenuButtons = {
   'btn-rotate-invert': () => ovactions.applyRotation(180),
   'btn-rotate-upright': () => ovactions.applyRotation(0),
   'btn-rotate-break': null,
-  'btn-flip': null,
+  'btn-flip': () => ovactions.applyFlip('menu'),
 };
 
 function bindButtons(buttonMap) {

@@ -229,11 +229,6 @@ function handleMenuClick(e) {
   // unwanted side effect now that the two are coupled.
   // ------------------------------------------------------------------------
 
-  if (target.id === 'btn-flip') {
-    lengine.toggleFlip(rootId, rootZone);
-    renderEntireBoard();
-    return;
-  }
   if (target.id === 'btn-rotate-break') {
     lengine.toggleBreak(rootId, rootZone);
     renderEntireBoard();
