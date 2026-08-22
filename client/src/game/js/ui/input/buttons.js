@@ -41,7 +41,7 @@ const actionMenuButtons = {
   'btn-dmg-down': () => ovactions.applyDamage(-10, 'menu'),
   'btn-counter-up': () => ovactions.applyCounter(1, 'menu'),
   'btn-counter-down': () => ovactions.applyCounter(-1, 'menu'),
-  'btn-ability': ovactions.applyAbilityUsed('menu'),
+  'btn-ability': () => ovactions.applyAbilityUsed('menu'),
   'btn-rotate-left': () => ovactions.applyRotation(-90),
   'btn-rotate-right': () => ovactions.applyRotation(90),
   'btn-rotate-invert': () => ovactions.applyRotation(180),
