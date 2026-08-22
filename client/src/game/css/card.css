@@ -26,8 +26,7 @@
   --status-psn: #9900cc;
   --status-slp: #6c6c6d;
   --status-frz: #33ccff;
-  --status-con-bg: #222;
-  --status-con-text: #fff;
+  --status-con: #222;
 }
 
 :root[local-theme='dark'] {
@@ -157,9 +156,7 @@
   background: var(--status-frz);
 }
 .stat-badge.status-con {
-  background: var(--status-con-bg);
-  color: var(--status-con-text);
-  text-shadow: none;
+  background: var(--status-con);
 }
 
 .trainer-attachments {
