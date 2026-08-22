@@ -391,10 +391,8 @@ function _attachCardToTarget(selectedId, fromZone, targetId, targetZone) {
     mutation: () =>
       engine.attachCardToTarget(selectedId, fromZone, targetId, targetZone),
     log: (result) => {
-      if (kind === 'energy') {
-        logAction(`attached ${result.name} to ${targetBefore.name} as energy.`);
-      } else if (kind === 'trainer') {
-        logAction(`attached ${result.name} to ${targetBefore.name}.`);
+      if (kind === 'energy' || kind === 'trainer') {
+        logAction(`attached ${selectedBefore.name} to ${targetBefore.name}.`);
       } else {
         logAction(`evolved ${targetBefore.name} into ${result.name}.`);
       }
@@ -421,10 +419,7 @@ function _detachCard(
         attachmentKind,
         toHandZone
       ),
-    log: (card) =>
-      logAction(
-        `detached ${card.name} from ${parent.name}, returning it to hand.`
-      ),
+    log: (card) => logAction(`detached ${card.name} from ${parent.name}.`),
   });
 }
 
@@ -435,9 +430,7 @@ function _devolveCard(cardId, zone, targetInstanceId) {
   return mutate({
     mutation: () => engine.devolveCard(cardId, zone, targetInstanceId),
     log: (previous) =>
-      logAction(
-        `devolved ${current.name} back into ${previous.name}, returning it to hand.`
-      ),
+      logAction(`devolved ${current.name} back into ${previous.name}.`),
   });
 }
 
