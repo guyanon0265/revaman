@@ -57,6 +57,7 @@ function handleBoardClick(e) {
 
     if (targetInstanceId !== clientState.selectedInstanceId) {
       attachCard(targetInstanceId, targetZone);
+      return;
     }
   }
 
