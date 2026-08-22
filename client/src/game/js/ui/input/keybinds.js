@@ -29,6 +29,7 @@ const actionMenuKeybinds = {
   'Mod+R': ovactions.cycleRotation,
   'Mod+B': ovactions.applyBreak,
   'Mod+F': ovactions.applyFlip,
+  'Mod+V': ovactions.toggleViewCard,
 };
 
 function getKeybind(event) {

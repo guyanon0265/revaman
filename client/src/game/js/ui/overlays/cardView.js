@@ -37,7 +37,7 @@ export function toggleCardView(card) {
   const isOpen = overlayEl.style.display === 'flex';
 
   if (isOpen) {
-    closeCardView;
+    closeCardView();
   } else {
     openCardView(card);
   }

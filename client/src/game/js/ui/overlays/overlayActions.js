@@ -2,7 +2,7 @@ import * as lengine from '../../logic/loggingEngine.js';
 import { clientState, gameState } from '../../logic/state.js';
 import { renderEntireBoard } from '../render.js';
 import { getActionMenuTarget, refreshControls } from './actionMenu.js';
-import { openCardView } from './cardView.js';
+import { openCardView, toggleCardView } from './cardView.js';
 
 export function applyDamage(amount, target = null) {
   if (target === 'menu') {
@@ -90,6 +90,7 @@ export function applyBreak(target = null) {
   const card = gameState.zones[zone]?.find(
     (card) => card.instanceId === instanceId
   );
+  if (!card) return;
   lengine.toggleBreak(instanceId, zone);
   renderEntireBoard();
   if (fromMenu) {
@@ -106,4 +107,15 @@ export function applyFlip(target = null) {
   if (!instanceId || !zone) return;
   lengine.toggleFlip(instanceId, zone);
   renderEntireBoard();
+}
+
+export function toggleViewCard() {
+  const instanceId = clientState.selectedInstanceId;
+  const zone = clientState.selectedZone;
+  if (!instanceId || !zone) return;
+  const card = gameState.zones[zone]?.find(
+    (card) => card.instanceId === instanceId
+  );
+  if (!card) return;
+  toggleCardView(card);
 }
