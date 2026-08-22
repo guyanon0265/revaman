@@ -27,7 +27,7 @@ const actionMenuKeybinds = {
   'Mod+6': () => ovactions.applyStatus('CON'),
   'Mod+0': ovactions.applyAbilityUsed,
   'Mod+R': ovactions.cycleRotation,
-  'Mod+B': null,
+  'Mod+B': ovactions.applyBreak,
   'Mod+F': ovactions.applyFlip,
 };
 

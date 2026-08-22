@@ -23,7 +23,6 @@
 // Both funnel through the same sync logic.
 
 import { gameState, clientState } from '../../logic/state.js';
-import * as lengine from '../../logic/loggingEngine.js';
 import { renderEntireBoard } from '../render.js';
 import { openCardView, closeCardView } from './cardView.js';
 import {
@@ -218,21 +217,6 @@ function handleMenuClick(e) {
 
   if (target.id === 'btn-action-menu-close') {
     closeMenu();
-    return;
-  }
-
-  // ------------------------------------------------------------------------
-  // Rotation / Flip
-  //
-  // These leave the menu (and Card View) open — see prior discussion:
-  // closing on every rotate would also tear down Card View as an
-  // unwanted side effect now that the two are coupled.
-  // ------------------------------------------------------------------------
-
-  if (target.id === 'btn-rotate-break') {
-    lengine.toggleBreak(rootId, rootZone);
-    renderEntireBoard();
-    openCardView(getRootCard()); // image/orientation changed — refresh the stale snapshot
     return;
   }
 }

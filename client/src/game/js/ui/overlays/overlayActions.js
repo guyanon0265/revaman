@@ -2,6 +2,7 @@ import * as lengine from '../../logic/loggingEngine.js';
 import { clientState, gameState } from '../../logic/state.js';
 import { renderEntireBoard } from '../render.js';
 import { getActionMenuTarget, refreshControls } from './actionMenu.js';
+import { openCardView } from './cardView.js';
 
 export function applyDamage(amount, target = null) {
   if (target === 'menu') {
@@ -76,6 +77,24 @@ export function cycleRotation() {
   }[card.rotation ?? 0];
   lengine.setRotation(instanceId, zone, nextRotation);
   renderEntireBoard();
+}
+
+export function applyBreak(target = null) {
+  const fromMenu = target === 'menu';
+  if (target === 'menu') {
+    target = getActionMenuTarget();
+  }
+  const instanceId = target?.instanceId ?? clientState.selectedInstanceId;
+  const zone = target?.zone ?? clientState.selectedZone;
+  if (!instanceId || !zone) return;
+  const card = gameState.zones[zone]?.find(
+    (card) => card.instanceId === instanceId
+  );
+  lengine.toggleBreak(instanceId, zone);
+  renderEntireBoard();
+  if (fromMenu) {
+    openCardView(card);
+  }
 }
 
 export function applyFlip(target = null) {
