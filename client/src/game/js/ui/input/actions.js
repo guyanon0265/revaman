@@ -16,7 +16,7 @@ import {
 import { refreshViewAttached } from '../overlays/viewAttached.js';
 import { renderEntireBoard } from '../render.js';
 import { GameLogger } from '../sidebar/chat/chatlog.js';
-import { closeSidebar } from '../sidebar/sidebarHud.js';
+import { closeSidebar, openSidebar } from '../sidebar/sidebarHud.js';
 
 function promptForCSV(slot) {
   const input = document.createElement('input');
@@ -368,6 +368,10 @@ export function redoAction() {
     closeAllOverlays();
     renderEntireBoard();
   }
+}
+
+export function openSidebarPanel() {
+  openSidebar();
 }
 
 export function closeAllPanels() {

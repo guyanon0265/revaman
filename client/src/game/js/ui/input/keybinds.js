@@ -13,6 +13,7 @@ const keybinds = {
   'Mod+Z': actions.undoAction,
   'Mod+Y': actions.redoAction,
   ESCAPE: actions.closeAllPanels,
+  ENTER: actions.openSidebarPanel,
 };
 
 const actionMenuKeybinds = {
