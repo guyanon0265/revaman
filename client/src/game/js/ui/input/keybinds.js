@@ -12,6 +12,7 @@ const keybinds = {
   'Mod+C': actions.flipCoin,
   'Mod+Z': actions.undoAction,
   'Mod+Y': actions.redoAction,
+  ESCAPE: actions.closeAllPanels,
 };
 
 const actionMenuKeybinds = {

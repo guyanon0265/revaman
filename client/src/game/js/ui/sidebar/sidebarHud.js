@@ -1,3 +1,9 @@
+const closeBtn = document.getElementById('close-sidebar');
+
+export function closeSidebar() {
+  document.getElementById('sidebar').classList.add('collapsed');
+}
+
 export function initSiderbarHud() {
   document.querySelectorAll('[data-open-tab]').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -16,9 +22,6 @@ export function initSiderbarHud() {
       targetTab?.click();
     });
   });
-  document.querySelectorAll('[data-close-sidebar]').forEach((btn) => {
-    btn.addEventListener('click', () =>
-      document.getElementById('sidebar').classList.add('collapsed')
-    );
-  });
+
+  closeBtn.addEventListener('click', () => closeSidebar());
 }
