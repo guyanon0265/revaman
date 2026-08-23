@@ -68,7 +68,7 @@ function getAttachedCards() {
   };
 }
 
-function handleAttachedCardAction(card, section) {
+export function handleAttachedCardAction(card, section) {
   if (!parentId || !parentZone) return;
 
   if (section.kind === 'evolution') {

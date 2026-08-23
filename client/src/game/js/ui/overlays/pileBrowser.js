@@ -28,8 +28,9 @@ const gridEl = document.getElementById('pile-browser-grid');
 
 let currentZone = null;
 
-function handlePileCardAction(card) {
+export function handlePileCardAction(card) {
   moveCardToZone(card.instanceId, currentZone, `${card.owner}-hand`);
+  closeCardView();
   renderPileGrid();
   renderEntireBoard();
 }

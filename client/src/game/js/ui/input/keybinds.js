@@ -34,6 +34,7 @@ const actionMenuKeybinds = {
   'Mod+B': ovactions.applyBreak,
   'Mod+F': ovactions.applyFlip,
   'Mod+V': ovactions.toggleViewCard,
+  'Mod+H': ovactions.handleSelectedBrowserCard,
 };
 
 function getKeybind(event) {

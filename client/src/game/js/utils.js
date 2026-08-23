@@ -117,6 +117,8 @@ export function renderBrowserGrid(targetGridEl, sections, options = {}) {
       img.className = 'browser-thumbnail';
       img.src = card.imageUrl;
       img.alt = card.name;
+      img.card = card;
+      img.section = section;
       img.draggable = false;
 
       let longPressTimer = null;

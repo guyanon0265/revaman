@@ -3,6 +3,8 @@ import { clientState, gameState } from '../../logic/state.js';
 import { renderEntireBoard } from '../render.js';
 import { getActionMenuTarget, refreshControls } from './actionMenu.js';
 import { openCardView, toggleCardView } from './cardView.js';
+import { handlePileCardAction } from './pileBrowser.js';
+import { handleAttachedCardAction } from './viewAttached.js';
 
 export function applyDamage(amount, target = null) {
   if (target === 'menu') {
@@ -118,4 +120,23 @@ export function toggleViewCard() {
   );
   if (!card) return;
   toggleCardView(card);
+}
+
+export function handleSelectedBrowserCard() {
+  const attachedImg = document
+    .getElementById('view-attached-grid')
+    ?.querySelector('.selected');
+
+  if (attachedImg) {
+    handleAttachedCardAction(attachedImg.card, attachedImg.section);
+    return;
+  }
+
+  const pileImg = document
+    .getElementById('pile-browser-grid')
+    ?.querySelector('.selected');
+
+  if (pileImg) {
+    handlePileCardAction(pileImg.card);
+  }
 }
