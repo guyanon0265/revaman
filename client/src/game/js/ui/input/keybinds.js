@@ -17,6 +17,8 @@ const keybinds = {
   ESCAPE: actions.closeAllPanels,
   ENTER: actions.openSidebarPanel,
   TAB: actions.cycleSidebarTabs,
+  'Shift+BACKSPACE': actions.resetBoard,
+  'Mod+Shift+BACKSPACE': actions.resetGame,
 };
 
 const actionMenuKeybinds = {
