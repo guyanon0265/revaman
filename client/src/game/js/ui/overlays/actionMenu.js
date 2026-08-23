@@ -73,8 +73,18 @@ function showPage(pageId) {
     revertViewAttachedSelection();
     refreshControls();
   } else if (pageId === 'view-attached-tab') {
-    document.getElementById('btn-view-attach').classList.add('active');
+    document.getElementById('btn-view-attached').classList.add('active');
     openViewAttached(rootId, rootZone, handleRootChanged);
+  }
+}
+
+export function togglePage() {
+  const controlsPage = document.getElementById('card-controls-tab');
+
+  if (controlsPage.classList.contains('active')) {
+    showPage('view-attached-tab');
+  } else {
+    showPage('card-controls-tab');
   }
 }
 
@@ -206,7 +216,7 @@ function handleMenuClick(e) {
     return;
   }
 
-  if (target.id === 'btn-view-attach') {
+  if (target.id === 'btn-view-attached') {
     showPage('view-attached-tab');
     return;
   }

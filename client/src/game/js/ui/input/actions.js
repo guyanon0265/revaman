@@ -6,7 +6,11 @@ import {
   runtimeState,
 } from '../../logic/state.js';
 import { requestRedo, requestUndo } from '../../networkSync.js';
-import { notifyCardReplaced, openActionMenu } from '../overlays/actionMenu.js';
+import {
+  notifyCardReplaced,
+  openActionMenu,
+  togglePage,
+} from '../overlays/actionMenu.js';
 import { openDemoDecks } from '../overlays/demoSelector.js';
 import { closeAllOverlays } from '../overlays/overlays.js';
 import {
@@ -241,6 +245,12 @@ export function openCardActions(instanceId, zone) {
   openActionMenu(instanceId, zone);
 }
 
+export function openCardActionsFromKeybind() {
+  const instanceId = clientState.selectedInstanceId;
+  const zone = clientState.selectedZone;
+  openCardActions(instanceId, zone);
+}
+
 export function shuffleDeck() {
   lengine.shuffleZone(`${runtimeState.mySlot}-deck`);
   renderEntireBoard();
@@ -377,4 +387,8 @@ export function openSidebarPanel() {
 export function closeAllPanels() {
   closeAllOverlays();
   closeSidebar();
+}
+
+export function toggleCardActionTabs() {
+  togglePage();
 }

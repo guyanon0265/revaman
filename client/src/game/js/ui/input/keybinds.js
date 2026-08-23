@@ -12,6 +12,8 @@ const keybinds = {
   'Mod+C': actions.flipCoin,
   'Mod+Z': actions.undoAction,
   'Mod+Y': actions.redoAction,
+  'Alt+M': actions.openCardActionsFromKeybind,
+  'Shift+TAB': actions.toggleCardActionTabs,
   ESCAPE: actions.closeAllPanels,
   ENTER: actions.openSidebarPanel,
 };
