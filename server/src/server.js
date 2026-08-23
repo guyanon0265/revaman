@@ -50,6 +50,7 @@
 // id starts fresh. Manual export/import is the accepted fallback for
 // state loss, not something this relay tries to solve.
 
+import 'dotenv/config.js';
 import express from 'express';
 import http from 'http';
 import path from 'path';
