@@ -16,6 +16,7 @@ const keybinds = {
   'Shift+TAB': actions.toggleCardActionTabs,
   ESCAPE: actions.closeAllPanels,
   ENTER: actions.openSidebarPanel,
+  TAB: actions.cycleSidebarTabs,
 };
 
 const actionMenuKeybinds = {

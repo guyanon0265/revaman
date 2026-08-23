@@ -1,5 +1,4 @@
-import { initSiderbarHud } from './sidebarHud.js';
-import { initSidebarTabs } from './sidebarTabs.js';
+import { initSiderbarHud, initSidebarTabs } from './sidebarHud.js';
 import { initChatlog } from './chat/chatlog.js';
 import { initSidebarMultiplayer } from './multiplayer/multiplayer.js';
 
