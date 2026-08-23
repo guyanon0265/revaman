@@ -50,7 +50,7 @@
 // id starts fresh. Manual export/import is the accepted fallback for
 // state loss, not something this relay tries to solve.
 
-import 'dotenv/config.js';
+import dotenv from 'dotenv';
 import express from 'express';
 import http from 'http';
 import path from 'path';
@@ -62,6 +62,8 @@ import { PORT } from './config.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const CLIENT_DIR = path.join(__dirname, '../../client/src/game');
 const ASSETS_DIR = path.join(__dirname, '../../client/src/assets');
