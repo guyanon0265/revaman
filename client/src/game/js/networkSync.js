@@ -54,6 +54,7 @@ import { closeAllOverlays } from './ui/overlays/overlays.js';
 import { onLogChanged } from './logic/network/logChangeBus.js';
 import { onChatChanged } from './logic/network/chatChangeBus.js';
 import { GameLogger } from './ui/sidebar/chat/chatlog.js';
+import { saveState } from './logic/persistence.js';
 
 let initialized = false;
 let lastAppliedSeq = 0;
@@ -85,6 +86,7 @@ function applyIncomingState({ seq, zones, cardbacks }) {
 
   closeAllOverlays();
   renderEntireBoard();
+  saveState();
 }
 
 export function requestUndo() {
@@ -165,6 +167,7 @@ export function joinRoom(room, username, allowSpectators = false) {
       if (current.cardbacks) runtimeState.cardbacks = current.cardbacks;
       closeAllOverlays();
       renderEntireBoard();
+      saveState();
     }
 
     if (runtimeState.isSpectator) {

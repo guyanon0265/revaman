@@ -73,6 +73,7 @@ export const runtimeState = {
   mySlot: 'p1',
   oppSlot: 'p2',
   socket: null,
+  roomId: null,
   isSpectator: false,
   myUsername: null,
   usernames: { p1: 'Player 1', p2: 'Player 2' },
