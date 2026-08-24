@@ -6,6 +6,7 @@ import {
   runtimeState,
 } from '../../logic/state.js';
 import { requestRedo, requestUndo } from '../../networkSync.js';
+import { SHARED_ZONE_IDS } from '../../utils.js';
 import {
   notifyCardReplaced,
   openActionMenu,
@@ -222,6 +223,34 @@ export function deselectCard() {
   renderEntireBoard();
 }
 
+export function selectHandCard(position) {
+  const handZone = `${runtimeState.mySlot}-hand`;
+  const handArray = gameState.zones[handZone];
+  const card = handArray[position - 1];
+  if (!card) return;
+  if (
+    clientState.selectedInstanceId === card.instanceId &&
+    clientState.selectedZone === handZone
+  ) {
+    deselectCard();
+    return;
+  }
+  selectCard(card.instanceId, handZone);
+}
+
+export function selectActiveCard() {
+  const activeZone = `${runtimeState.mySlot}-active`;
+  const card = gameState.zones[activeZone][0];
+  if (
+    clientState.selectedInstanceId === card.instanceId &&
+    clientState.selectedZone === activeZone
+  ) {
+    deselectCard();
+    return;
+  }
+  selectCard(card.instanceId, activeZone);
+}
+
 export function attachCard(instanceId, zone) {
   const occupant = lengine.attachCardToTarget(
     clientState.selectedInstanceId,
@@ -238,6 +267,13 @@ export function attachCard(instanceId, zone) {
 
   refreshViewAttached();
   return;
+}
+
+export function attachCardToActive() {
+  const activeZone = `${runtimeState.mySlot}-active`;
+  const activeCard = gameState.zones[activeZone][0];
+  if (!activeCard) return;
+  attachCard(activeCard.instanceId, activeZone);
 }
 
 export function openPile(zone) {
@@ -279,6 +315,13 @@ export function moveSelectedCardToZone(zone) {
   clearSelection();
   renderEntireBoard();
   refreshPileBrowser();
+}
+
+export function moveSelectedCardByBind(zone) {
+  const targetZone = SHARED_ZONE_IDS.includes(zone)
+    ? zone
+    : `${runtimeState.mySlot}-${zone}`;
+  moveSelectedCardToZone(targetZone);
 }
 
 export function moveToDeckBottom() {

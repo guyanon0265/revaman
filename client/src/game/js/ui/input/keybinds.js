@@ -12,13 +12,34 @@ const keybinds = {
   'Mod+C': actions.flipCoin,
   'Mod+Z': actions.undoAction,
   'Mod+Y': actions.redoAction,
-  'Alt+M': actions.openCardActionsFromKeybind,
+  'Shift+M': actions.openCardActionsFromKeybind,
   'Shift+TAB': actions.toggleCardActionTabs,
   ESCAPE: actions.closeAllPanels,
   ENTER: actions.openSidebarPanel,
   TAB: actions.cycleSidebarTabs,
   'Shift+BACKSPACE': actions.resetBoard,
   'Mod+Shift+BACKSPACE': actions.resetGame,
+};
+
+const quickActionKeybinds = {
+  1: () => actions.selectHandCard(1),
+  2: () => actions.selectHandCard(2),
+  3: () => actions.selectHandCard(3),
+  4: () => actions.selectHandCard(4),
+  5: () => actions.selectHandCard(5),
+  6: () => actions.selectHandCard(6),
+  7: () => actions.selectHandCard(7),
+  0: actions.selectActiveCard,
+  A: () => actions.moveSelectedCardByBind('active'),
+  'Shift+A': actions.attachCardToActive,
+  B: () => actions.moveSelectedCardByBind('bench'),
+  H: () => actions.moveSelectedCardByBind('hand'),
+  D: () => actions.moveSelectedCardByBind('deck'),
+  I: () => actions.moveSelectedCardByBind('discard'),
+  P: () => actions.moveSelectedCardByBind('prizes'),
+  S: () => actions.moveSelectedCardByBind('stadium'),
+  L: () => actions.moveSelectedCardByBind('lost-zone'),
+  T: () => actions.moveSelectedCardByBind('table-half'),
 };
 
 const actionMenuKeybinds = {
@@ -33,7 +54,7 @@ const actionMenuKeybinds = {
   'Mod+5': () => ovactions.applyStatus('SLP'),
   'Mod+6': () => ovactions.applyStatus('CON'),
   'Mod+0': ovactions.applyAbilityUsed,
-  'Mod+R': ovactions.cycleRotation,
+  'Shift+R': ovactions.cycleRotation,
   'Mod+B': ovactions.applyBreak,
   'Mod+F': ovactions.applyFlip,
   'Mod+V': ovactions.toggleViewCard,
@@ -80,4 +101,5 @@ function bindKeybinds(bindMap) {
 export function initKeybinds() {
   bindKeybinds(keybinds);
   bindKeybinds(actionMenuKeybinds);
+  bindKeybinds(quickActionKeybinds);
 }
