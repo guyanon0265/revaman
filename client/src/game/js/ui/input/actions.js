@@ -13,6 +13,7 @@ import {
   togglePage,
 } from '../overlays/actionMenu.js';
 import { openDemoDecks } from '../overlays/demoSelector.js';
+import { toggleInformation } from '../overlays/informationPanel.js';
 import { closeAllOverlays } from '../overlays/overlays.js';
 import {
   openPileBrowser,
@@ -442,4 +443,8 @@ export function cycleSidebarTabs() {
 
 export function toggleCardActionTabs() {
   togglePage();
+}
+
+export function handeInformationOverlay() {
+  toggleInformation();
 }

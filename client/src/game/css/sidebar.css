@@ -534,7 +534,7 @@
 }
 
 .settings-label {
-  font-size: 1.25dvh;
+  font-size: 1.4dvh;
   font-weight: 600;
   color: var(--text-default);
 }
@@ -584,6 +584,10 @@ input[type='checkbox'].settings-checkbox:checked::before {
 }
 .settings-select:focus {
   border-color: var(--accent-button);
+}
+
+#information-overlay-trigger {
+  cursor: pointer;
 }
 
 /* ==========================================================================
