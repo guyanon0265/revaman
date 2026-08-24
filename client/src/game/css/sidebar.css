@@ -22,6 +22,7 @@
 
   /* Brand/role accents — held constant across themes on purpose;
      see note in the light-theme block below. */
+  --accent-system: #f1c40f;
   --accent-player: #38bdf8;
   --accent-2: #7db8ff;
   --accent-opp: #ef4444;
@@ -84,10 +85,8 @@
   --shadow-deep: rgba(0, 0, 0, 0.18);
   --scrollbar-thumb: #c2c8d1;
   --danger-text: #ef4444;
-  /* NOTE: --accent-player/--accent-opp/etc. are NOT overridden here —
-     they stay the same brand/role colors in both themes (kept in the
-     base :root block above). If you want e.g. a softer blue on light
-     backgrounds, add overrides for those specific vars here. */
+
+  --accent-system: #ccaa23;
 }
 
 .hud-dock {
@@ -230,7 +229,7 @@
   word-wrap: break-word;
 }
 .log-entry.system {
-  color: #f1c40f; /* system/warning yellow — intentionally constant across themes */
+  color: var(--accent-system);
   font-style: italic;
 }
 .log-entry.action {
