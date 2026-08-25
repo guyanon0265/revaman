@@ -527,6 +527,34 @@
   justify-content: center;
 }
 
+#information-overlay {
+  z-index: 900;
+}
+
+.scrolling-grid {
+  flex: 1;
+  min-height: 0;
+  background-color: var(--bg-recessed);
+  border: 1px solid var(--border-subtle);
+  border-radius: 1.2dvh;
+  padding: 1.4dvh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+}
+
+.scrolling-grid ol a {
+  color: inherit;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.scrolling-grid ol a:hover {
+  text-decoration: underline;
+}
+
 /* ==========================================================================
    Card View overlay close button
    ========================================================================== */
