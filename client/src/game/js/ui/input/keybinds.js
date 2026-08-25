@@ -30,6 +30,8 @@ const quickActionKeybinds = {
   5: () => actions.selectHandCard(5),
   6: () => actions.selectHandCard(6),
   7: () => actions.selectHandCard(7),
+  8: () => actions.selectHandCard(8),
+  9: () => actions.selectHandCard(9),
   0: actions.selectActiveCard,
   A: () => actions.moveSelectedCardByBind('active'),
   'Shift+A': actions.attachCardToActive,
