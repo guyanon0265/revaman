@@ -555,6 +555,24 @@
   text-decoration: underline;
 }
 
+.keybind-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.keybind-list li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  padding: 0.25rem 0;
+}
+
+.keybind-list kbd {
+  min-width: 7rem;
+  text-align: center;
+}
+
 /* ==========================================================================
    Card View overlay close button
    ========================================================================== */
