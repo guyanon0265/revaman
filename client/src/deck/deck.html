@@ -2,105 +2,97 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- Removed user-select=none so users can tap and copy long card image URLs -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>PTCG Sandbox — Deck Builder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+    <title>RevaMan | PTCG Deck Builder</title>
     <link rel="icon" type="image/png" href="../assets/logo.png" />
     <link rel="stylesheet" href="deck.css" />
   </head>
   <body>
+    <!--
+      LAYOUT NOTE (grid vs. sidebar side):
+      The grid panel is currently first in the DOM / on the LEFT, sidebar
+      second / on the RIGHT. To swap sides later, flip the two children's
+      order in the markup (or just change `flex-direction` + swap the
+      `order` values on #grid-panel / #sidebar-panel in deck.css — see the
+      matching note there).
+    -->
     <div id="deck-builder-view">
-      <div class="deck-builder-header">
-        <a href="../home/index.html" class="back-link">&larr; Back to Dashboard</a>
-        <h1 id="builder-title">Deck Builder</h1>
-      </div>
-
-      <div class="builder-grid">
-        <!-- Left Side Panel: Deck Configurations -->
-        <div class="menu-box builder-meta">
-          <h3>Deck Details</h3>
-          <label for="deck-name-input">Deck Name</label>
-          <input type="text" id="deck-name-input" placeholder="e.g. Charizard ex" />
-
-          <label for="deck-cardback-input">Cardback Image URL</label>
-          <input type="text" id="deck-cardback-input" placeholder="https://images.pokemontcg.io/back.png" />
-
-          <div class="builder-stats">
-            <span id="card-count-stat">0 cards</span>
+      <main id="grid-panel" class="panel grid-panel">
+        <header class="panel-heading">
+          <div class="panel-heading-text">
+            <h1 id="deck-name-heading">Deck</h1>
+            <p id="deck-stats-line" class="panel-subtext">0 cards</p>
           </div>
+        </header>
 
-          <div class="builder-actions">
-            <button id="btn-add-row" class="menu-btn secondary-btn">+ Add Blank Card</button>
-            <button id="btn-save-deck-builder" class="menu-btn">Save to Library</button>
-          </div>
+        <!-- Populated entirely by deck.js — always includes one permanent
+             cardback tile plus one tile per card in state.cards. -->
+        <div id="deck-grid" class="deck-grid"></div>
+      </main>
 
-          <div class="builder-import">
-            <h4>Or import a CSV</h4>
-            <input type="file" id="csv-import-input" accept=".csv,text/csv" />
-            <p class="hint">Format: qty,name,type,url</p>
+      <aside id="sidebar-panel" class="panel sidebar-panel">
+        <header class="panel-heading">
+          <h1>Edit</h1>
+        </header>
+
+        <div class="sidebar-preview">
+          <div class="sidebar-preview-thumb" id="sidebar-preview-thumb">
+            <img id="sidebar-preview-img" alt="" />
+            <span id="sidebar-preview-fallback" class="thumb-fallback"></span>
           </div>
         </div>
 
-        <!-- Right Side Panel: Visual List Stack Area -->
-        <div class="menu-box builder-rows full-height-box">
-          <h3>Cards</h3>
-          <!-- The scrollable visual container replacing the table layout -->
-          <div id="rows-container" class="scroll-list visual-deck-stack"></div>
+        <div class="sidebar-fields">
+          <div class="sidebar-field">
+            <!-- Label + input swap meaning when the cardback tile is
+                 selected: "Card Name" -> "Deck Name". See deck.js. -->
+            <label for="sidebar-name-input" id="sidebar-name-label">Card Name</label>
+            <input type="text" id="sidebar-name-input" placeholder="e.g. Pikachu" autocomplete="off" />
+          </div>
+
+          <div class="sidebar-field">
+            <label for="sidebar-type-select">Type</label>
+            <!-- Real dropdown for normal cards. -->
+            <select id="sidebar-type-select">
+              <option value="Pokemon">Pokemon</option>
+              <option value="Trainer">Trainer</option>
+              <option value="Energy">Energy</option>
+            </select>
+            <!-- Swapped in, disabled, when cardback is selected (type is
+                 fixed and not one of the three editable options). -->
+            <input type="text" id="sidebar-type-readonly" value="Cardback" disabled hidden />
+          </div>
+
+          <div class="sidebar-field">
+            <label for="sidebar-qty-input">Quantity</label>
+            <!-- Forced to 0 and disabled when cardback is selected — a
+                 cardback isn't a counted card in the deck. -->
+            <input type="number" id="sidebar-qty-input" min="0" max="60" value="1" />
+          </div>
+
+          <div class="sidebar-field">
+            <label for="sidebar-url-input">Image URL</label>
+            <input type="text" id="sidebar-url-input" placeholder="https://images.pokemontcg.io/..." autocomplete="off" />
+          </div>
         </div>
-      </div>
+
+        <p class="sidebar-hint">The Cardback entry is permanent and cannot be removed from the grid.</p>
+
+        <div class="sidebar-actions">
+          <div class="sidebar-actions-row">
+            <button type="button" id="btn-add-card" class="menu-btn">+ Add Card</button>
+            <button type="button" id="btn-remove-card" class="menu-btn danger-btn">Remove Card</button>
+          </div>
+          <div class="sidebar-actions-row">
+            <button type="button" id="btn-import-csv" class="menu-btn secondary-btn">Import CSV</button>
+            <button type="button" id="btn-export-csv" class="menu-btn secondary-btn">Export CSV</button>
+          </div>
+        </div>
+
+        <input type="file" id="csv-file-input" accept=".csv,text/csv" hidden />
+      </aside>
     </div>
 
-    <!-- The Tap Overlay Box Layout (Accessible Native Dialog) -->
-    <dialog id="card-detail-modal" class="detail-overlay-box">
-      <div class="modal-content">
-        <button id="modal-close-btn" class="modal-close-icon">&times;</button>
-
-        <div class="modal-body-split">
-          <!-- Visual Left Area: Dynamic Card Preview -->
-          <div class="modal-preview-pane">
-            <img id="modal-preview-img" src="../assets/logo.png" alt="Card Image Preview" />
-          </div>
-
-          <!-- Data Right Area: Form Editors -->
-          <div class="modal-form-pane">
-            <input type="hidden" id="modal-card-id" />
-
-            <div class="modal-field">
-              <label for="modal-qty-input">Quantity</label>
-              <div class="qty-stepper">
-                <button id="modal-qty-down" class="step-btn">−</button>
-                <input type="number" id="modal-qty-input" min="0" max="59" />
-                <button id="modal-qty-up" class="step-btn">+</button>
-              </div>
-            </div>
-
-            <div class="modal-field">
-              <label for="modal-name-input">Card Name</label>
-              <input type="text" id="modal-name-input" placeholder="e.g. Pikachu" />
-            </div>
-
-            <div class="modal-field">
-              <label for="modal-type-input">Card Type</label>
-              <select id="modal-type-input">
-                <option value="Pokémon">Pokémon</option>
-                <option value="Trainer">Trainer</option>
-                <option value="Energy">Energy</option>
-                <option value="cardback">Cardback</option>
-              </select>
-            </div>
-
-            <div class="modal-field">
-              <label for="modal-url-input">Image URL</label>
-              <input type="text" id="modal-url-input" placeholder="https://images.pokemontcg.io/..." />
-            </div>
-
-            <button id="modal-save-btn" class="menu-btn">Apply Changes</button>
-            <button id="modal-delete-btn" class="menu-btn danger-btn">Remove Card</button>
-          </div>
-        </div>
-      </div>
-    </dialog>
-
-    <script src="./deck.js"></script>
+    <script src="deck.js" defer></script>
   </body>
 </html>

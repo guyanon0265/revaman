@@ -1,476 +1,511 @@
 /* ==========================================================================
-   1. BASE STYLES & MOBiLE-FIRST RESETS
+   deck.css — Deck Builder
+   Token names/values are kept identical to the ones used in game.css,
+   sidebar.css, card.css and menu.css so this page reads as part of the
+   same app rather than a re-skin. No dark/light theme switch is wired up
+   here (not requested) — these are the tokens the app renders by default.
    ========================================================================== */
 :root {
-  --bg-main: #1a1a1a; /* Deep obsidian dark mode background */
-  --bg-box: #121212; /* Slate panel containers */
-  --bg-row: #334155; /* Default card item background */
-  --text-main: #f8fafc; /* Crisp white primary typography */
-  --text-muted: #94a3b8; /* Subdued labels */
-  --primary: #3e3f42; /* Energetic blue for buttons */
-  --primary-hover: #1d4fba;
-  --accent: #f8fafc; /* Gold badge accents */
-  --border: #3a3c3f; /* Clean framing lines */
-  --radius: 12px;
-  --touch-target: 44px; /* Minimum interactive tap surface sizing */
+  /* -- surfaces / structure (game.css + sidebar.css) -- */
+  --bg: #0d0f13;
+  --surface: #1b1e26;
+  --surface-elevated: #262b35;
+  --surface-subtle: rgba(255, 255, 255, 0.06);
+  --surface-subtle-hover: rgba(255, 255, 255, 0.07);
+  --bg-recessed: #121419;
+  --slot: #23262d;
+  --border: #383c46;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.18);
+
+  /* -- text (sidebar.css) -- */
+  --text-strong: #ffffff;
+  --text-default: #e7ebf3;
+  --text-muted: #8b93a3;
+  --text-faint: #6b7280;
+
+  /* -- shadows / misc (sidebar.css) -- */
+  --shadow-soft: rgba(0, 0, 0, 0.4);
+  --shadow-deep: rgba(0, 0, 0, 0.55);
+  --scrollbar-thumb: #3a3f4a;
+
+  /* -- accents (sidebar.css) -- */
+  --accent-player: #38bdf8;
+  --accent-tint-bg: rgba(47, 111, 237, 0.18);
+  --accent-tint-text: #7db8ff;
+  --accent-button: #2f6fed;
+  --accent-hover: #4a82f5;
+  --accent-generate: #dc9110;
+  --accent-generate-hover: #eca431;
+  --accent-success: #4ade80;
+  --accent-success-border: rgba(74, 222, 128, 0.35);
+
+  /* -- danger (sidebar.css) -- */
+  --danger-bg: rgba(239, 68, 68, 0.2);
+  --danger-bg-strong: rgba(239, 68, 68, 0.15);
+  --danger-border: rgba(239, 68, 68, 0.4);
+  --danger-border-strong: #ef4444;
+  --danger-text: #fca5a5;
+  --danger-section-border: rgba(239, 68, 68, 0.25);
+
+  /* -- card visuals (card.css / menu.css) -- */
+  --card-bg: #0f172a;
+  --card-border: #383c46;
+  --card-selected: #15b5fa;
+  --card-selected-glow: rgba(21, 174, 250, 0.5);
+  --card-w-sm: 7dvh;
+  --card-h-sm: 9.8dvh;
+
+  /* -- type accent mapping (semantic reuse of existing tokens) --
+     Pokemon -> player accent, Trainer -> generate accent (amber, "tool"
+     feel), Energy -> success accent (green), Cardback -> faint/neutral. */
+  --type-p: var(--accent-player);
+  --type-t: var(--accent-generate);
+  --type-e: var(--accent-success);
+  --type-c: var(--text-faint);
 }
 
 * {
   box-sizing: border-box;
+}
+
+html,
+body {
   margin: 0;
   padding: 0;
-}
-
-body {
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text-default);
   font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: var(--bg-main);
-  color: var(--text-main);
-  line-height: 1.5;
-  /* Safe-area padding handling for edge-to-edge screens */
-  padding: env(safe-area-inset-top) env(safe-area-inset-right)
-    env(safe-area-inset-bottom) env(safe-area-inset-left);
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  overflow: hidden;
 }
 
+/* ==========================================================================
+   Shell — two panels.
+   SIDE NOTE: grid-panel is order:1 (left), sidebar-panel is order:2 (right)
+   in the default row direction. To move the sidebar to the left later,
+   just swap these two `order` values (or the flex-direction below stays
+   the same — only the order changes).
+   ========================================================================== */
 #deck-builder-view {
-  padding: 16px;
-  max-width: 1400px;
-  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100dvh;
+  padding: max(1.4dvh, env(safe-area-inset-top, 0px))
+    max(1.4dvh, env(safe-area-inset-right, 0px))
+    max(1.4dvh, env(safe-area-inset-bottom, 0px))
+    max(1.4dvh, env(safe-area-inset-left, 0px));
+  gap: 1.4dvh;
 }
 
-/* ==========================================================================
-   2. APP HEADER & LAYOUT CONTROLS
-   ========================================================================== */
-.deck-builder-header {
-  margin-bottom: 24px;
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 1.8dvh;
+  box-shadow: 0 20px 60px var(--shadow-deep);
+  padding: 1.6dvh;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
-.back-link {
-  display: inline-block;
-  color: var(--primary);
-  text-decoration: none;
-  font-weight: 500;
-  margin-bottom: 6px;
+.panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8dvh;
+  margin-bottom: 1.4dvh;
+  flex-shrink: 0;
 }
 
-#builder-title {
-  font-size: 1.75rem;
+.panel-heading h1 {
+  margin: 0;
+  font-size: 2dvh;
   font-weight: 800;
+  color: var(--text-strong);
 }
 
-/* Base structural flow on mobile devices */
-.builder-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.panel-subtext {
+  margin: 0.4dvh 0 0;
+  font-size: 1.3dvh;
+  font-weight: 600;
+  color: var(--text-muted);
 }
 
-.menu-box {
-  background: var(--bg-box);
-  border-radius: var(--radius);
-  padding: 20px;
-  border: 1px solid var(--border);
+/* -- grid panel (left) -- */
+.grid-panel {
+  order: 1;
+  flex: 1 1 68%;
 }
 
-.menu-box h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 16px;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 8px;
+/* -- sidebar panel (right) -- */
+.sidebar-panel {
+  order: 2;
+  flex: 0 0 min(340px, 34%);
+  overflow-y: auto;
 }
 
 /* ==========================================================================
-   3. DECK DETAILS PANEL & FORMS
+   Deck grid
    ========================================================================== */
-label {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  margin-top: 14px;
+.deck-grid {
+  flex: 1;
+  min-height: 0;
+  background-color: var(--bg-recessed);
+  border: 1px solid var(--border-subtle);
+  border-radius: 1.2dvh;
+  padding: 1.6dvh;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11dvh, 1fr));
+  gap: 1.6dvh 1.2dvh;
+  align-content: start;
 }
 
-input[type='text'],
-input[type='number'],
-select {
-  width: 100%;
-  min-height: var(--touch-target);
-  background-color: var(--bg-main);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 14px;
-  color: var(--text-main);
-  font-size: 16px; /* Prevents auto-zoom scaling issues on iOS Safari */
-  transition: border-color 0.2s;
+.deck-grid::-webkit-scrollbar {
+  width: 6px;
+}
+.deck-grid::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 3px;
 }
 
-input:focus,
-select:focus {
-  outline: none;
-  border-color: var(--primary);
-}
-
-.builder-stats {
-  margin: 16px 0;
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: var(--accent);
-}
-
-.builder-actions {
+.deck-card-item {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  align-items: center;
+  gap: 0.7dvh;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
 }
 
-.menu-btn {
+.deck-card-thumb {
+  position: relative;
   width: 100%;
-  min-height: var(--touch-target);
-  background-color: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
+  aspect-ratio: 5 / 7;
+  border-radius: 0.9dvh;
+  border: 0.2dvh solid var(--card-border);
+  background: var(--card-bg);
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+  transition:
+    transform 0.1s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
-.menu-btn:hover {
-  background-color: var(--primary-hover);
+.deck-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
-.secondary-btn {
-  background-color: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-main);
-}
-.secondary-btn:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-.builder-import h4 {
-  margin-top: 20px;
-  font-size: 0.95rem;
-}
-
-.hint {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  margin-top: 4px;
+/* Shown only when a card has no image URL yet, or the URL fails to load —
+   not used as a stand-in for real art anywhere else. */
+.thumb-fallback {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 3dvh;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--text-faint);
 }
 
-/* ==========================================================================
-   4. NEW FADING ROW SCROLLING MECHANISM
-   ========================================================================== */
-#rows-header {
-  display: none; /* Stripping away old raw horizontal text columns completely */
+.deck-card-thumb.no-image {
+  border-style: dashed;
+  background: var(--bg-recessed);
+}
+.deck-card-thumb.no-image img {
+  display: none;
+}
+.deck-card-thumb.no-image .thumb-fallback {
+  display: flex;
 }
 
-.scroll-list {
+.pin-badge {
+  position: absolute;
+  top: 0.5dvh;
+  right: 0.5dvh;
+  font-size: 1.2dvh;
+  filter: grayscale(1) brightness(1.6);
+  opacity: 0.85;
+}
+
+.deck-card-item:hover .deck-card-thumb {
+  transform: translateY(-0.2dvh);
+  border-color: var(--border-hover);
+}
+
+.deck-card-item.selected .deck-card-thumb,
+.deck-card-item:focus-visible .deck-card-thumb {
+  border: 0.3dvh solid var(--card-selected);
+  box-shadow: 0 0 0 0.2dvh var(--card-selected-glow);
+}
+
+.deck-card-meta {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  max-height: 550px;
-  overflow-y: auto;
-  padding-right: 4px;
-  -webkit-overflow-scrolling: touch; /* Butter-smooth scrolling acceleration */
-}
-
-/* Individual Card Visual Element Block */
-.faded-card-row {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  height: 56px;
-  background-color: var(--bg-main);
-  border-radius: 8px;
-  overflow: hidden;
-  position: relative;
-  border: 1px solid var(--border);
-  cursor: pointer;
-  transition:
-    transform 0.15s,
-    border-color 0.2s;
+  gap: 0.3dvh;
+  width: 100%;
 }
 
-.faded-card-row:hover,
-.faded-card-row.selected-row-highlight {
-  transform: translateY(-1px);
-  border-color: var(--primary);
-}
-
-/* Card details left cluster alignment */
-.card-meta-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-left: 16px;
-  z-index: 2; /* Sits text crisp and cleanly over top of image gradient layer */
-  position: relative;
-  pointer-events: none; /* Stops sub elements breaking click bubblers */
-}
-
-.card-qty-badge {
-  background-color: var(--bg-row);
-  color: var(--accent);
-  font-weight: 800;
-  font-size: 0.9rem;
-  padding: 4px 8px;
-  border-radius: 4px;
-  min-width: 36px;
-  text-align: center;
-}
-
-.card-title-text {
+.deck-card-name {
+  font-size: 1.15dvh;
   font-weight: 600;
-  font-size: 1rem;
+  color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 180px;
+  max-width: 100%;
 }
 
-/* Image graphic framing architecture on the right */
-.card-art-right {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 60%;
-  height: 100%;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.card-art-right img {
-  width: 100%;
-  height: 150%; /* Taller profile scaling offsets frame box ratios safely */
-  object-fit: cover;
-  object-position: 50% 20%; /* Centers crop viewport precisely onto the card artwork */
-}
-
-/* The Faded Overlay Mask Logic */
-.card-art-right::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 2;
-  background: linear-gradient(
-    to right,
-    var(--bg-main) 0%,
-    rgba(15, 23, 42, 0.85) 30%,
-    rgba(15, 23, 42, 0) 100%
-  );
-}
-
-/* ==========================================================================
-   5. FLOATING DETAIL DRAWER PREVIEW POPUP
-   ========================================================================== */
-.card-details-popup {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: var(--bg-box);
-  border-top: 1px solid var(--border);
-  border-radius: 20px 20px 0 0;
-  padding: 24px;
-  z-index: 1000;
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4);
-  transform: translateY(100%);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Active Class trigger for opening animation state */
-.card-details-popup.active {
-  transform: translateY(0);
-}
-
-.popup-grid {
-  display: grid;
-  grid-template-columns: 100px 1fr;
-  gap: 16px;
-  position: relative;
-}
-
-.popup-close-btn {
-  position: absolute;
-  top: -8px;
-  right: -4px;
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 1.5rem;
-  cursor: pointer;
-  width: var(--touch-target);
-  height: var(--touch-target);
-}
-
-.popup-image-container img {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 2.5 / 3.5; /* Lock aspect ratio to official Trading Card footprints */
-  object-fit: contain;
-  border-radius: 6px;
-  background-color: var(--bg-main);
-}
-
-.popup-fields-container {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.popup-row-split {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.popup-fields-container label {
-  margin: 0 0 4px 0;
-}
-
-/* Small adjustments to input boxes found inside editing popups */
-.popup-fields-container input,
-.popup-fields-container select {
-  background-color: var(--bg-box);
-  border-color: var(--border);
-}
-
-/* Backdrop Dimmer overlay layout */
-.popup-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  z-index: 999;
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity 0.25s,
-    visibility 0.25s;
-}
-
-.popup-backdrop.active {
-  opacity: 1;
-  visibility: visible;
-}
-
-/* Inline Delete Button for Faded Card Rows */
-.row-delete-btn {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 32px;
-  height: 32px;
-  border-radius: 10%;
-  background-color: rgb(164, 31, 31); /* Translucent red */
-  color: #fff; /* Crisp red cross symbol */
-  border: 1px solid rgba(239, 68, 68, 0.4);
-  font-size: 1.25rem;
-  line-height: 1;
+.qty-type-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  z-index: 10; /* Sits completely above the image masking effects */
-  transition:
-    background-color 0.2s,
-    transform 0.1s;
+  gap: 0.5dvh;
 }
 
-/* Expand the visual hit target area size specifically for mobile fingers */
-.row-delete-btn::after {
-  content: '';
-  position: absolute;
-  top: -6px;
-  left: -6px;
-  right: -6px;
-  bottom: -6px;
+.deck-card-qty {
+  font-size: 1.3dvh;
+  font-weight: 800;
+  color: var(--text-default);
 }
 
-.row-delete-btn:hover {
-  background-color: rgba(239, 68, 68, 0.9);
-  color: #ffffff;
+.deck-card-type {
+  font-size: 1.05dvh;
+  font-weight: 800;
+  line-height: 1;
+  padding: 0.3dvh 0.7dvh;
+  border-radius: 999px;
+  color: var(--text-strong);
 }
 
-.row-delete-btn:active {
-  transform: translateY(-50%) scale(0.95);
+.deck-card-type.type-p {
+  background: color-mix(in srgb, var(--type-p) 35%, transparent);
+  color: var(--type-p);
 }
-
-/* Slight padding correction on rows to prevent card titles overlapping the delete icon */
-.card-title-text {
-  max-width: 140px; /* Constrain slightly more on mobile for safety */
+.deck-card-type.type-t {
+  background: color-mix(in srgb, var(--type-t) 35%, transparent);
+  color: var(--type-t);
 }
-
-@media (min-width: 900px) {
-  .card-title-text {
-    max-width: 260px;
-  }
+.deck-card-type.type-e {
+  background: color-mix(in srgb, var(--type-e) 35%, transparent);
+  color: var(--type-e);
+}
+.deck-card-type.type-c {
+  background: var(--surface-subtle);
+  color: var(--type-c);
 }
 
 /* ==========================================================================
-   6. DESKTOP WORKSPACE LAYOUT (Widescreens)
+   Sidebar (editing panel)
    ========================================================================== */
-@media (min-width: 900px) {
-  .builder-grid {
-    display: grid;
-    grid-template-columns: 360px 1fr;
-    gap: 24px;
-    align-items: start;
+.sidebar-preview {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.6dvh;
+}
+
+.sidebar-preview-thumb {
+  position: relative;
+  width: 60%;
+  max-width: 20dvh;
+  aspect-ratio: 5 / 7;
+  border-radius: 1.4dvh;
+  border: 0.2dvh solid var(--card-border);
+  background: var(--card-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 10px 30px var(--shadow-soft);
+}
+
+.sidebar-preview-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.sidebar-preview-thumb .thumb-fallback {
+  font-size: 5dvh;
+}
+
+.sidebar-preview-thumb.no-image {
+  border-style: dashed;
+  background: var(--bg-recessed);
+}
+.sidebar-preview-thumb.no-image img {
+  display: none;
+}
+.sidebar-preview-thumb.no-image .thumb-fallback {
+  display: flex;
+}
+
+.sidebar-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2dvh;
+}
+
+.sidebar-field label {
+  display: block;
+  font-size: 1.2dvh;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 0.5dvh;
+}
+
+.sidebar-field input,
+.sidebar-field select {
+  width: 100%;
+  min-height: 4.2dvh;
+  background-color: var(--bg-recessed);
+  border: 1px solid var(--border-subtle);
+  border-radius: 1dvh;
+  color: var(--text-strong);
+  padding: 0.8dvh 1.1dvh;
+  font-size: 1.5dvh;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.sidebar-field input:focus,
+.sidebar-field select:focus {
+  border-color: var(--accent-button);
+}
+
+.sidebar-field input:disabled,
+.sidebar-field select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.sidebar-hint {
+  font-size: 1.15dvh;
+  line-height: 1.5;
+  color: var(--text-faint);
+  margin: 1.4dvh 0 0;
+}
+
+.sidebar-actions {
+  margin-top: auto;
+  padding-top: 1.6dvh;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8dvh;
+}
+
+.sidebar-actions-row {
+  display: flex;
+  gap: 0.8dvh;
+}
+
+.menu-btn {
+  flex: 1;
+  min-height: 4.4dvh;
+  background-color: var(--accent-button);
+  color: var(--text-strong);
+  border: 1px solid var(--accent-button);
+  border-radius: 1dvh;
+  font-weight: 700;
+  font-size: 1.4dvh;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.08s ease;
+}
+.menu-btn:hover {
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+.menu-btn:active {
+  transform: scale(0.97);
+}
+
+.menu-btn.secondary-btn {
+  background-color: var(--surface-elevated);
+  border-color: var(--border-subtle);
+  color: var(--text-default);
+}
+.menu-btn.secondary-btn:hover {
+  background-color: var(--surface-subtle-hover);
+  border-color: var(--border-hover);
+}
+
+.menu-btn.danger-btn {
+  background-color: var(--surface-elevated);
+  border-color: var(--danger-section-border);
+  color: var(--danger-text);
+}
+.menu-btn.danger-btn:hover {
+  background-color: var(--danger-bg-strong);
+  border-color: var(--danger-border-strong);
+  color: var(--text-strong);
+}
+
+.menu-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+}
+.menu-btn:disabled:hover {
+  background-color: var(--surface-elevated);
+  border-color: var(--danger-section-border);
+  color: var(--danger-text);
+}
+
+/* ==========================================================================
+   MOBILE
+   TOP/BOTTOM NOTE: grid-panel is order:1 (top), sidebar-panel is order:2
+   (bottom) here. To flip which sits on top, swap these two `order` values.
+   ========================================================================== */
+@media (max-width: 767px) {
+  #deck-builder-view {
+    flex-direction: column;
   }
 
-  #builder-title {
-    font-size: 2.25rem;
+  .grid-panel {
+    order: 1;
+    flex: 1 1 62%;
   }
 
-  .full-height-box {
-    min-height: calc(100vh - 150px);
+  .sidebar-panel {
+    order: 2;
+    flex: 1 1 38%;
   }
 
-  .scroll-list {
-    max-height: calc(100vh - 240px);
-  }
-
-  /* Transform drawer to fit nicely into centered overlay workspace module on desktop screens */
-  .card-details-popup {
-    top: 50%;
-    left: 50%;
-    bottom: auto;
-    right: auto;
-    width: 500px;
-    transform: translate(-50%, -30%) scale(0.95);
-    border-radius: var(--radius);
-    opacity: 0;
-    visibility: hidden;
-    transition:
-      transform 0.2s,
-      opacity 0.2s,
-      visibility 0.2s;
-  }
-
-  .card-details-popup.active {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
-    visibility: visible;
-  }
-
-  .popup-grid {
-    grid-template-columns: 140px 1fr;
-    gap: 20px;
+  .deck-grid {
+    grid-template-columns: repeat(auto-fill, minmax(9.5dvh, 1fr));
   }
 }
