@@ -242,6 +242,7 @@ export function selectHandCard(position) {
 export function selectActiveCard() {
   const activeZone = `${runtimeState.mySlot}-active`;
   const card = gameState.zones[activeZone][0];
+  if (!card) return;
   if (
     clientState.selectedInstanceId === card.instanceId &&
     clientState.selectedZone === activeZone
