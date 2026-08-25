@@ -282,6 +282,13 @@ export function openPile(zone) {
   openPileBrowser(zone);
 }
 
+export function openPileFromKeybind(zone) {
+  const pileZone = SHARED_ZONE_IDS.includes(zone)
+    ? zone
+    : `${runtimeState.mySlot}-${zone}`;
+  openPile(pileZone);
+}
+
 export function openCardActions(instanceId, zone) {
   selectCard(instanceId, zone);
   openActionMenu(instanceId, zone);

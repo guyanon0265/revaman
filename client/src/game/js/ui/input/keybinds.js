@@ -14,12 +14,16 @@ const keybinds = {
   'Mod+Y': actions.redoAction,
   'Shift+M': actions.openCardActionsFromKeybind,
   'Shift+TAB': actions.toggleCardActionTabs,
+  'Shift+D': () => actions.openPileFromKeybind('deck'),
+  'Shift+I': () => actions.openPileFromKeybind('discard'),
+  'Shift+P': () => actions.openPileFromKeybind('prizes'),
+  'Shift+L': () => actions.openPileFromKeybind('lost-zone'),
   ESCAPE: actions.closeAllPanels,
   ENTER: actions.openSidebarPanel,
   TAB: actions.cycleSidebarTabs,
   'Shift+BACKSPACE': actions.resetBoard,
   'Mod+Shift+BACKSPACE': actions.resetGame,
-  'Shift+I': actions.handleInformationOverlay,
+  'Shift+H': actions.handleInformationOverlay,
 };
 
 const quickActionKeybinds = {
