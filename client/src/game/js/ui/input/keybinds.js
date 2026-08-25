@@ -19,7 +19,7 @@ const keybinds = {
   TAB: actions.cycleSidebarTabs,
   'Shift+BACKSPACE': actions.resetBoard,
   'Mod+Shift+BACKSPACE': actions.resetGame,
-  'Shift+I': actions.handeInformationOverlay,
+  'Shift+I': actions.handleInformationOverlay,
 };
 
 const quickActionKeybinds = {

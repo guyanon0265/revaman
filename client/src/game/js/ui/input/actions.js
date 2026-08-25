@@ -446,6 +446,6 @@ export function toggleCardActionTabs() {
   togglePage();
 }
 
-export function handeInformationOverlay() {
+export function handleInformationOverlay() {
   toggleInformation();
 }
