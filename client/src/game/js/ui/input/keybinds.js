@@ -18,12 +18,12 @@ const keybinds = {
   'Shift+I': () => actions.openPileFromKeybind('discard'),
   'Shift+P': () => actions.openPileFromKeybind('prizes'),
   'Shift+L': () => actions.openPileFromKeybind('lost-zone'),
-  ESCAPE: actions.closeAllPanels,
   ENTER: actions.openSidebarPanel,
   TAB: actions.cycleSidebarTabs,
+  ESCAPE: actions.closeAllPanels,
+  'Shift+H': actions.handleInformationOverlay,
   'Shift+BACKSPACE': actions.resetBoard,
   'Mod+Shift+BACKSPACE': actions.resetGame,
-  'Shift+H': actions.handleInformationOverlay,
 };
 
 const quickActionKeybinds = {
