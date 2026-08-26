@@ -27,6 +27,47 @@ import { initSettingsZone } from '../game/js/ui/sidebar/multiplayer/settingsZone
 const DEFAULT_CARDBACK_URL = 'https://images.pokemontcg.io/back.png';
 
 // --------------------------------------------------------------------------
+// Draft persistence (sessionStorage)
+// Keeps the deck currently being edited alive across reloads without
+// needing an explicit save step. sessionStorage (rather than localStorage)
+// is deliberate: it clears when the tab/window actually closes, so it
+// behaves like "don't lose my in-progress edits", not "remember this deck
+// forever". Loading a demo deck, importing a CSV, or editing anything
+// overwrites the draft, so there's no separate "clear draft" affordance —
+// starting over just means loading something else.
+// --------------------------------------------------------------------------
+const DRAFT_STORAGE_KEY = 'revaman-deck-builder-draft';
+
+function saveDraft() {
+  try {
+    sessionStorage.setItem(
+      DRAFT_STORAGE_KEY,
+      JSON.stringify({
+        deckName: state.deckName,
+        cardbackUrl: state.cardbackUrl,
+        cards: state.cards,
+        selectedId: state.selectedId,
+      })
+    );
+  } catch {
+    // sessionStorage can throw (private browsing, storage disabled/full);
+    // losing draft-persistence silently is fine, editing still works.
+  }
+}
+
+function loadDraft() {
+  try {
+    const raw = sessionStorage.getItem(DRAFT_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.cards)) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+// --------------------------------------------------------------------------
 // Element refs
 // --------------------------------------------------------------------------
 const grid = document.getElementById('deck-grid');
@@ -337,6 +378,7 @@ function renderGrid() {
   grid.innerHTML = '';
   grid.appendChild(buildCardbackTile());
   for (const card of state.cards) grid.appendChild(buildCardTile(card));
+  saveDraft();
 }
 
 function setPreview(url, name, letter) {
@@ -576,12 +618,22 @@ textImportConfirmBtn.addEventListener('click', () => {
 });
 
 // --------------------------------------------------------------------------
-// Init — starts blank; populate via Add Card, Import CSV, Load Demo Deck,
-// or Import From Text.
+// Init — restores an in-progress deck from sessionStorage if one exists;
+// otherwise starts blank. Populate via Add Card, Import CSV, Load Demo
+// Deck, or Import From Text.
 // --------------------------------------------------------------------------
 (function init() {
   // Applies the persisted theme (and no-ops harmlessly on buttonSide/tab/
   // spectators settings, since this page doesn't have those controls).
   initSettingsZone();
+
+  const draft = loadDraft();
+  if (draft) {
+    state.deckName = draft.deckName ?? state.deckName;
+    state.cardbackUrl = draft.cardbackUrl ?? state.cardbackUrl;
+    state.cards = draft.cards;
+    state.selectedId = draft.selectedId ?? state.selectedId;
+  }
+
   renderAll();
 })();
