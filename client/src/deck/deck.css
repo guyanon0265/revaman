@@ -520,17 +520,29 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: min(520px, 92vw);
-  max-height: 86dvh;
+  max-width: 90%;
   background: var(--surface);
   border: 1px solid var(--border-subtle);
   border-radius: 1.8dvh;
   display: none;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
   padding: 1.4dvh;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
   box-shadow: 0 20px 60px var(--shadow-deep);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  transition:
+    transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.2s ease;
   z-index: 700;
 }
 
@@ -575,15 +587,18 @@ body {
 
 /* -- Demo Decks -- */
 .demo-card-container {
+  flex: 1;
+  min-height: 0;
+  width: max-content;
   background-color: var(--bg-recessed);
   border: 1px solid var(--border-subtle);
   border-radius: 1.2dvh;
-  padding: 1.6dvh;
-  overflow-y: auto;
+  padding: 1.4dvh;
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
-  gap: 1.6dvh;
-  align-items: flex-start;
+  gap: 18px;
+  align-items: center;
   justify-content: center;
 }
 
