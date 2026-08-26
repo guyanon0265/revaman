@@ -83,15 +83,20 @@ export function initSettingsZone() {
     });
   }
 
-  if (themeSelect) {
-    settings.theme = VALID_THEMES.includes(stored.theme)
-      ? stored.theme
-      : VALID_THEMES.includes(themeSelect.value)
-        ? themeSelect.value
-        : 'dark';
-    themeSelect.value = settings.theme;
-    applyTheme(settings.theme);
+  // FIX: theme is now computed + applied unconditionally (same pattern as
+  // buttonSide/defaultTab above). Previously this whole block — including
+  // applyTheme() — was gated behind `if (themeSelect)`, so any page without
+  // the #theme-select dropdown (e.g. deck.html) never got the persisted
+  // theme applied to <html>, even though it was sitting in localStorage.
+  settings.theme = VALID_THEMES.includes(stored.theme)
+    ? stored.theme
+    : VALID_THEMES.includes(themeSelect?.value)
+      ? themeSelect.value
+      : 'dark';
+  applyTheme(settings.theme);
 
+  if (themeSelect) {
+    themeSelect.value = settings.theme;
     themeSelect.addEventListener('change', () => {
       settings.theme = themeSelect.value;
       applyTheme(settings.theme);

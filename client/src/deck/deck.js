@@ -13,6 +13,13 @@
 //   and its URL becomes the cardback art. QTY is ignored on that row.
 // ==========================================================================
 
+import { initSettingsZone } from '../game/js/ui/sidebar/multiplayer/settingsZone.js';
+
+// NOTE: path assumed from the game/js/deck-select.js pattern you shared
+// ('../../logic/loggingEngine.js' from game/js/), scaled to deck.js sitting
+// one level down from the project root instead of two. Adjust if your
+// actual folder layout differs.
+
 // Shown for the cardback tile/preview whenever state.cardbackUrl is empty.
 // Display-only — never written into state.cardbackUrl itself, so it never
 // ends up in an exported CSV. Paste whatever image you want as the
@@ -573,5 +580,8 @@ textImportConfirmBtn.addEventListener('click', () => {
 // or Import From Text.
 // --------------------------------------------------------------------------
 (function init() {
+  // Applies the persisted theme (and no-ops harmlessly on buttonSide/tab/
+  // spectators settings, since this page doesn't have those controls).
+  initSettingsZone();
   renderAll();
 })();
