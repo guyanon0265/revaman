@@ -19,37 +19,6 @@
 // fallback cardback art here.
 const DEFAULT_CARDBACK_URL = 'https://images.pokemontcg.io/back.png';
 
-// A real deck (from the uploaded dragapult-deck.csv) used as starting data,
-// so the schema below is exercised by real content rather than placeholders.
-const DEFAULT_CSV = `QTY,Name,Type,URL
-4,Dreepy,Pokémon,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/TWM/TWM_128_R_EN.png
-4,Drakloak,Pokémon,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/TWM/TWM_129_R_EN.png
-2,Dragapult ex,Pokémon,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/TWM/TWM_130_R_EN.png
-2,Duskull,Pokémon,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/PRE/PRE_035_R_EN.png
-2,Dusclops,Pokémon,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/PRE/PRE_036_R_EN.png
-1,Dusknoir,Pokémon,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/PRE/PRE_037_R_EN.png
-1,Budew,Pokémon,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/ASC/ASC_016_R_EN.png
-1,Fezandipiti ex,Pokémon,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/ASC/ASC_142_R_EN.png
-1,Meowth ex,Pokémon,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/POR/POR_062_R_EN.png
-1,Munkidori,Pokémon,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/TWM/TWM_095_R_EN.png
-4,Lillie's Determination,Trainer,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/MEG/MEG_119_R_EN.png
-3,Crispin,Trainer,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/SCR/SCR_133_R_EN.png
-2,Boss's Orders,Trainer,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/MEG/MEG_114_R_EN.png
-1,Dawn,Trainer,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/PFL/PFL_087_R_EN.png
-4,Ultra Ball,Trainer,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/MEG/MEG_131_R_EN.png
-4,Poké Pad,Trainer,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/POR/POR_081_R_EN.png
-4,Buddy-Buddy Poffin,Trainer,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/TEF/TEF_144_R_EN.png
-4,Crushing Hammer,Trainer,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/POR/POR_071_R_EN.png
-2,Night Stretcher,Trainer,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/ASC/ASC_196_R_EN.png
-1,Unfair Stamp,Trainer,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/TWM/TWM_165_R_EN.png
-1,Special Red Card,Trainer,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/CRI/CRI_082_R_EN.png
-1,Handheld Fan,Trainer,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/TWM/TWM_150_R_EN.png
-1,Team Rocket's Watchtower,Trainer,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/DRI/DRI_180_R_EN.png
-1,Jamming Tower,Trainer,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/TWM/TWM_153_R_EN.png
-3,Psychic Energy,Energy,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/MEE/MEE_005_R_EN.png
-3,Fire Energy,Energy,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/MEE/MEE_002_R_EN.png
-2,Darkness Energy,Energy,https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/MEE/MEE_007_R_EN.png`;
-
 // --------------------------------------------------------------------------
 // Element refs
 // --------------------------------------------------------------------------
@@ -70,9 +39,19 @@ const urlInput = document.getElementById('sidebar-url-input');
 
 const addBtn = document.getElementById('btn-add-card');
 const removeBtn = document.getElementById('btn-remove-card');
+const loadDemoDeckBtn = document.getElementById('btn-load-demo-deck');
+const importTextBtn = document.getElementById('btn-import-text');
 const importBtn = document.getElementById('btn-import-csv');
 const exportBtn = document.getElementById('btn-export-csv');
 const fileInput = document.getElementById('csv-file-input');
+
+const demoDeckOverlay = document.getElementById('demo-deck-selector');
+const closeDemoDecksBtn = document.getElementById('btn-demo-decks-close');
+
+const textImportOverlay = document.getElementById('text-import-overlay');
+const closeTextImportBtn = document.getElementById('btn-text-import-close');
+const textImportTextarea = document.getElementById('text-import-textarea');
+const textImportConfirmBtn = document.getElementById('btn-text-import-confirm');
 
 // --------------------------------------------------------------------------
 // State
@@ -421,6 +400,24 @@ function selectCard(id) {
   renderAll();
 }
 
+// Applies a { deckName, cardbackUrl, cards } result (from parseCSV) to
+// state and re-renders. Shared by CSV import, demo decks, and (eventually)
+// text import.
+function applyParsedDeck(parsed, fallbackName = 'New Deck') {
+  state.deckName = parsed.deckName || fallbackName;
+  state.cardbackUrl = parsed.cardbackUrl;
+  state.cards = parsed.cards;
+  selectCard('cardback');
+}
+
+function titleCaseFromSlug(slug) {
+  return slug
+    .split('-')
+    .filter(Boolean)
+    .map((w) => w[0].toUpperCase() + w.slice(1))
+    .join(' ');
+}
+
 // --------------------------------------------------------------------------
 // Sidebar field edits — mutate state, then refresh the grid/header only.
 // Rebuilding the sidebar itself would steal focus from whichever input the
@@ -492,11 +489,7 @@ fileInput.addEventListener('change', (e) => {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = () => {
-    const parsed = parseCSV(String(reader.result));
-    state.deckName = parsed.deckName || 'New Deck';
-    state.cardbackUrl = parsed.cardbackUrl;
-    state.cards = parsed.cards;
-    selectCard('cardback');
+    applyParsedDeck(parseCSV(String(reader.result)));
   };
   reader.readAsText(file);
   fileInput.value = '';
@@ -505,13 +498,80 @@ fileInput.addEventListener('change', (e) => {
 exportBtn.addEventListener('click', exportCSV);
 
 // --------------------------------------------------------------------------
-// Init
+// Demo Deck overlay
+// Mirrors the game.html/menu.css pattern: a centered floating panel toggled
+// via the .open class. Each .demo-card-option's data-deck-id maps to a
+// packaged CSV at ../assets/demo_decks/{deckId}.csv — drop your CSVs there
+// (e.g. dragapult-deck.csv, alakazam-back-deck.csv) for these to resolve.
+// --------------------------------------------------------------------------
+function openDemoDecks() {
+  demoDeckOverlay.classList.add('open');
+}
+
+function closeDemoDecks() {
+  demoDeckOverlay.classList.remove('open');
+}
+
+async function loadDemoDeckCsv(deckId) {
+  const response = await fetch(`../assets/demo_decks/${deckId}.csv`);
+  if (!response.ok) {
+    throw new Error(`Failed to load demo deck: ${deckId}`);
+  }
+  return response.text();
+}
+
+async function handleDemoDeckClick(deckId) {
+  try {
+    const csv = await loadDemoDeckCsv(deckId);
+    applyParsedDeck(parseCSV(csv), titleCaseFromSlug(deckId));
+    closeDemoDecks();
+  } catch (err) {
+    console.error('Failed to load demo deck:', err);
+  }
+}
+
+loadDemoDeckBtn.addEventListener('click', openDemoDecks);
+closeDemoDecksBtn.addEventListener('click', closeDemoDecks);
+
+demoDeckOverlay.addEventListener('click', (e) => {
+  if (e.target.closest('#btn-demo-decks-close')) return; // handled above
+  const option = e.target.closest('.demo-card-option');
+  if (!option) return;
+  handleDemoDeckClick(option.dataset.deckId);
+});
+
+// --------------------------------------------------------------------------
+// Import From Text overlay
+// Same modal pattern as Demo Decks. Parsing/loading is stubbed for now —
+// wire textImportConfirmBtn's handler up to parseCSV() (or a looser format)
+// once the expected text format is decided.
+// --------------------------------------------------------------------------
+function openTextImport() {
+  textImportOverlay.classList.add('open');
+  textImportTextarea.value = '';
+  textImportTextarea.focus();
+}
+
+function closeTextImport() {
+  textImportOverlay.classList.remove('open');
+}
+
+importTextBtn.addEventListener('click', openTextImport);
+closeTextImportBtn.addEventListener('click', closeTextImport);
+
+textImportConfirmBtn.addEventListener('click', () => {
+  // TODO: parse textImportTextarea.value and applyParsedDeck(...) once the
+  // expected text format is decided. Left stubbed per request.
+  console.log(
+    'Import From Text — stubbed, textarea contents:',
+    textImportTextarea.value
+  );
+});
+
+// --------------------------------------------------------------------------
+// Init — starts blank; populate via Add Card, Import CSV, Load Demo Deck,
+// or Import From Text.
 // --------------------------------------------------------------------------
 (function init() {
-  const parsed = parseCSV(DEFAULT_CSV);
-  state.deckName = parsed.deckName || 'Dragapult ex';
-  state.cardbackUrl = parsed.cardbackUrl; // intentionally empty -> falls back to DEFAULT_CARDBACK_URL for display
-  state.cards = parsed.cards;
-  state.selectedId = 'cardback';
   renderAll();
 })();

@@ -84,6 +84,10 @@
             <button type="button" id="btn-remove-card" class="menu-btn danger-btn">Remove Card</button>
           </div>
           <div class="sidebar-actions-row">
+            <button type="button" id="btn-load-demo-deck" class="menu-btn secondary-btn">Load Demo Deck</button>
+            <button type="button" id="btn-import-text" class="menu-btn secondary-btn">Import From Text</button>
+          </div>
+          <div class="sidebar-actions-row">
             <button type="button" id="btn-import-csv" class="menu-btn secondary-btn">Import CSV</button>
             <button type="button" id="btn-export-csv" class="menu-btn secondary-btn">Export CSV</button>
           </div>
@@ -91,6 +95,51 @@
 
         <input type="file" id="csv-file-input" accept=".csv,text/csv" hidden />
       </aside>
+    </div>
+
+    <!-- ==================================================================
+         Demo Deck overlay — same pattern as game.html/menu.css: a centered
+         floating panel, hidden by default, toggled via the .open class.
+         Each .demo-card-option's data-deck-id maps to a packaged CSV at
+         ../assets/demo_decks/{deckId}.csv (see deck.js loadDemoDeckCsv()).
+         Add/remove .demo-card-option entries here to change the roster.
+         ================================================================== -->
+    <div id="demo-deck-selector" class="modal-overlay">
+      <div class="panel-header">
+        <div class="panel-header-text">
+          <div class="side-panel-title">Demo Decks</div>
+        </div>
+        <button type="button" id="btn-demo-decks-close" class="btn-side-panel-close">&times;</button>
+      </div>
+      <div class="demo-card-container">
+        <div class="demo-card-option" data-deck-id="dragapult-deck">
+          <div class="demo-card">
+            <img src="https://limitlesstcg.nyc3.digitaloceanspaces.com/tpci/TWM/TWM_130_R_EN.png" alt="Dragapult ex" />
+          </div>
+          <span class="demo-card-label">Dragapult ex</span>
+        </div>
+        <div class="demo-card-option" data-deck-id="alakazam-back-deck">
+          <div class="demo-card">
+            <img src="https://images.pokemontcg.io/ecard1/33_hires.png" alt="Alakazam" />
+          </div>
+          <span class="demo-card-label">Alakazam</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================================================================
+         Import From Text overlay — same modal pattern as above. JS wiring
+         for the actual parse-and-load is stubbed for now (see deck.js).
+         ================================================================== -->
+    <div id="text-import-overlay" class="modal-overlay">
+      <div class="panel-header">
+        <div class="panel-header-text">
+          <div class="side-panel-title">Import From Text</div>
+        </div>
+        <button type="button" id="btn-text-import-close" class="btn-side-panel-close">&times;</button>
+      </div>
+      <textarea id="text-import-textarea" class="text-import-textarea" placeholder="Paste a deck list here..." spellcheck="false"></textarea>
+      <button type="button" id="btn-text-import-confirm" class="menu-btn">Import</button>
     </div>
 
     <script src="deck.js" defer></script>
