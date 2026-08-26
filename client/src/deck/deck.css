@@ -65,6 +65,65 @@
   --type-c: var(--text-faint);
 }
 
+/* Accent/danger tokens are intentionally NOT overridden below — same
+   convention as sidebar.css/card.css: they're semantic (brand, role,
+   status) and mean the same thing regardless of theme. Only
+   surface/border/text/shadow/card tokens vary by theme. */
+
+:root[local-theme='dark'] {
+  --bg: #101010;
+  --surface: #1c1c1c;
+  --surface-elevated: #282828;
+  --surface-subtle: rgba(255, 255, 255, 0.05);
+  --surface-subtle-hover: rgba(255, 255, 255, 0.08);
+  --bg-recessed: #101010;
+  --slot: #282828;
+  --border: #3d3d3d;
+  --border-subtle: #3d3d3d;
+  --border-hover: #525252;
+
+  --text-strong: #ffffff;
+  --text-default: #e4e7eb;
+  --text-muted: #7c828d;
+  --text-faint: #5a5f68;
+
+  --shadow-soft: rgba(0, 0, 0, 0.5);
+  --shadow-deep: rgba(0, 0, 0, 0.65);
+  --scrollbar-thumb: #333333;
+
+  --card-bg: #0f172a;
+  --card-border: #383c46;
+}
+
+:root[local-theme='light'] {
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --surface-elevated: #eef1f5;
+  --surface-subtle: rgba(0, 0, 0, 0.04);
+  --surface-subtle-hover: rgba(0, 0, 0, 0.06);
+  --bg-recessed: #eef1f5;
+  --slot: #eef1f5;
+  --border: #d2d7df;
+  --border-subtle: rgba(0, 0, 0, 0.1);
+  --border-hover: rgba(0, 0, 0, 0.2);
+
+  --text-strong: #12141a;
+  --text-default: #23262d;
+  --text-muted: #656d78;
+  --text-faint: #8b93a3;
+
+  --shadow-soft: rgba(0, 0, 0, 0.12);
+  --shadow-deep: rgba(0, 0, 0, 0.18);
+  --scrollbar-thumb: #c2c8d1;
+
+  --card-bg: #e2e8f0;
+  --card-border: #d2d7df;
+
+  /* Same exception sidebar.css makes: the dark-theme danger-text pink
+     (#fca5a5) doesn't have enough contrast on a light surface. */
+  --danger-text: #ef4444;
+}
+
 * {
   box-sizing: border-box;
 }
