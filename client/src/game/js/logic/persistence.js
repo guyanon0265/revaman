@@ -1,21 +1,8 @@
-// persistence.js — saves gameState/runtimeState to localStorage and
-// restores them on load, so a page reload doesn't lose the game.
-//
-// gameState/clientState/runtimeState are `export const` objects that
-// every other module already holds a reference to — loadPersistedState
-// mutates their existing fields in place rather than reassigning them,
-// since a reassignment here wouldn't be visible anywhere else in the app.
-
 import { onStateChanged } from './network/stateChangeBus.js';
 import { gameState, clientState, runtimeState } from './state.js';
 
 const STORAGE_KEY = 'revaman-game-state';
 const SAVE_DEBOUNCE_MS = 300;
-
-// socket is a live connection object — not serializable, and meaningless
-// after reload anyway, since a fresh page load always needs a fresh
-// socket. Excluded explicitly rather than relying on JSON.stringify to
-// skip it silently (it wouldn't — it'd throw on circular refs instead).
 const PERSISTED_RUNTIME_KEYS = [
   'mode',
   'mySlot',
@@ -35,29 +22,23 @@ function serialize() {
 
 let saveTimer = null;
 
-// Debounced — call this from wherever the app already re-renders after
-// a mutation (e.g. renderEntireBoard), without worrying about hammering
-// localStorage on rapid-fire actions.
 export function saveState() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     try {
       localStorage.setItem(STORAGE_KEY, serialize());
     } catch {
-      // Storage full/unavailable — game keeps running in-memory, it
-      // just won't survive a reload this time.
+      return null;
     }
   }, SAVE_DEBOUNCE_MS);
 }
 
-// Bypasses the debounce for pagehide/beforeunload, where a pending
-// setTimeout would never get the chance to fire.
 export function saveStateImmediately() {
   clearTimeout(saveTimer);
   try {
     localStorage.setItem(STORAGE_KEY, serialize());
   } catch {
-    // see saveState()
+    return null;
   }
 }
 
@@ -66,7 +47,7 @@ export function clearPersistedState() {
   try {
     localStorage.removeItem(STORAGE_KEY);
   } catch {
-    // ignore
+    return false;
   }
 }
 
@@ -91,7 +72,7 @@ export function loadPersistedState() {
   try {
     parsed = JSON.parse(raw);
   } catch {
-    clearPersistedState(); // corrupt entry — don't let it wedge every future load
+    clearPersistedState();
     return false;
   }
 
@@ -113,11 +94,8 @@ export function loadPersistedState() {
   for (const key of PERSISTED_RUNTIME_KEYS) {
     if (key in parsed.runtime) runtimeState[key] = parsed.runtime[key];
   }
-  runtimeState.socket = null; // never restored — see comment above
+  runtimeState.socket = null;
 
-  // Selection describes what overlay is open on THIS tab, not anything
-  // about the game — the DOM it points at (a highlighted thumbnail, an
-  // open Card View) doesn't exist yet after a fresh page load.
   clientState.selectedInstanceId = null;
   clientState.selectedZone = null;
   clientState.selectedKind = null;

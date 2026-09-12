@@ -46,11 +46,10 @@ export function getSelectedCard() {
     );
   }
 
-  // Attachment/evolution selection — resolve the parent first, then
-  // search its nested arrays.
   const parent = zoneArr.find(
     (c) => c.instanceId === clientState.selectedParentId
   );
+
   if (!parent) return null;
   return (
     [

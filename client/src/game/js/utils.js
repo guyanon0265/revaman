@@ -72,23 +72,6 @@ export function isPileZone(zone) {
   return PILE_ZONE_IDS.includes(zone);
 }
 
-// ---------------------------------------------------------------------------
-// Shared browser grid
-// ---------------------------------------------------------------------------
-//
-// sections: [{ label: string|null, cards: [], kind?: string }, ...]
-// options: { onSelect(card, section), onDeselect(card, section), onContextMenu(card, section) }
-//
-// `kind` is caller-defined and opaque to this function — it's passed
-// straight through to the callbacks so a caller with multiple sections
-// (e.g. View Attached's Evolutions/Trainers/Energy) can dispatch
-// differently per section without needing separate grids or separate
-// renderBrowserGrid() calls (which would break single-selection tracking
-// across sections).
-//
-// Empty sections are skipped entirely. Selecting a thumbnail highlights it
-// and deselects any previously-selected thumbnail in this grid; clicking
-// the already-selected thumbnail deselects it.
 export function renderBrowserGrid(targetGridEl, sections, options = {}) {
   const { onSelect, onDeselect, onContextMenu, onLongPress } = options;
 

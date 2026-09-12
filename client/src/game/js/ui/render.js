@@ -5,7 +5,6 @@ import {
   COUNT_BADGE_SUFFIXES,
 } from '../utils.js';
 
-// DOM element id -> actual gameState.zones key it should render/target.
 export function domIdToStateZone(domId) {
   if (domId.startsWith('player-')) {
     const suffix = domId.slice('player-'.length);
@@ -15,7 +14,7 @@ export function domIdToStateZone(domId) {
     const suffix = domId.slice('opp-'.length);
     return `${runtimeState.oppSlot}-${suffix}`;
   }
-  return domId; // stadium / lost-zone / etc
+  return domId;
 }
 
 function isHidden(card, stateZoneId) {
@@ -60,13 +59,6 @@ function buildCardEl(card, stateZoneId) {
   const previousEvolution = breakDisplay
     ? card.evolutionStack[card.evolutionStack.length - 1]
     : null;
-
-  // Buried evolutions — middle column, vertical stack, most-recently
-  // evolved-into on top (last array entry = last DOM child = top,
-  // via column-reverse below). Nothing renders here while face-down.
-  // While BREAK is active, the immediate previous evolution is already
-  // shown full-size as the background image, so it's excluded here to
-  // avoid showing it twice.
   const evolutionThumbnails = breakDisplay
     ? card.evolutionStack.slice(0, -1)
     : card.evolutionStack;
@@ -82,7 +74,6 @@ function buildCardEl(card, stateZoneId) {
     el.appendChild(evoBox);
   }
 
-  // Trainer attachments — left column. Nothing renders here while face-down.
   if (!hidden && card.trainerAttachments.length > 0) {
     const trainerBox = document.createElement('div');
     trainerBox.className = 'trainer-attachments';
@@ -169,7 +160,6 @@ function buildCardEl(card, stateZoneId) {
     el.appendChild(overlay);
   }
 
-  // Energy attachments — right column. Nothing renders here while face-down.
   if (!hidden && card.energyAttachments.length > 0) {
     const energyBox = document.createElement('div');
     energyBox.className = 'energy-attachments';
@@ -196,7 +186,6 @@ function getCardHost(container, suffix) {
 }
 
 export function renderEntireBoard() {
-  // Owned zones (deck/hand/active/bench/discard/prizes), both sides
   for (const suffix of OWNED_ZONE_SUFFIXES) {
     const playerContainer = document.getElementById(`player-${suffix}`);
     const oppContainer = document.getElementById(`opp-${suffix}`);
@@ -231,9 +220,6 @@ export function renderEntireBoard() {
     }
   }
 
-  // Shared zones — 1:1 with their DOM id, no translation needed.
-  // Only lost-zone gets a count badge here — stadium/table-left/
-  // table-right stay without one.
   for (const zoneId of SHARED_ZONE_IDS) {
     const container = document.getElementById(zoneId);
     if (!container) continue;

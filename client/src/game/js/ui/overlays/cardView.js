@@ -1,11 +1,3 @@
-// menu/cardview.js — the View Card zoom overlay.
-// Read-only: never mutates gameState or clientState.
-// The caller explicitly supplies the card to display.
-//
-// Card View owns only its own display state. It does not infer the card
-// from game selection, and it does not clear or modify any selection when
-// opened or closed.
-
 const overlayEl = document.getElementById('card-view-overlay');
 const imgEl = document.getElementById('card-view-img');
 

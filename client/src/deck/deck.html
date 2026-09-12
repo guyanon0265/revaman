@@ -8,14 +8,6 @@
     <link rel="stylesheet" href="deck.css" />
   </head>
   <body>
-    <!--
-      LAYOUT NOTE (grid vs. sidebar side):
-      The grid panel is currently first in the DOM / on the LEFT, sidebar
-      second / on the RIGHT. To swap sides later, flip the two children's
-      order in the markup (or just change `flex-direction` + swap the
-      `order` values on #grid-panel / #sidebar-panel in deck.css — see the
-      matching note there).
-    -->
     <div id="deck-builder-view">
       <main id="grid-panel" class="panel grid-panel">
         <header class="panel-heading">
@@ -24,9 +16,6 @@
             <p id="deck-stats-line" class="panel-subtext">0 cards</p>
           </div>
         </header>
-
-        <!-- Populated entirely by deck.js — always includes one permanent
-             cardback tile plus one tile per card in state.cards. -->
         <div id="deck-grid" class="deck-grid"></div>
       </main>
 
@@ -44,29 +33,22 @@
 
         <div class="sidebar-fields">
           <div class="sidebar-field">
-            <!-- Label + input swap meaning when the cardback tile is
-                 selected: "Card Name" -> "Deck Name". See deck.js. -->
             <label for="sidebar-name-input" id="sidebar-name-label">Card Name</label>
             <input type="text" id="sidebar-name-input" placeholder="e.g. Pikachu" autocomplete="off" />
           </div>
 
           <div class="sidebar-field">
             <label for="sidebar-type-select">Type</label>
-            <!-- Real dropdown for normal cards. -->
             <select id="sidebar-type-select">
               <option value="Pokemon">Pokemon</option>
               <option value="Trainer">Trainer</option>
               <option value="Energy">Energy</option>
             </select>
-            <!-- Swapped in, disabled, when cardback is selected (type is
-                 fixed and not one of the three editable options). -->
             <input type="text" id="sidebar-type-readonly" value="Cardback" disabled hidden />
           </div>
 
           <div class="sidebar-field">
             <label for="sidebar-qty-input">Quantity</label>
-            <!-- Forced to 0 and disabled when cardback is selected — a
-                 cardback isn't a counted card in the deck. -->
             <input type="number" id="sidebar-qty-input" min="0" max="60" value="1" />
           </div>
 
@@ -96,14 +78,6 @@
         <input type="file" id="csv-file-input" accept=".csv,text/csv" hidden />
       </aside>
     </div>
-
-    <!-- ==================================================================
-         Demo Deck overlay — same pattern as game.html/menu.css: a centered
-         floating panel, hidden by default, toggled via the .open class.
-         Each .demo-card-option's data-deck-id maps to a packaged CSV at
-         ../assets/demo_decks/{deckId}.csv (see deck.js loadDemoDeckCsv()).
-         Add/remove .demo-card-option entries here to change the roster.
-         ================================================================== -->
     <div id="demo-deck-selector" class="modal-overlay">
       <div class="panel-header">
         <div class="panel-header-text">
@@ -119,11 +93,6 @@
         </div>
       </div>
     </div>
-
-    <!-- ==================================================================
-         Import From Text overlay — same modal pattern as above. JS wiring
-         for the actual parse-and-load is stubbed for now (see deck.js).
-         ================================================================== -->
     <div id="text-import-overlay" class="modal-overlay">
       <div class="panel-header">
         <div class="panel-header-text">

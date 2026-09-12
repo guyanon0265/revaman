@@ -1,12 +1,3 @@
-// loggingEngine.js — thin wrapper around engine.js that adds GameLogger
-// calls, undo/redo snapshotting, and multiplayer broadcast, without
-// touching engine.js itself.
-//
-// Every exported function here has the exact same name and signature as
-// its engine.js counterpart. Callers only need to change their import path
-// from './engine.js' (or '../gameboard/engine.js') to this file — no
-// call-site logic changes required.
-
 import * as engine from './engine.js';
 import { gameState, runtimeState, DEFAULT_CARDBACK } from './state.js';
 import {
@@ -26,17 +17,6 @@ import { emitStateChanged } from './network/stateChangeBus.js';
 import { emitLogChanged } from './network/logChangeBus.js';
 import { parseDeckCSV } from './parser.js';
 
-// ---------------------------------------------------------------------
-// Logging helpers
-// ---------------------------------------------------------------------
-
-// Logs an action, always attributed to the local acting viewer
-// (runtimeState.mySlot) — NOT derived from the zone a card happens to be
-// in. A card's zone changes as it moves; the actor performing the click
-// doesn't. Attributing by zone caused moves into/out of the opponent's
-// zone to flip-flop between Player/Opponent on successive moves of the
-// same card — this fixes that. Matches the client-authoritative model:
-// a client only ever logs its own actions.
 export function logAction(actionText) {
   GameLogger.logAction(runtimeState.mySlot, actionText);
   emitLogChanged(actionText);
@@ -75,23 +55,6 @@ function sanitizeZones(rawZones) {
   return clean;
 }
 
-// ---------------------------------------------------------------------
-// Common mutation lifecycle
-//
-// Normal mutations all follow the same sequence:
-//
-//   1. Validate that the mutation is applicable.
-//   2. Flush any pending delta batch.
-//   3. Snapshot the pre-mutation state.
-//   4. Execute the engine mutation.
-//   5. Log the successful mutation.
-//   6. Broadcast the resulting state.
-//
-// `success` exists because some legitimate engine functions return
-// undefined or zero on success (for example shuffleZone/loadDeck),
-// while card mutations use null to indicate failure.
-// ---------------------------------------------------------------------
-
 function mutate({
   validate = () => true,
   mutation,
@@ -112,19 +75,6 @@ function mutate({
 
   return result;
 }
-
-// ---------------------------------------------------------------------
-// Damage / overheal / counter deltas — batched.
-//
-// Consecutive clicks on the SAME stat of the SAME card accumulate into
-// one pending entry, which is also one undo step: pushSnapshot() fires
-// once, when the batch STARTS (before that first mutation), not on every
-// click that extends it.
-//
-// The batch flushes (logs + clears) via a short timer after the last
-// click. Broadcasting remains unbatched so the opponent sees every
-// individual delta live.
-// ---------------------------------------------------------------------
 
 const BATCH_FLUSH_DELAY_MS = 600;
 
@@ -168,9 +118,6 @@ function applyDelta(statLabel, engineFn, instanceId, zone, delta) {
   const key = `${instanceId}:${statLabel}`;
   const isNewBatch = !(pendingBatch && pendingBatch.key === key);
 
-  // Must be decided BEFORE the mutation below — pushSnapshot() has to
-  // fire pre-mutation, and whether this is a new batch is exactly what
-  // determines whether a snapshot is needed at all.
   if (isNewBatch) {
     flushPendingBatch();
     pushSnapshot();
@@ -196,20 +143,9 @@ function applyDelta(statLabel, engineFn, instanceId, zone, delta) {
   }
 
   scheduleBatchFlush();
-
-  // Every individual delta is broadcast immediately.
   emitStateChanged();
-
   return card;
 }
-
-// ---------------------------------------------------------------------
-// Actual mutation implementations
-//
-// These are intentionally NOT exported. The public exports at the
-// bottom of the file pass through guarded(), which prevents spectators
-// from reaching any mutation logic at all.
-// ---------------------------------------------------------------------
 
 function _applyDamageDelta(instanceId, zone, delta) {
   return applyDelta('damage', engine.applyDamageDelta, instanceId, zone, delta);
@@ -488,7 +424,6 @@ function _setUpright(instanceId, zone) {
 function _toggleBreak(instanceId, zone) {
   const before = findCard(zone, instanceId);
 
-  // Mirrors engine.js's guard: BREAK requires evolution history.
   if (!before || !before.evolutionStack.length) return null;
 
   return mutate({
@@ -531,14 +466,6 @@ function _flipCoin() {
   logAction(`flipped ${result}.`);
 }
 
-// ---------------------------------------------------------------------
-// Spectator guard
-//
-// This is deliberately applied at the public API boundary. A spectator
-// therefore cannot reach mutate(), applyDelta(), engine.js, snapshotting,
-// logging, or broadcasting.
-// ---------------------------------------------------------------------
-
 function guarded(fn) {
   return (...args) => {
     if (runtimeState.isSpectator) {
@@ -549,10 +476,6 @@ function guarded(fn) {
     return fn(...args);
   };
 }
-
-// ---------------------------------------------------------------------
-// Public API
-// ---------------------------------------------------------------------
 
 export const flipCoin = guarded(_flipCoin);
 

@@ -1,9 +1,3 @@
-/* ==========================================================================
-   menu.css — theme tokens
-   Shares token NAMES with sidebar.css (--surface, --border-subtle, etc.)
-   by design, so both files read as visually consistent — but each file
-   defines its own values, per-file, per the project's theme convention.
-   ========================================================================== */
 :root {
   --surface: #1b1e26;
   --bg-recessed: #121419;
@@ -31,9 +25,6 @@
   --control-btn-hover-bg: rgba(255, 255, 255, 0.08);
   --control-btn-hover-border: rgba(255, 255, 255, 0.16);
 
-  /* Same statuses/values as card.css — kept in sync deliberately since
-     these appear in both the on-card badge and this action-menu chip
-     for the same status. */
   --status-par-bg: #e6b800;
   --status-par-text: #000;
   --status-brn: #ff6600;
@@ -94,10 +85,6 @@
   --control-btn-hover-border: rgba(0, 0, 0, 0.15);
 }
 
-/* ==========================================================================
-   Side Panel shell — generic sliding panel container
-   ========================================================================== */
-
 .side-panel {
   position: fixed;
   top: max(1.4dvh, env(safe-area-inset-top, 0px));
@@ -126,7 +113,6 @@
   z-index: 200;
 }
 
-/* Slide OUT to the left */
 .side-panel.collapsed {
   transform: translateX(calc(-100% - 3dvh));
   opacity: 0;
@@ -156,10 +142,6 @@
     transform: translateY(calc(100% + 3dvh));
   }
 }
-
-/* ==========================================================================
-   Panel Header
-   ========================================================================== */
 
 .panel-header {
   display: flex;
@@ -213,10 +195,6 @@
   color: var(--danger-text);
 }
 
-/* ==========================================================================
-   Panel Tabs
-   ========================================================================== */
-
 .panel-tabs {
   display: flex;
   gap: 0.6dvh;
@@ -256,10 +234,6 @@
   color: var(--accent-tint-text);
 }
 
-/* ==========================================================================
-   Panel Grid
-   ========================================================================== */
-
 .panel-grid {
   flex: 1;
   min-height: 0;
@@ -282,10 +256,6 @@
   background-color: var(--scrollbar-thumb);
   border-radius: 3px;
 }
-
-/* ==========================================================================
-   Browser Sections & Thumbnails
-   ========================================================================== */
 
 .browser-section-label {
   color: var(--text-muted);
@@ -325,10 +295,6 @@
   border: 0.3dvh solid var(--browser-selected-border);
   box-shadow: 0 0 0 0.2dvh var(--browser-selected-glow);
 }
-
-/* ==========================================================================
-   Action Menu — Controls tab content
-   ========================================================================== */
 
 .menu-page {
   display: none;
@@ -422,10 +388,6 @@
   color: var(--status-con-text);
 }
 
-/* --------------------------------------------------------------------------
-   Rotation D-pad
-   -------------------------------------------------------------------------- */
-
 .rotation-dpad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -471,10 +433,6 @@
   grid-column: 2;
   grid-row: 3;
 }
-
-/* --------------------------------------------------------------------------
-   BREAK
-   -------------------------------------------------------------------------- */
 
 .controls-tab .break-btn {
   font-style: italic;
@@ -572,10 +530,6 @@
   min-width: 7rem;
   text-align: center;
 }
-
-/* ==========================================================================
-   Card View overlay close button
-   ========================================================================== */
 
 .close-btn {
   width: 3.4dvh;

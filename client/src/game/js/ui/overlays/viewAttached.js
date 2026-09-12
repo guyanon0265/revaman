@@ -1,33 +1,3 @@
-// gameboard/ui/overlays/viewAttached.js
-//
-// View Attached is a specialized grid, living inside #action-menu's own
-// view-attached-tab, showing the attachments of one root card.
-//
-// The root card id/zone are passed in explicitly by actionmenu.js (which
-// captures them from clientState exactly once when the Action Menu opens)
-// rather than read from clientState here. This module has no dependency
-// on clientState at all.
-//
-// Attachment thumbnails behave like pile browser thumbnails: click to
-// select (temporarily swaps Card View to that attachment), click again
-// to deselect. The difference from the standalone pile browser is what
-// deselecting does — here it REVERTS Card View back to the root card
-// rather than closing it, since the Action Menu keeps Card View open for
-// as long as the menu itself is open.
-//
-// Right-click moves an attachment back to hand. Evolutions and
-// Trainers/Energy use genuinely different engine calls — detachCard()
-// pulls a nested attachment straight out of the parent's arrays, while
-// devolveCard() promotes a buried evolution stage back onto the board,
-// which means the card OCCUPYING this zone slot changes identity.
-//
-// Because of that, openViewAttached() takes an optional onRootChanged
-// callback. When a devolve happens, this module updates its own local
-// parentId to the newly-promoted card AND calls onRootChanged(newCard)
-// so the caller (actionmenu.js) can keep its own rootId/title in sync.
-// Card View is refreshed here, after parentId is already updated, so it
-// always ends up showing the new root correctly.
-
 import { gameState } from '../../logic/state.js';
 import { renderBrowserGrid } from '../../utils.js';
 import { openCardView } from './cardView.js';
@@ -38,8 +8,8 @@ const gridEl = document.getElementById('view-attached-grid');
 
 let parentId = null;
 let parentZone = null;
-let overrideActive = false; // true while an attachment is temporarily shown in Card View
-let onRootChanged = null; // notified when devolve replaces the card at parentZone/parentId
+let overrideActive = false;
+let onRootChanged = null;
 
 function getParentCard() {
   if (!parentId || !parentZone) return null;
@@ -163,9 +133,6 @@ export function refreshViewAttached() {
   renderAttachedGrid();
 }
 
-// Called when navigating away from the View Attached tab back to
-// Controls, while the Action Menu itself stays open. If an attachment
-// was temporarily overriding Card View, this puts the root card back.
 export function revertViewAttachedSelection() {
   if (!overrideActive) return;
 
@@ -174,12 +141,6 @@ export function revertViewAttachedSelection() {
   if (root) openCardView(root);
 }
 
-// Called by actionMenu.js when a board interaction OUTSIDE this module
-// (an evolve via board attach, not a devolve triggered from this grid's
-// own context menu) replaces the card at parentZone. Devolve already
-// updates parentId itself, inline, before calling onRootChanged upward —
-// this covers the other direction, so a subsequent refreshViewAttached()
-// doesn't look up a now-nonexistent instanceId and silently close.
 export function syncRootIdentity(oldId, zone, newCard) {
   if (!newCard) return;
   if (parentId === oldId && parentZone === zone) {

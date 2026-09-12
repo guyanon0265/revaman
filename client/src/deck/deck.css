@@ -1,12 +1,4 @@
-/* ==========================================================================
-   deck.css — Deck Builder
-   Token names/values are kept identical to the ones used in game.css,
-   sidebar.css, card.css and menu.css so this page reads as part of the
-   same app rather than a re-skin. No dark/light theme switch is wired up
-   here (not requested) — these are the tokens the app renders by default.
-   ========================================================================== */
 :root {
-  /* -- surfaces / structure (game.css + sidebar.css) -- */
   --bg: #0d0f13;
   --surface: #1b1e26;
   --surface-elevated: #262b35;
@@ -18,18 +10,15 @@
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-hover: rgba(255, 255, 255, 0.18);
 
-  /* -- text (sidebar.css) -- */
   --text-strong: #ffffff;
   --text-default: #e7ebf3;
   --text-muted: #8b93a3;
   --text-faint: #6b7280;
 
-  /* -- shadows / misc (sidebar.css) -- */
   --shadow-soft: rgba(0, 0, 0, 0.4);
   --shadow-deep: rgba(0, 0, 0, 0.55);
   --scrollbar-thumb: #3a3f4a;
 
-  /* -- accents (sidebar.css) -- */
   --accent-player: #38bdf8;
   --accent-tint-bg: rgba(47, 111, 237, 0.18);
   --accent-tint-text: #7db8ff;
@@ -40,7 +29,6 @@
   --accent-success: #4ade80;
   --accent-success-border: rgba(74, 222, 128, 0.35);
 
-  /* -- danger (sidebar.css) -- */
   --danger-bg: rgba(239, 68, 68, 0.2);
   --danger-bg-strong: rgba(239, 68, 68, 0.15);
   --danger-border: rgba(239, 68, 68, 0.4);
@@ -48,7 +36,6 @@
   --danger-text: #fca5a5;
   --danger-section-border: rgba(239, 68, 68, 0.25);
 
-  /* -- card visuals (card.css / menu.css) -- */
   --card-bg: #0f172a;
   --card-border: #383c46;
   --card-selected: #15b5fa;
@@ -56,19 +43,11 @@
   --card-w-sm: 7dvh;
   --card-h-sm: 9.8dvh;
 
-  /* -- type accent mapping (semantic reuse of existing tokens) --
-     Pokemon -> player accent, Trainer -> generate accent (amber, "tool"
-     feel), Energy -> success accent (green), Cardback -> faint/neutral. */
   --type-p: var(--accent-player);
   --type-t: var(--accent-generate);
   --type-e: var(--accent-success);
   --type-c: var(--text-faint);
 }
-
-/* Accent/danger tokens are intentionally NOT overridden below — same
-   convention as sidebar.css/card.css: they're semantic (brand, role,
-   status) and mean the same thing regardless of theme. Only
-   surface/border/text/shadow/card tokens vary by theme. */
 
 :root[local-theme='dark'] {
   --bg: #101010;
@@ -119,8 +98,6 @@
   --card-bg: #e2e8f0;
   --card-border: #d2d7df;
 
-  /* Same exception sidebar.css makes: the dark-theme danger-text pink
-     (#fca5a5) doesn't have enough contrast on a light surface. */
   --danger-text: #ef4444;
 }
 
@@ -146,13 +123,6 @@ body {
   overflow: hidden;
 }
 
-/* ==========================================================================
-   Shell — two panels.
-   SIDE NOTE: grid-panel is order:1 (left), sidebar-panel is order:2 (right)
-   in the default row direction. To move the sidebar to the left later,
-   just swap these two `order` values (or the flex-direction below stays
-   the same — only the order changes).
-   ========================================================================== */
 #deck-builder-view {
   display: flex;
   flex-direction: row;
@@ -199,22 +169,17 @@ body {
   color: var(--text-muted);
 }
 
-/* -- grid panel (left) -- */
 .grid-panel {
   order: 1;
   flex: 1 1 68%;
 }
 
-/* -- sidebar panel (right) -- */
 .sidebar-panel {
   order: 2;
   flex: 0 0 min(340px, 34%);
   overflow-y: auto;
 }
 
-/* ==========================================================================
-   Deck grid
-   ========================================================================== */
 .deck-grid {
   flex: 1;
   min-height: 0;
@@ -274,8 +239,6 @@ body {
   display: block;
 }
 
-/* Shown only when a card has no image URL yet, or the URL fails to load —
-   not used as a stand-in for real art anywhere else. */
 .thumb-fallback {
   display: none;
   align-items: center;
@@ -376,9 +339,6 @@ body {
   color: var(--type-c);
 }
 
-/* ==========================================================================
-   Sidebar (editing panel)
-   ========================================================================== */
 .sidebar-preview {
   flex-shrink: 0;
   display: flex;
@@ -544,11 +504,6 @@ body {
   color: var(--danger-text);
 }
 
-/* ==========================================================================
-   MOBILE
-   TOP/BOTTOM NOTE: grid-panel is order:1 (top), sidebar-panel is order:2
-   (bottom) here. To flip which sits on top, swap these two `order` values.
-   ========================================================================== */
 @media (max-width: 767px) {
   #deck-builder-view {
     flex-direction: column;
@@ -569,11 +524,6 @@ body {
   }
 }
 
-/* ==========================================================================
-   Modal overlays (Demo Decks / Import From Text)
-   Same "centered floating panel" pattern as menu.css's #demo-deck-selector —
-   hidden by default, toggled open via the .open class from deck.js.
-   ========================================================================== */
 .modal-overlay {
   position: fixed;
   top: 50%;
@@ -644,7 +594,6 @@ body {
   color: var(--danger-text);
 }
 
-/* -- Demo Decks -- */
 .demo-card-container {
   flex: 1;
   min-height: 0;
@@ -704,7 +653,6 @@ body {
   color: var(--text-default);
 }
 
-/* -- Import From Text -- */
 #text-import-overlay {
   width: min(560px, 92vw);
   gap: 1.2dvh;

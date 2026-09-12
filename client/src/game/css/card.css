@@ -1,9 +1,3 @@
-/* ==========================================================================
-   card.css — theme tokens
-   Badge/status colors are semantic (damage=red, poison=purple, etc.) and
-   intentionally NOT overridden per-theme — they mean the same thing in
-   light or dark mode. Only surface/border/text tokens vary by theme.
-   ========================================================================== */
 :root {
   --card-bg: #0f172a;
   --card-border: #383c46;

@@ -5,7 +5,7 @@ const undoStack = [];
 const redoStack = [];
 
 export function pushSnapshot() {
-  if (runtimeState.mode === 'multiplayer') return; // history is server-authoritative while connected — see server.js / networkSync.js
+  if (runtimeState.mode === 'multiplayer') return;
   undoStack.push(structuredClone(gameState.zones));
   redoStack.length = 0;
 }
@@ -15,7 +15,7 @@ export function undo() {
 
   redoStack.push(structuredClone(gameState.zones));
   gameState.zones = undoStack.pop();
-  emitStateChanged(); // a local rewind is shared-state-worthy too — see file header
+  emitStateChanged();
   return true;
 }
 

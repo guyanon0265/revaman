@@ -15,8 +15,6 @@ let longPressTimer = null;
 let longPressTriggered = false;
 
 function handleBoardClick(e) {
-  // A long-press already opened the action menu. Ignore the synthetic
-  // click that mobile browsers may generate afterward.
   if (longPressTriggered) {
     longPressTriggered = false;
     return;
@@ -39,9 +37,6 @@ function handleBoardClick(e) {
     }
   }
 
-  // 0. Attachment mode active — the NEXT card clicked (that isn't the
-  // card being attached) is the target, regardless of what it would
-  // normally mean to click a card.
   if (clientState.selectedInstanceId && cardEl) {
     const targetInstanceId = cardEl.dataset.instanceId;
     const targetZone = cardEl.dataset.zone;
@@ -61,8 +56,6 @@ function handleBoardClick(e) {
     }
   }
 
-  // 1. If a card is already selected and we click a DIFFERENT zone
-  // (or a card inside a different zone)
   if (clientState.selectedInstanceId && zoneEl) {
     const targetZone = domIdToStateZone(zoneEl.id);
 
@@ -72,7 +65,6 @@ function handleBoardClick(e) {
     }
   }
 
-  // 2. Otherwise, treat clicking a card as a selection action
   if (cardEl) {
     const clickedInstanceId = cardEl.dataset.instanceId;
     const clickedCardZone = cardEl.dataset.zone;
@@ -86,7 +78,6 @@ function handleBoardClick(e) {
     return;
   }
 
-  // 3. Clicked empty space — clear selection
   if (clientState.selectedInstanceId) {
     deselectCard();
   }

@@ -1,8 +1,3 @@
-// engine.js — pure, DOM-free rules + helpers. No document/window access,
-// ever, so this stays safe to reuse from anywhere non-browser later
-// (mirrors RM-merged's engine.js in spirit). Everything here reads/writes
-// gameState.zones directly; nothing here renders anything.
-
 import { gameState } from './state.js';
 import {
   classifyType,
@@ -10,11 +5,6 @@ import {
   OWNED_ZONE_SUFFIXES,
   SHARED_ZONE_IDS,
 } from '../utils.js';
-
-// ---------------------------------------------------------------------
-// RULES — every function takes the zone(s) it needs
-// explicitly. Nothing here ever guesses a card's zone internally.
-// ---------------------------------------------------------------------
 
 function removeFromZone(zoneId, instanceId) {
   const arr = gameState.zones[zoneId];
@@ -122,8 +112,6 @@ export function attachCardToTarget(selectedId, fromZone, targetId, targetZone) {
   } else if (kind === 'trainer') {
     targetCard.trainerAttachments.push(selectedCard);
   } else {
-    // evolution: selectedCard takes the target's board position;
-    // targetCard gets buried beneath it, carrying its history along
     selectedCard.energyAttachments = [
       ...selectedCard.energyAttachments,
       ...targetCard.energyAttachments,
@@ -142,14 +130,6 @@ export function attachCardToTarget(selectedId, fromZone, targetId, targetZone) {
     targetArr[targetIdx] = selectedCard;
   }
 
-  // Return whatever actually occupies the slot after this call, not
-  // unconditionally selectedCard. For energy/trainer that's targetCard
-  // (unchanged identity — callers can treat a same-id return as a
-  // no-op). For evolution it's selectedCard, since that's what now
-  // occupies targetZone[targetIdx]. Callers that need to know "did this
-  // replace the board occupant" should compare the returned card's
-  // instanceId against targetId rather than re-deriving classifyType()
-  // themselves.
   return targetArr[targetIdx];
 }
 
@@ -184,32 +164,20 @@ export function devolveCard(cardId, zone, targetInstanceId) {
   const targetIdx = current.evolutionStack.findIndex(
     (c) => c.instanceId === targetInstanceId
   );
-  if (targetIdx === -1) return null; // clicked card wasn't actually in this card's evolutionStack
+  if (targetIdx === -1) return null;
 
   const previous = current.evolutionStack[targetIdx];
-  // Everything buried ABOVE the target (closer to current) has to leave
-  // too, since it can't coexist with `previous` taking over this slot.
   const skippedStages = current.evolutionStack.slice(targetIdx + 1);
 
-  // All markers and attachments transfer onto the newly-promoted card —
-  // there is only ever ONE live set of markers/attachments per evo
-  // line at a time, carried by whichever stage is currently active.
   previous.damage = current.damage;
   previous.counter = current.counter;
   previous.statuses = [...current.statuses];
   previous.abilityUsed = current.abilityUsed;
   previous.energyAttachments = current.energyAttachments;
   previous.trainerAttachments = current.trainerAttachments;
-  // previous.evolutionStack is untouched — it already holds whatever
-  // was buried under IT before it ever evolved further, from when it
-  // was itself an active card.
 
   arr[idx] = previous;
 
-  // Everything headed to hand — current AND every skipped intermediate
-  // stage — resets fresh. Once a card leaves the active evo line, it
-  // holds nothing: the one live set of markers/attachments just moved
-  // to previous above, so nothing here should still be carrying a copy.
   resetToFresh(current);
   skippedStages.forEach(resetToFresh);
 

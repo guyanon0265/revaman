@@ -1,41 +1,6 @@
-// ==========================================================================
-// deck.js — PTCG Deck Builder
-//
-// State shape:
-//   state.deckName    — string, editable only via the cardback tile
-//   state.cardbackUrl — string, the cardback tile's own image URL
-//   state.cards       — [{ id, name, type: 'Pokemon'|'Trainer'|'Energy', qty, url }]
-//   state.selectedId  — 'cardback' | a card's id
-//
-// CSV schema (matches uploaded reference decks):
-//   QTY,Name,Type,URL
-//   A row with Type "Cardback" is special: its Name becomes the deck name
-//   and its URL becomes the cardback art. QTY is ignored on that row.
-// ==========================================================================
-
 import { initSettingsZone } from '../game/js/ui/sidebar/multiplayer/settingsZone.js';
 
-// NOTE: path assumed from the game/js/deck-select.js pattern you shared
-// ('../../logic/loggingEngine.js' from game/js/), scaled to deck.js sitting
-// one level down from the project root instead of two. Adjust if your
-// actual folder layout differs.
-
-// Shown for the cardback tile/preview whenever state.cardbackUrl is empty.
-// Display-only — never written into state.cardbackUrl itself, so it never
-// ends up in an exported CSV. Paste whatever image you want as the
-// fallback cardback art here.
 const DEFAULT_CARDBACK_URL = 'https://images.pokemontcg.io/back.png';
-
-// --------------------------------------------------------------------------
-// Draft persistence (sessionStorage)
-// Keeps the deck currently being edited alive across reloads without
-// needing an explicit save step. sessionStorage (rather than localStorage)
-// is deliberate: it clears when the tab/window actually closes, so it
-// behaves like "don't lose my in-progress edits", not "remember this deck
-// forever". Loading a demo deck, importing a CSV, or editing anything
-// overwrites the draft, so there's no separate "clear draft" affordance —
-// starting over just means loading something else.
-// --------------------------------------------------------------------------
 const DRAFT_STORAGE_KEY = 'revaman-deck-builder-draft';
 
 function saveDraft() {
@@ -50,8 +15,7 @@ function saveDraft() {
       })
     );
   } catch {
-    // sessionStorage can throw (private browsing, storage disabled/full);
-    // losing draft-persistence silently is fine, editing still works.
+    return null;
   }
 }
 
@@ -67,9 +31,6 @@ function loadDraft() {
   }
 }
 
-// --------------------------------------------------------------------------
-// Element refs
-// --------------------------------------------------------------------------
 const grid = document.getElementById('deck-grid');
 const nameHeading = document.getElementById('deck-name-heading');
 const statsLine = document.getElementById('deck-stats-line');
@@ -101,9 +62,6 @@ const closeTextImportBtn = document.getElementById('btn-text-import-close');
 const textImportTextarea = document.getElementById('text-import-textarea');
 const textImportConfirmBtn = document.getElementById('btn-text-import-confirm');
 
-// --------------------------------------------------------------------------
-// State
-// --------------------------------------------------------------------------
 const state = {
   deckName: 'New Deck',
   cardbackUrl: '',
@@ -111,9 +69,6 @@ const state = {
   selectedId: 'cardback',
 };
 
-// --------------------------------------------------------------------------
-// CSV parsing / export
-// --------------------------------------------------------------------------
 function splitCsvLine(line) {
   const fields = [];
   let cur = '';
@@ -181,7 +136,6 @@ function parseCSV(text) {
   const cards = [];
 
   lines.forEach((line, i) => {
-    // Skip the header row if present.
     if (
       i === 0 &&
       /^qty,\s*name,\s*type,\s*url$/i.test(line.replace(/\s+/g, ' '))
@@ -217,8 +171,6 @@ function escapeCsvField(value) {
 
 function exportCSV() {
   const rows = ['QTY,Name,Type,URL'];
-  // Cardback quantity is always exported as 0 — the editor treats it as a
-  // non-counted, uneditable field (see requirement in sidebar rendering).
   rows.push(
     [
       0,
@@ -245,9 +197,6 @@ function exportCSV() {
   URL.revokeObjectURL(url);
 }
 
-// --------------------------------------------------------------------------
-// Rendering
-// --------------------------------------------------------------------------
 function sumQty(cards) {
   return cards.reduce((sum, c) => sum + (c.qty || 0), 0);
 }
@@ -265,8 +214,6 @@ function findSelectedCard() {
   return state.cards.find((c) => c.id === state.selectedId);
 }
 
-// Display-only fallback — state.cardbackUrl itself stays whatever the user
-// typed (including empty), so exportCSV() never writes the default in.
 function cardbackDisplayUrl() {
   return state.cardbackUrl || DEFAULT_CARDBACK_URL;
 }
@@ -441,17 +388,11 @@ function renderAll() {
   renderSidebar();
 }
 
-// --------------------------------------------------------------------------
-// Selection
-// --------------------------------------------------------------------------
 function selectCard(id) {
   state.selectedId = id;
   renderAll();
 }
 
-// Applies a { deckName, cardbackUrl, cards } result (from parseCSV) to
-// state and re-renders. Shared by CSV import, demo decks, and (eventually)
-// text import.
 function applyParsedDeck(parsed, fallbackName = 'New Deck') {
   state.deckName = parsed.deckName || fallbackName;
   state.cardbackUrl = parsed.cardbackUrl;
@@ -467,11 +408,6 @@ function titleCaseFromSlug(slug) {
     .join(' ');
 }
 
-// --------------------------------------------------------------------------
-// Sidebar field edits — mutate state, then refresh the grid/header only.
-// Rebuilding the sidebar itself would steal focus from whichever input the
-// user is actively typing in.
-// --------------------------------------------------------------------------
 nameInput.addEventListener('input', () => {
   if (state.selectedId === 'cardback') {
     state.deckName = nameInput.value;
@@ -492,7 +428,7 @@ typeSelect.addEventListener('change', () => {
 });
 
 qtyInput.addEventListener('input', () => {
-  if (state.selectedId === 'cardback') return; // disabled, but just in case
+  if (state.selectedId === 'cardback') return;
   const card = findSelectedCard();
   if (card) card.qty = Math.max(0, parseInt(qtyInput.value, 10) || 0);
   renderHeader();
@@ -511,9 +447,6 @@ urlInput.addEventListener('input', () => {
   renderGrid();
 });
 
-// --------------------------------------------------------------------------
-// Actions
-// --------------------------------------------------------------------------
 addBtn.addEventListener('click', () => {
   const id = uniqueId('card');
   state.cards.push({ id, name: 'New Card', type: 'Pokemon', qty: 1, url: '' });
@@ -523,7 +456,7 @@ addBtn.addEventListener('click', () => {
 });
 
 removeBtn.addEventListener('click', () => {
-  if (state.selectedId === 'cardback') return; // guarded (button is also disabled)
+  if (state.selectedId === 'cardback') return;
   const idx = state.cards.findIndex((c) => c.id === state.selectedId);
   if (idx === -1) return;
   state.cards.splice(idx, 1);
@@ -546,13 +479,6 @@ fileInput.addEventListener('change', (e) => {
 
 exportBtn.addEventListener('click', exportCSV);
 
-// --------------------------------------------------------------------------
-// Demo Deck overlay
-// Mirrors the game.html/menu.css pattern: a centered floating panel toggled
-// via the .open class. Each .demo-card-option's data-deck-id maps to a
-// packaged CSV at ../assets/demo_decks/{deckId}.csv — drop your CSVs there
-// (e.g. dragapult-deck.csv, alakazam-back-deck.csv) for these to resolve.
-// --------------------------------------------------------------------------
 function openDemoDecks() {
   demoDeckOverlay.classList.add('open');
 }
@@ -583,18 +509,12 @@ loadDemoDeckBtn.addEventListener('click', openDemoDecks);
 closeDemoDecksBtn.addEventListener('click', closeDemoDecks);
 
 demoDeckOverlay.addEventListener('click', (e) => {
-  if (e.target.closest('#btn-demo-decks-close')) return; // handled above
+  if (e.target.closest('#btn-demo-decks-close')) return;
   const option = e.target.closest('.demo-card-option');
   if (!option) return;
   handleDemoDeckClick(option.dataset.deckId);
 });
 
-// --------------------------------------------------------------------------
-// Import From Text overlay
-// Same modal pattern as Demo Decks. Parsing/loading is stubbed for now —
-// wire textImportConfirmBtn's handler up to parseCSV() (or a looser format)
-// once the expected text format is decided.
-// --------------------------------------------------------------------------
 function openTextImport() {
   textImportOverlay.classList.add('open');
   textImportTextarea.value = '';
@@ -609,22 +529,13 @@ importTextBtn.addEventListener('click', openTextImport);
 closeTextImportBtn.addEventListener('click', closeTextImport);
 
 textImportConfirmBtn.addEventListener('click', () => {
-  // TODO: parse textImportTextarea.value and applyParsedDeck(...) once the
-  // expected text format is decided. Left stubbed per request.
   console.log(
     'Import From Text — stubbed, textarea contents:',
     textImportTextarea.value
   );
 });
 
-// --------------------------------------------------------------------------
-// Init — restores an in-progress deck from sessionStorage if one exists;
-// otherwise starts blank. Populate via Add Card, Import CSV, Load Demo
-// Deck, or Import From Text.
-// --------------------------------------------------------------------------
 (function init() {
-  // Applies the persisted theme (and no-ops harmlessly on buttonSide/tab/
-  // spectators settings, since this page doesn't have those controls).
   initSettingsZone();
 
   const draft = loadDraft();
