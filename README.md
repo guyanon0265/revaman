@@ -29,14 +29,15 @@ To close this minor vulnerability:
    CLIENT_ORIGIN=
    PORT=
    ```
-3. In the `server/` directory (`cd server`), run `node -e "console.log(require('bcryptjs').hashSync('yourpassword', 10))"` and replace `yourpassword` with a password of choice.
+3. In the `server/` directory (`cd server`), run  
+   `node -e "console.log(require('bcryptjs').hashSync('yourpassword', 10))"`  
+   and replace `yourpassword` with a password of choice.
 4. Copy and paste the resulting hash in the `ADMIN_UI_PASSWORD_HASH=` field.
 5. Fill in the remaining fields.
 6. Make sure to set the CLIENT_ORIGIN port to the PORT value. For example:
-
-```
-CLIENT_ORIGIN=http://localhost:3000
-PORT=3000
-```
+   ```
+   CLIENT_ORIGIN=http://localhost:3000
+   PORT=3000
+   ```
 
 Again, this is not necessary for local play.
