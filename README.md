@@ -38,3 +38,5 @@ To close this minor vulnerability:
 CLIENT_ORIGIN=http://localhost:3000
 PORT=3000
 ```
+
+Again, this is not necessary for local play.
