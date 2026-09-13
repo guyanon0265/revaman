@@ -15,7 +15,7 @@ services:
       - key: NODE_VERSION
         value: 22.11.0
       - key: CLIENT_ORIGIN
-        sync: false
+        value: https://revaman.onrender.com
       - key: ADMIN_UI_USERNAME
         sync: false
       - key: ADMIN_UI_PASSWORD_HASH
