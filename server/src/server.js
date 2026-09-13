@@ -30,6 +30,7 @@ app.use('/deck', express.static(BUILDER_DIR));
 const io = new Server(server, {
   cors: {
     origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
       if (origin === 'https://admin.socket.io') return callback(null, true);
       if (!CLIENT_ORIGIN) return callback(null, true);
       if (origin === CLIENT_ORIGIN) return callback(null, true);
