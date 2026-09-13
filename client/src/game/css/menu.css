@@ -503,13 +503,13 @@
   flex-direction: column;
 }
 
-.scrolling-grid ol a {
+.scrolling-grid a {
   color: inherit;
   text-decoration: none;
   font-weight: bold;
 }
 
-.scrolling-grid ol a:hover {
+.scrolling-grid a:hover {
   text-decoration: underline;
 }
 
