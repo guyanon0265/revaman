@@ -5,7 +5,7 @@ services:
     plan: free
     branch: main
     rootDir: .
-    buildCommand: npm install -g pnpm@11.12.0 && pnpm install --frozen-lockfile
+    buildCommand: npm install -g pnpm@11.22.0 && pnpm install --frozen-lockfile
     startCommand: node server/src/server.js
     healthCheckPath: /
     autoDeploy: true
@@ -13,7 +13,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: NODE_VERSION
-        value: 22.11.0
+        value: 24.15.0
       - key: CLIENT_ORIGIN
         value: https://revaman.onrender.com
       - key: ADMIN_UI_USERNAME
