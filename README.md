@@ -2,24 +2,32 @@
 
 Inspired by [xxmichaellong/ptcg-sim](https://github.com/xxmichaellong/ptcg-sim).
 
+Frontend: Standard HTML, CSS, JS  
+Backend: Node.js, Express.js, Socket.io
+
 This is mostly a proof-of-concept, rather than a finished product.
 
-### Running local multiplayer
+## Running Locally
 
-The repo has a built-in multiplayer function using untun, a Cloudflare tunneler.
+To run RevaMan locally:
 
 1. Clone the repo
 2. Run `pnpm install` to make sure all dependencies are present.
-3. Run `pnpm share` and paste the given link or QR code to let others connect via the tunnel.
+3. Run `pnpm start` to boot up a local server.
+
+### Local Multiplayer
+
+The repo has a built-in multiplayer function using untun, a Cloudflare tunneler.
+
+Simply run `pnpm share` and paste the given link or QR code to let others connect via the tunnel.
 
 Running `pnpm start` only starts the server locally. It does not establish a tunnel. `pnpm share` starts the server and establishes the tunnel. There is no need to run `pnpm start` before running `pnpm share`.
 
-## Note
+### Configuring Environment
 
-There is a fallback password for admin.socket.io functionality. This is a vulnerability for real deployment, but is safe for local testing and play.  
-See comment in `server/src/server.js`.
+There is a fallback password for testing admin.socket.io functionality. This is a vulnerability for real deployment if evironment variables are not configured. It is safe for local testing and play. See comment in `server/src/server.js`.
 
-To close this minor vulnerability:
+To close this minor vulnerability when running a local server:
 
 1. Create a file in root called `.env`
 2. Paste this blank template:
